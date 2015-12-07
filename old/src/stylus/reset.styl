@@ -1,0 +1,48 @@
+@import 'nib'
+@import '_variables'
+@import '_mixins'
+
+global-reset()
+
+html
+	-webkit-text-size-adjust   : 100%
+	-webkit-tap-highlight-color: rgba(0,0,0,0)
+
+	*
+		box-sizing             : border-box
+		-webkit-font-smoothing : antialiased
+		-moz-osx-font-smoothing: grayscale
+		
+	body
+	main
+		background-color: $black
+		color           : $white
+		overflow-x      : hidden
+		
+	main
+		absolute: top left
+		width   : 100%
+		
+		&.home
+			overflow: hidden
+			height  : 100%
+			
+		&.about
+			min-height: 950px
+		
+	img
+		max-width  : 100%
+		user-select: none
+		user-drag  : none
+		
+	span
+		display: inline-block
+		
+	::-webkit-scrollbar
+		width: 5px
+
+	::-webkit-scrollbar-track
+		background: $black
+
+	::-webkit-scrollbar-thumb
+		background: $white

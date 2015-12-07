@@ -1,0 +1,63 @@
+#about
+	
+	.background
+		fixed-fullscreen()
+	
+	.copy
+		absolute: top 10% left 8%
+		width   : 520px
+		cursor  : default
+			
+		.title
+			margin-bottom: 20px
+		
+		.description
+			margin-bottom: 20px
+			
+			a
+				font-weight: bold
+		
+		ul
+			li
+				h4
+					font-weight: bold
+					line-height: 26px
+				
+				p
+					margin-bottom: 15px
+					
+					a
+						font-weight: bold
+						
+		.contact
+			font-weight: bold
+			margin-bottom: 8px
+			
+		.email
+			display: inline-block
+			margin-bottom: 15px
+				
+		.social
+			display: inline-block
+			
+			a
+				display     : inline-block
+				width       : 20px
+				margin-right: 10px
+				transition  : opacity 0.15s $ease-in-out-quad
+				
+				&:hover
+					opacity: 1 !important
+				
+			&:hover a
+				opacity: 0.5
+				
+						
+	+mobile()
+		overflow: hidden
+			
+		.copy
+			relative  : top 80px left
+			width     : 100%
+			padding   : 0 20px 80px 20px
+		

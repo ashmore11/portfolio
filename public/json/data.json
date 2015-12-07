@@ -1,0 +1,201 @@
+{
+  "dolce-gabbana" : {
+    "assets" : [ {
+      "id" : "big-home-image",
+      "src" : "images/dolcegabbana/big-home-image.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-0",
+      "src" : "images/dolcegabbana/project-image-1.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-1",
+      "src" : "images/dolcegabbana/project-image-2.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-2",
+      "src" : "images/dolcegabbana/project-image-3.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-3",
+      "src" : "images/dolcegabbana/project-image-4.jpg",
+      "type" : "image"
+    } ],
+    "description" : "Task: Build a website to showcase Dolce & Gabbana's existing line of beauty products",
+    "id" : "dolce-gabbana",
+    "link" : "http://www.dolcegabbana.com/beauty",
+    "title" : "DOLCE & GABBANA",
+    "tools" : "Technologies: Coffeescript, Stylus and HTML",
+    "url" : "project/dolce-gabbana",
+    "video" : ""
+  },
+  "furla" : {
+    "assets" : [ {
+      "id" : "big-home-image",
+      "src" : "images/furla/big-home-image.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-0",
+      "src" : "images/furla/project-image-1.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-1",
+      "src" : "images/furla/project-image-3.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-2",
+      "src" : "images/furla/project-image-2.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-3",
+      "src" : "images/furla/project-image-4.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-4",
+      "src" : "images/furla/project-image-5.jpg",
+      "type" : "image"
+    } ],
+    "description" : "Task: Build the new brand site for Italian fashion brand, Furla",
+    "id" : "furla",
+    "link" : "http://www.furla.com",
+    "title" : "FURLA",
+    "tools" : "Technologies: Coffeescript, Stylus and HTML",
+    "url" : "project/furla",
+    "video" : ""
+  },
+  "hi-res" : {
+    "assets" : [ {
+      "id" : "big-home-image",
+      "src" : "images/hires/big-home-image.png",
+      "type" : "image"
+    }, {
+      "id" : "project-image-0",
+      "src" : "images/hires/project-image-1.png",
+      "type" : "image"
+    }, {
+      "id" : "project-image-1",
+      "src" : "images/hires/project-image-2.png",
+      "type" : "image"
+    }, {
+      "id" : "project-image-2",
+      "src" : "images/hires/project-image-3.png",
+      "type" : "image"
+    }, {
+      "id" : "project-image-3",
+      "src" : "images/hires/project-image-4.png",
+      "type" : "image"
+    } ],
+    "description" : "Task: Build a website to showcase the work of my previous company, Hi-ReS!",
+    "id" : "hi-res",
+    "link" : "http://hi-res.net",
+    "title" : "Hi-ReS!",
+    "tools" : "Technologies: Coffeescript, Node, Stylus and Jade",
+    "url" : "project/hi-res"
+  },
+  "hogan" : {
+    "assets" : [ {
+      "id" : "big-home-image",
+      "src" : "images/hogan/brand-site/big-home-image.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-0",
+      "src" : "images/hogan/brand-site/project-image-1.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-1",
+      "src" : "images/hogan/brand-site/project-image-2.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-2",
+      "src" : "images/hogan/brand-site/project-image-3.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-3",
+      "src" : "images/hogan/brand-site/project-image-4.jpg",
+      "type" : "image"
+    } ],
+    "description" : "Task: Build the new brand site for Italian fashion brand, Hogan",
+    "id" : "hogan",
+    "link" : "http://www.hogan.com",
+    "title" : "HOGAN",
+    "tools" : "Technologies: Coffeescript, Stylus, PHP and HTML",
+    "url" : "project/hogan",
+    "video" : ""
+  },
+  "hogan-atelier" : {
+    "assets" : [ {
+      "id" : "big-home-image",
+      "src" : "images/hogan/atelier/big-home-image.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-0",
+      "src" : "images/hogan/atelier/project-image-1.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-1",
+      "src" : "images/hogan/atelier/project-image-2.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-2",
+      "src" : "images/hogan/atelier/project-image-3.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-3",
+      "src" : "images/hogan/atelier/project-image-4.jpg",
+      "type" : "image"
+    } ],
+    "description" : "Task: Build an interactive website to showcase Hogan's new line of high-end footwear",
+    "id" : "hogan-atelier",
+    "link" : "http://www.hogan.com/en/atelier",
+    "title" : "HOGAN ATELIER",
+    "tools" : "Technologies: Coffeescript, Stylus and HTML",
+    "url" : "project/hogan-atelier",
+    "video" : "videos/hogan/atelier/animatik"
+  },
+  "noah" : {
+    "assets" : [ {
+      "id" : "big-home-image",
+      "src" : "images/noah/big-home-image.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-0",
+      "src" : "images/noah/project-image-1.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-1",
+      "src" : "images/noah/project-image-2.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-2",
+      "src" : "images/noah/project-image-3.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-3",
+      "src" : "images/noah/project-image-4.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-4",
+      "src" : "images/noah/project-image-5.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-5",
+      "src" : "images/noah/project-image-6.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-6",
+      "src" : "images/noah/project-image-7.jpg",
+      "type" : "image"
+    }, {
+      "id" : "project-image-7",
+      "src" : "images/noah/project-image-8.jpg",
+      "type" : "image"
+    } ],
+    "description" : "Task: Build the trailer and experience websites for the motion picture, NOAH, by American film studio, Paramount",
+    "id" : "noah",
+    "link" : "http://origin.noahmovie.com/",
+    "title" : "NOAH",
+    "tools" : "Technologies: Custom MVC Framework, Coffeescript, Stylus and Jade",
+    "url" : "project/noah",
+    "video" : ""
+  }
+}

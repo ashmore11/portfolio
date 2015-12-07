@@ -1,0 +1,31 @@
+include ../mixins/ui
+
+#project.page
+
+	.copy( layout="column" )
+		
+		h1.title {{ data.title }}
+
+		p.description {{ data.description }}
+
+		p.tools {{ data.tools }}
+
+		div.status.not-online( ng-if="!data.link" ) Status: Offline
+
+		div.status.live( ng-if="data.link" ) Status: Live - 
+
+			a.external-link( href="{{ data.link }}" target="_blank" ) Go to website
+
+	.video( ng-if="data.video" )
+		video(
+			controls
+			poster="images/_tmp/transparent.png"
+			style="background-image: url('{{ data.assets[0].src }}');"
+		)
+			source( ng-src="{{ data.video }}" type="video/mp4" )
+
+	.images( images-loaded use-progress-events="yes" )
+	
+		.image( ng-repeat="image in data.assets" ng-if="$index > 0" )
+
+			img( ng-src="{{ image.src }}" )

@@ -1,0 +1,11 @@
+header(id="header")
+  
+  ul
+
+    each link in navLinks
+      
+      li: a(href="#{link.href}") #{link.label}
+
+    if user
+
+      li: a(href="/keystone") Admin

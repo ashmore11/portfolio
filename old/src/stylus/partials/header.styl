@@ -1,0 +1,40 @@
+#header
+	absolute : top 20px left
+	width    : 100%
+	z-index  : 10000
+	
+	ul
+		text-align: center
+		
+		&.home
+			li.work a
+				cursor: default
+				
+				&:after
+					width: 100%
+					left : -1px
+		
+		&.about
+			
+			li.about a
+				cursor: default
+				
+				&:after
+					width: 100%
+					left : -1px
+		
+		li
+			display: inline-block
+			
+			&.logo
+				width         : 36px
+				margin        : 0 15px
+				opacity       : 0.9
+				perspective   : 200
+				vertical-align: middle
+			
+			a
+				color         : $white
+				display       : inline-block
+				text-transform: lowercase
+			

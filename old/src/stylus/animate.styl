@@ -1,0 +1,106 @@
+
+// TRANSITION OUT HOME //
+
+@keyframes transitionOutHome
+	
+	from
+		opacity  : 1 
+		transform: scale(1)
+	
+	to
+		opacity  : 0
+		transform: scale(1.08)
+
+// TRANSITION IN HOME //
+
+@keyframes transitionInHome
+	
+	from 
+		opacity  : 0
+		transform: translateY(-15%)
+	
+	to 
+		opacity  : 1
+		transform: translateY(0)
+	
+// TRANSITION OUT PROJECT //
+
+@keyframes transitionOutProject
+	
+	from
+		opacity  : 1 
+		transform: scale(1)
+	
+	to 
+		opacity  : 0
+		transform: scale(0.975)
+
+// TRANSITION IN PROJECT //
+
+@keyframes transitionInProject
+	
+	from 
+		opacity  : 0
+		transform: translateY(-2.5%)
+	
+	to 
+		opacity  : 1
+		transform: translateY(0)
+		
+// TRANSITION OUT ABOUT //
+
+@keyframes transitionOutAbout
+	
+	from
+		opacity  : 1 
+		transform: scale(1)
+	
+	to 
+		opacity  : 0
+		transform: scale(0.975)
+
+// TRANSITION IN ABOUT //
+
+@keyframes transitionInAbout
+	
+	from 
+		opacity  : 0
+		transform: translateY(-2.5%)
+	
+	to 
+		opacity  : 1
+		transform: translateY(0)
+	
+
+.ng-enter
+	z-index: 8888
+	
+.ng-leave
+	z-index: 9999
+
+main
+	transform-origin: 50%
+	
+	&.home
+
+		&.ng-enter
+			animation: transitionInHome 1s both $ease-out-sine 0.875s
+			
+		&.ng-leave
+			animation: transitionOutHome 1s both $ease-in-sine
+			
+	&.project
+
+		&.ng-enter
+			animation: transitionInProject 1s both $ease-out-sine 0.875s
+			
+		&.ng-leave
+			animation: transitionOutProject 1s both $ease-in-sine
+			
+	&.about
+
+		&.ng-enter
+			animation: transitionInAbout 1s both $ease-out-sine 0.875s
+			
+		&.ng-leave
+			animation: transitionOutAbout 1s both $ease-in-sine
