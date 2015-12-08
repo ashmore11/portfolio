@@ -41,14 +41,14 @@ export default class ParticleSystem {
 
 			const size = this.parameters[i][1];
 
-			this.materials[ i ] = new THREE.PointCloudMaterial({
+			this.materials[ i ] = new THREE.PointsMaterial({
 				size        : size,
 				map         : THREE.ImageUtils.loadTexture('images/_tmp/particle.jpg'),
 				blending    : THREE.NormalBlending,
 				transparent : true
 			});
 
-			const particle = new THREE.PointCloud(this.geometry, this.materials[i]);
+			const particle = new THREE.Points(this.geometry, this.materials[i]);
 
 			particle.rotation.x = Math.random() * 6;
 			particle.rotation.y = Math.random() * 6;
@@ -65,15 +65,15 @@ export default class ParticleSystem {
 	
 	update() {
 
-		const time = Date.now() * 0.00002;
+		// const time = Date.now() * 0.00002;
 
-		for(let i = 0; i < this.particles.length; i++) {
+		// for(let i = 0; i < this.particles.length; i++) {
 
-			const object = this.particles[i];
+		// 	const object = this.particles[i];
 
-			object.rotation.y = time * (i < 4 ? i + 1 : - (i + 1));
+		// 	object.rotation.y = time * (i < 4 ? i + 1 : - (i + 1));
 
-		}
+		// }
 
 	}
 

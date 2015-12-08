@@ -17208,7 +17208,11 @@
 	    (0, _happens2.default)(this);
 
 	    this.$el = (0, _jquery2.default)('#three-viewport');
-	    this.win = (0, _jquery2.default)(window);
+	    this.win = {
+	      el: (0, _jquery2.default)(window),
+	      w: (0, _jquery2.default)(window).width(),
+	      h: (0, _jquery2.default)(window).height()
+	    };
 
 	    _jquery2.default.get('json/data.json', function (data) {
 
@@ -17222,22 +17226,24 @@
 	    value: function init() {
 
 	      this.scene = new _three2.default.Scene();
-	      this.camera = new _three2.default.PerspectiveCamera(50, this.win.width() / this.win.height(), 0.1, 10000);
 	      this.scene.fog = new _three2.default.Fog(0x000000, 10, 10000);
+
+	      this.camera = new _three2.default.PerspectiveCamera(50, this.win.w / this.win.h, 0.1, 10000);
 	      this.controls = new _orbitControls2.default(this.scene, this.camera);
+
 	      this.particles = new _particleSystem2.default(this.scene);
 	      this.projects = new _projectSphere2.default(this.data, this.scene, this.camera);
 
 	      this.renderer = new _three2.default.WebGLRenderer({ antialias: true });
-	      this.renderer.setSize(window.innerWidth, window.innerHeight);
+	      this.renderer.setSize(this.win.w, this.win.h);
 	      this.renderer.setClearColor(0x000000);
 	      this.$el.append(this.renderer.domElement);
 
-	      this.scene.add(this.camera);
+	      this.animate_camera_pos();
 
-	      this.cam_tween_complete = true;
-	      this.camera.position.set(0, 25, 1000);
-	      this.controls.pos.x = -0.00025;
+	      // this.cam_tween_complete = true;
+	      // this.camera.position.set(0, 25, 1000);
+	      // this.controls.pos.x = -0.00025;
 
 	      this.animate();
 	    }
@@ -17274,8 +17280,8 @@
 	    key: 'resize',
 	    value: function resize() {
 
-	      this.renderer.setSize(window.innerWidth, window.innerHeight);
-	      this.camera.aspect = window.innerWidth / window.innerHeight;
+	      this.renderer.setSize(this.win.w, this.win.h);
+	      this.camera.aspect = this.win.w / this.win.h;
 
 	      this.camera.updateProjectionMatrix();
 	    }
@@ -17292,14 +17298,10 @@
 	    value: function update() {
 
 	      this.renderer.render(this.scene, this.camera);
+
 	      _tween2.default.update();
 
-	      if (this.cam_tween_complete) {
-
-	        this.controls.update();
-	      }
-
-	      this.controls.watchTarget();
+	      this.controls.update();
 	      this.particles.update();
 	      this.projects.update();
 	    }
@@ -54673,14 +54675,14 @@
 
 				var size = this.parameters[i][1];
 
-				this.materials[i] = new _three2.default.PointCloudMaterial({
+				this.materials[i] = new _three2.default.PointsMaterial({
 					size: size,
 					map: _three2.default.ImageUtils.loadTexture('images/_tmp/particle.jpg'),
 					blending: _three2.default.NormalBlending,
 					transparent: true
 				});
 
-				var particle = new _three2.default.PointCloud(this.geometry, this.materials[i]);
+				var particle = new _three2.default.Points(this.geometry, this.materials[i]);
 
 				particle.rotation.x = Math.random() * 6;
 				particle.rotation.y = Math.random() * 6;
@@ -54696,14 +54698,16 @@
 			key: 'update',
 			value: function update() {
 
-				var time = Date.now() * 0.00002;
+				// const time = Date.now() * 0.00002;
 
-				for (var i = 0; i < this.particles.length; i++) {
+				// for(let i = 0; i < this.particles.length; i++) {
 
-					var object = this.particles[i];
+				// 	const object = this.particles[i];
 
-					object.rotation.y = time * (i < 4 ? i + 1 : -(i + 1));
-				}
+				// 	object.rotation.y = time * (i < 4 ? i + 1 : - (i + 1));
+
+				// }
+
 			}
 		}]);
 
@@ -54744,9 +54748,10 @@
 		function OrbitControls(scene, camera) {
 			_classCallCheck(this, OrbitControls);
 
+			this.$el = (0, _jquery2.default)('#three-viewport');
+
 			this.scene = scene;
 			this.camera = camera;
-			this.doc = (0, _jquery2.default)(document);
 
 			this.pivot = null;
 			this.tween = null;
@@ -54768,19 +54773,19 @@
 			key: 'bind',
 			value: function bind() {
 
-				this.doc.on('mousemove', this.mouseMove.bind(this));
-				this.doc.on('touchstart', this.touchStart.bind(this));
-				this.doc.on('touchmove', this.touchMove.bind(this));
-				this.doc.on('touchend', this.touchEnd.bind(this));
+				this.$el.on('mousemove', this.mouseMove.bind(this));
+				this.$el.on('touchstart', this.touchStart.bind(this));
+				this.$el.on('touchmove', this.touchMove.bind(this));
+				this.$el.on('touchend', this.touchEnd.bind(this));
 			}
 		}, {
 			key: 'unbind',
 			value: function unbind() {
 
-				this.doc.off('mousemove', this.mouseMove.bind(this));
-				this.doc.off('touchstart', this.touchStart.bind(this));
-				this.doc.off('touchmove', this.touchMove.bind(this));
-				this.doc.off('touchend', this.touchEnd.bind(this));
+				this.$el.off('mousemove');
+				this.$el.off('touchstart');
+				this.$el.off('touchmove');
+				this.$el.off('touchend');
 			}
 		}, {
 			key: 'mouseMove',
@@ -54830,6 +54835,8 @@
 			value: function update() {
 
 				this.pivot.rotation.y = this.pivot.rotation.y - this.pos.x;
+
+				this.watchTarget();
 			}
 		}]);
 

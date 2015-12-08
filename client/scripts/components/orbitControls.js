@@ -6,9 +6,10 @@ export default class OrbitControls {
 
 	constructor(scene, camera) {
 
+		this.$el = $('#three-viewport');
+
 		this.scene  = scene;
 		this.camera = camera;
-		this.doc    = $(document);
 
 		this.pivot = null;
 		this.tween = null;
@@ -29,19 +30,19 @@ export default class OrbitControls {
 	
 	bind() {
 
-		this.doc.on('mousemove',  this.mouseMove.bind(this));
-		this.doc.on('touchstart', this.touchStart.bind(this));
-		this.doc.on('touchmove',  this.touchMove.bind(this));
-		this.doc.on('touchend',   this.touchEnd.bind(this));
+		this.$el.on('mousemove',  this.mouseMove.bind(this));
+		this.$el.on('touchstart', this.touchStart.bind(this));
+		this.$el.on('touchmove',  this.touchMove.bind(this));
+		this.$el.on('touchend',   this.touchEnd.bind(this));
 
 	}
 
 	unbind() {
 
-		this.doc.off('mousemove',  this.mouseMove.bind(this));
-		this.doc.off('touchstart', this.touchStart.bind(this));
-		this.doc.off('touchmove',  this.touchMove.bind(this));
-		this.doc.off('touchend',   this.touchEnd.bind(this));
+		this.$el.off('mousemove');
+		this.$el.off('touchstart');
+		this.$el.off('touchmove');
+		this.$el.off('touchend');
 
 	}
 
@@ -89,6 +90,8 @@ export default class OrbitControls {
 	update() {
 			
 		this.pivot.rotation.y = this.pivot.rotation.y - this.pos.x;
+
+		this.watchTarget();
 
 	}
 
