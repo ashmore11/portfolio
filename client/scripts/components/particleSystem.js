@@ -61,19 +61,18 @@ export default class ParticleSystem {
 		}
 
 	}
-
 	
 	update() {
 
-		// const time = Date.now() * 0.00002;
+		const time = Date.now() * 0.00002;
 
-		// for(let i = 0; i < this.particles.length; i++) {
+		for(let i = 0; i < this.particles.length; i++) {
 
-		// 	const object = this.particles[i];
+			const object = this.particles[i];
 
-		// 	object.rotation.y = time * (i < 4 ? i + 1 : - (i + 1));
+			object.rotation.y = time * (i < 4 ? i + 1 : - (i + 1));
 
-		// }
+		}
 
 	}
 

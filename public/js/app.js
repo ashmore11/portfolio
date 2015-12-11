@@ -56,7 +56,7 @@
 
 	var _home2 = _interopRequireDefault(_home);
 
-	var _example = __webpack_require__(12);
+	var _example = __webpack_require__(13);
 
 	var _example2 = _interopRequireDefault(_example);
 
@@ -17183,15 +17183,19 @@
 
 	var _happens2 = _interopRequireDefault(_happens);
 
-	var _projectSphere = __webpack_require__(9);
+	var _window = __webpack_require__(9);
+
+	var _window2 = _interopRequireDefault(_window);
+
+	var _projectSphere = __webpack_require__(10);
 
 	var _projectSphere2 = _interopRequireDefault(_projectSphere);
 
-	var _particleSystem = __webpack_require__(10);
+	var _particleSystem = __webpack_require__(11);
 
 	var _particleSystem2 = _interopRequireDefault(_particleSystem);
 
-	var _orbitControls = __webpack_require__(11);
+	var _orbitControls = __webpack_require__(12);
 
 	var _orbitControls2 = _interopRequireDefault(_orbitControls);
 
@@ -17228,34 +17232,36 @@
 	      this.scene = new _three2.default.Scene();
 	      this.scene.fog = new _three2.default.Fog(0x000000, 10, 10000);
 
-	      this.camera = new _three2.default.PerspectiveCamera(50, this.win.w / this.win.h, 0.1, 10000);
+	      this.camera = new _three2.default.PerspectiveCamera(50, _window2.default.width / _window2.default.height, 0.1, 10000);
 	      this.controls = new _orbitControls2.default(this.scene, this.camera);
 
 	      this.particles = new _particleSystem2.default(this.scene);
 	      this.projects = new _projectSphere2.default(this.data, this.scene, this.camera);
 
 	      this.renderer = new _three2.default.WebGLRenderer({ antialias: true });
-	      this.renderer.setSize(this.win.w, this.win.h);
+	      this.renderer.setSize(_window2.default.width, _window2.default.height);
 	      this.renderer.setClearColor(0x000000);
+
 	      this.$el.append(this.renderer.domElement);
 
-	      this.animate_camera_pos();
+	      // this.animateCameraPos();
 
-	      // this.cam_tween_complete = true;
-	      // this.camera.position.set(0, 25, 1000);
-	      // this.controls.pos.x = -0.00025;
+	      this.camTweenComplete = true;
+	      this.camera.position.set(0, 25, 1000);
+	      this.controls.pos.x = -0.00025;
 
-	      this.animate();
+	      this.render();
+	      this.bind();
 	    }
 	  }, {
 	    key: 'bind',
 	    value: function bind() {
 
-	      this.win.on('resize', this.resize.bind(this));
+	      _window2.default.on('resize', this.resize.bind(this));
 	    }
 	  }, {
-	    key: 'animate_camera_pos',
-	    value: function animate_camera_pos() {
+	    key: 'animateCameraPos',
+	    value: function animateCameraPos() {
 	      var _this2 = this;
 
 	      this.camera.position.set(0, 2500, 5000);
@@ -17267,7 +17273,7 @@
 	      tween.to({ y: 25 }, 5000);
 	      tween.easing(_tween2.default.Easing.Sinusoidal.InOut);
 	      tween.onComplete(function () {
-	        _this2.cam_tween_complete = true;
+	        _this2.camTweenComplete = true;
 	      });
 	      tween.start();
 
@@ -17280,24 +17286,24 @@
 	    key: 'resize',
 	    value: function resize() {
 
-	      this.renderer.setSize(this.win.w, this.win.h);
-	      this.camera.aspect = this.win.w / this.win.h;
+	      this.renderer.setSize(_window2.default.width, _window2.default.height);
+	      this.camera.aspect = _window2.default.width / _window2.default.height;
 
 	      this.camera.updateProjectionMatrix();
 	    }
 	  }, {
-	    key: 'animate',
-	    value: function animate() {
+	    key: 'render',
+	    value: function render() {
 
-	      this.RAF = requestAnimationFrame(this.animate.bind(this));
+	      this.RAF = requestAnimationFrame(this.render.bind(this));
+
+	      this.renderer.render(this.scene, this.camera);
 
 	      this.update();
 	    }
 	  }, {
 	    key: 'update',
 	    value: function update() {
-
-	      this.renderer.render(this.scene, this.camera);
 
 	      _tween2.default.update();
 
@@ -54411,6 +54417,104 @@
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
+	var _happens = __webpack_require__(2);
+
+	var _happens2 = _interopRequireDefault(_happens);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Window = (function () {
+		function Window() {
+			_classCallCheck(this, Window);
+
+			(0, _happens2.default)(this);
+
+			this.window = (0, _jquery2.default)(window);
+			this.width = 0;
+			this.height = 0;
+
+			this.resize();
+			this.bind();
+		}
+
+		_createClass(Window, [{
+			key: 'bind',
+			value: function bind() {
+
+				this.window.on('resize', this.resize.bind(this));
+				this.window.on('keydown', this.keydown.bind(this));
+			}
+		}, {
+			key: 'resize',
+			value: function resize() {
+
+				this.width = this.window.width();
+				this.height = this.window.height();
+
+				this.emit('resize');
+			}
+		}, {
+			key: 'keydown',
+			value: function keydown(event) {
+
+				var code = event.keyCode;
+				var key = null;
+
+				switch (event.keyCode) {
+
+					case 38:
+
+						key = 'up';
+
+						break;
+
+					case 40:
+
+						key = 'down';
+
+						break;
+
+					case 37:
+
+						key = 'left';
+
+						break;
+
+					case 39:
+
+						key = 'right';
+
+						break;
+
+				}
+
+				this.emit('keydown', key);
+			}
+		}]);
+
+		return Window;
+	})();
+
+	exports.default = new Window();
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _jquery = __webpack_require__(5);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
 	var _three = __webpack_require__(7);
 
 	var _three2 = _interopRequireDefault(_three);
@@ -54622,7 +54726,7 @@
 	exports.default = ProjectSphere;
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -54698,16 +54802,14 @@
 			key: 'update',
 			value: function update() {
 
-				// const time = Date.now() * 0.00002;
+				var time = Date.now() * 0.00002;
 
-				// for(let i = 0; i < this.particles.length; i++) {
+				for (var i = 0; i < this.particles.length; i++) {
 
-				// 	const object = this.particles[i];
+					var object = this.particles[i];
 
-				// 	object.rotation.y = time * (i < 4 ? i + 1 : - (i + 1));
-
-				// }
-
+					object.rotation.y = time * (i < 4 ? i + 1 : -(i + 1));
+				}
 			}
 		}]);
 
@@ -54717,7 +54819,7 @@
 	exports.default = ParticleSystem;
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -54846,7 +54948,7 @@
 	exports.default = OrbitControls;
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports) {
 
 	'use strict';

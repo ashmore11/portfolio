@@ -30,7 +30,6 @@ export default class ProjectSphere {
 		this.createProjects();
 
 	}
-		
 
 	bind() {
 		
@@ -39,14 +38,12 @@ export default class ProjectSphere {
 
 	}
 
-
 	unbind() {
 		
 		this.el.off('mousemove touchmove', this.sceneMouseMove.bind(this));
 		this.el.off('mousedown touchstart', this.projectMouseDown.bind(this));
 
 	}
-
 
 	createProjects() {
 
@@ -88,7 +85,6 @@ export default class ProjectSphere {
 
 	}
 
-
 	fadeInProject(object) {
 
 		const tween = new TWEEN.Tween(object.material);
@@ -98,7 +94,6 @@ export default class ProjectSphere {
 
 	}
 
-
 	fadeOutProject(object) {
 
 		const tween = new TWEEN.Tween(object.material);
@@ -107,7 +102,6 @@ export default class ProjectSphere {
 		tween.start();
 
 	}
-
 
 	sceneMouseMove(event) {
 
@@ -122,7 +116,6 @@ export default class ProjectSphere {
 		};
 
 	}
-
 
 	projectMouseDown(event) {
 
@@ -146,7 +139,6 @@ export default class ProjectSphere {
 
 	}
 
-
 	projectMouseOver() {
 
 		$('#home h1').html(this.intersected.title);
@@ -159,7 +151,6 @@ export default class ProjectSphere {
 
 	}
 
-	
 	projectMouseOut() {
 
 		if(this.intersected) {
@@ -173,7 +164,6 @@ export default class ProjectSphere {
 		}
 
 	}
-
 
 	update() {
 
