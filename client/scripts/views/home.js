@@ -1,19 +1,17 @@
 import $              from 'jquery';
 import THREE          from 'three';
 import TWEEN          from 'tween.js';
-import Happens        from 'happens';
 import Win            from 'app/utils/window';
 import ProjectSphere  from 'app/components/projectSphere';
 import ParticleSystem from 'app/components/particleSystem';
 import OrbitControls  from 'app/components/orbitControls';
+import GET            from 'app/utils/request';
 
 const Home = {
 
   $el: $('#three-viewport'),
-  win: {
-    w : $(window).width(),
-    h : $(window).height()
-  },
+
+  projectSphere: ProjectSphere,
   controls: OrbitControls,
   particles: ParticleSystem,
 
@@ -21,14 +19,19 @@ const Home = {
 
 Home.init = function init() {
 
-  Happens(this);
+  const host = window.location.origin;
+  const url  = `${host}/api/posts`;
 
-  $.get('json/data.json', data => {
+  GET(url).then(response => {
 
-    this.data = data;
+    this.data = JSON.parse(response).filter(item => {
+
+      return item.state === 'published';
+      
+    })
 
     this.initScene();
-
+  
   });
 
 };
@@ -40,10 +43,9 @@ Home.initScene = function initScene() {
 
   this.camera = new THREE.PerspectiveCamera(50, Win.width / Win.height, 0.1, 10000);
   
+  this.projectSphere.init(this.data, this.scene, this.camera);
   this.controls.init(this.scene, this.camera);
   this.particles.init(this.scene);
-
-  this.projects = new ProjectSphere(this.data, this.scene, this.camera);
   
   this.renderer = new THREE.WebGLRenderer({ antialias: true });
   this.renderer.setSize(Win.width, Win.height);
@@ -119,13 +121,13 @@ Home.update = function update() {
   
   this.controls.update();
   this.particles.update();
-  this.projects.update();
+  this.projectSphere.update();
 
 };
 
 Home.destroy = function destroy() {
 
-  this.projects.unbind();
+  this.projectSphere.unbind();
   this.controls.unbind();
   this.unbind();
 

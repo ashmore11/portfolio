@@ -6,7 +6,7 @@ var Post     = keystone.list('Post');
  */
 exports.get = function(req, res) {
 
-  Post.model.findOne({ slug: req.params.slug }).exec(function(err, item) {
+  Post.model.find().exec(function(err, item) {
     
     if(err) {
       return res.apiError('database error', err);
@@ -15,10 +15,8 @@ exports.get = function(req, res) {
     if(!item) {
       return res.apiError('not found');
     }
-    
-    var post = { post: item };
 
-    res.apiResponse(post);
+    res.apiResponse(item);
     
   });
 

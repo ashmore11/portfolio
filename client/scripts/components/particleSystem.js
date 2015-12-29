@@ -1,4 +1,6 @@
-import THREE from 'three';
+import THREE               from 'three';
+import { times as _times } from 'underscore';
+import TextureLoader       from 'app/utils/textureLoader';
 
 const ParticleSystem = {
 
@@ -29,7 +31,7 @@ ParticleSystem.init = function init(scene) {
 
 ParticleSystem.pushVertices = function pushVertices() {
 
-	for(let i = 0; i < this.count; i++) {
+	_times(this.count, n => {
 
 		const vertex = new THREE.Vector3();
 
@@ -39,7 +41,7 @@ ParticleSystem.pushVertices = function pushVertices() {
 
 		this.geometry.vertices.push(vertex);
 
-	}
+	});
 
 };
 
@@ -51,7 +53,7 @@ ParticleSystem.createParticles = function createParticles() {
 
 		this.materials[index] = new THREE.PointsMaterial({
 			size        : size,
-			map         : THREE.ImageUtils.loadTexture('images/_tmp/particle.jpg'),
+			map         : TextureLoader('images/_tmp/particle.jpg'),
 			blending    : THREE.NormalBlending,
 			transparent : true
 		});

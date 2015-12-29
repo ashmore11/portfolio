@@ -67,7 +67,7 @@ OrbitControls.touchStart = function touchStart() {
 
 OrbitControls.touchMove = function touchMove() {
 
-	if(tween) { tween.stop(); }
+	if(this.tween) this.tween.stop();
 
 	this.pos.x = event.originalEvent.touches[0].pageX;
 	this.pos.x = this.pos.x - this.pos.a;
@@ -78,11 +78,12 @@ OrbitControls.touchMove = function touchMove() {
 OrbitControls.touchEnd = function touchEnd() {
 
 	const duration = Math.round(Math.abs(this.pos.x * 100000));
-	const tween    = new TWEEN.Tween(this.pos);
+	
+	this.tween = new TWEEN.Tween(this.pos);
 
-	tween.to({ x: 0 }, duration);
-	tween.easing(TWEEN.Easing.Sinusoidal.Out);
-	tween.start();
+	this.tween.to({ x: 0 }, duration);
+	this.tween.easing(TWEEN.Easing.Sinusoidal.Out);
+	this.tween.start();
 
 };
 
