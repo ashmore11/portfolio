@@ -1,74 +1,75 @@
 import $       from 'jquery';
 import Happens from 'happens';
 
-class Window {
+const Window = {
 
-	constructor() {
+	window: $(window),
+	width: 0,
+	height: 0,
 
-		Happens(this);
+};
 
-		this.window = $(window);
-		this.width  = 0;
-		this.height = 0;
+Window.init = function init() {
 
-		this.resize();
-		this.bind();
+	Happens(this);
 
-	}
+	this.resize();
+	this.bind();
 
-	bind() {
+};
 
-		this.window.on('resize', this.resize.bind(this));
-		this.window.on('keydown', this.keydown.bind(this));
+Window.bind = function bind() {
 
-	}
+	this.window.on('resize', this.resize.bind(this));
+	this.window.on('keydown', this.keydown.bind(this));
 
-	resize() {
+};
 
-		this.width  = this.window.width();
-		this.height = this.window.height();
+Window.resize = function resize() {
 
-		this.emit('resize');
+	this.width  = this.window.width();
+	this.height = this.window.height();
 
-	}
+	this.emit('resize');
 
-	keydown(event) {
+};
 
-		const code = event.keyCode;
-		let key    = null;
+Window.keydown = function keydown(event) {
 
-		switch(event.keyCode) {
+	let key = null;
 
-			case 38:
+	switch(event.keyCode) {
 
-				key = 'up';
-			
-				break;
+		case 38:
 
-			case 40:
+			key = 'up';
+		
+			break;
 
-				key = 'down';
-			
-				break;
+		case 40:
 
-			case 37:
+			key = 'down';
+		
+			break;
 
-				key = 'left';
-			
-				break;
+		case 37:
 
-			case 39:
+			key = 'left';
+		
+			break;
 
-				key = 'right';
-			
-				break;
+		case 39:
 
-		}
-
-		this.emit('keydown', key);
+			key = 'right';
+		
+			break;
 
 	}
 
-}
+	this.emit('keydown', key);
 
-export default new Window();
+};
+
+Window.init();
+
+export default Window;

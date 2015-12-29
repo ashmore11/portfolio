@@ -11,9 +11,9 @@ const App = {
 
 	init: function init() {
 
-		const nav = new Navigation();
+		Navigation.init();
 
-		nav.on('url:changed', id => {
+		Navigation.on('url:changed', id => {
 			
 			if(this.view) {
 				
@@ -26,7 +26,7 @@ const App = {
 
 		});
 
-		nav.init();
+		Navigation.start();
 
 	},
 

@@ -1,38 +1,32 @@
 import $             from 'jquery';
 import THREE         from 'three';
 import TWEEN         from 'tween.js';
+import Win           from 'app/utils/window';
 import TextureLoader from 'app/utils/textureLoader';
 
 const ProjectSphere = {
 
-	data   : null,
-	scene  : null,
-	camera : null,
-	el     : $('#three-viewport'),
-	win    : $(window),
-
-	raycaster  : null,
-	camera_pos : null,
-
-	pos : {
+	$el: $('#three-viewport'),
+	data: null,
+	scene: null,
+	camera: null,
+	pos: {
 		x: 0,
 		y: 0
 	},
-
-	spheres     : [],
-	intersected : null,
-
-	raycaster  : new THREE.Raycaster(),
-	camera_pos : new THREE.Vector3(),
-
+	spheres: [],
+	intersected: null,
+	raycaster: new THREE.Raycaster,
+	camera_pos: new THREE.Vector3,
 	project: {
-		radius: 3000,
-		widthSegments: 16,
+		radiusTop: 3000,
+		radiusBottom: 3000,
+		height: 1200,
+		radiusSegments: 16,
 		heightSegments: 16,
-		phiStart: 0,
-		phiLength: Math.PI / 4.5,
-		thetaStart: 4.5,
-		thetaLength: Math.PI / 8,
+		openEnded: true,
+		thetaStart: 0,
+		thetaLength: Math.PI / 4.5,
 	},
 
 };
@@ -50,43 +44,42 @@ ProjectSphere.init = function init(data, scene, camera) {
 
 ProjectSphere.bind = function bind() {
 	
-	this.el.on('mousemove touchmove', this.sceneMouseMove.bind(this));
-	this.el.on('mousedown touchstart', this.projectMouseDown.bind(this));
+	this.$el.on('mousemove touchmove', this.sceneMouseMove.bind(this));
+	this.$el.on('mousedown touchstart', this.projectMouseDown.bind(this));
 
 }
 
 ProjectSphere.unbind = function unbind() {
 	
-	this.el.off('mousemove touchmove', this.sceneMouseMove.bind(this));
-	this.el.off('mousedown touchstart', this.projectMouseDown.bind(this));
+	this.$el.off('mousemove touchmove', this.sceneMouseMove.bind(this));
+	this.$el.off('mousedown touchstart', this.projectMouseDown.bind(this));
 
 }
 
 ProjectSphere.createProjects = function createProjects() {
 
 	const target   = new THREE.Vector3();
-	const geometry = new THREE.SphereGeometry(
-		this.project.radius, 
-		this.project.widthSegments,
-		this.project.heightSegments, 
-		this.project.phiStart, 
-		this.project.phiLength, 
-		this.project.thetaStart, 
+	const geometry = new THREE.CylinderGeometry(
+		this.project.radiusTop,
+		this.project.radiusBottom,
+		this.project.height,
+		this.project.radiusSegments,
+		this.project.heightSegments,
+		this.project.openEnded,
+		this.project.thetaStart,
 		this.project.thetaLength
-	);
+	)
 
 	this.data.forEach((item, index) => {
 
 		const texture = TextureLoader(item.featuredImage.url);
 		
 		texture.minFilter = THREE.LinearFilter;
-		texture.flipY     = false;
 
 		const material = new THREE.MeshBasicMaterial({
 			map         : texture,
 			transparent : true,
-			opacity     : 0.5,
-			wireframe   : false
+			opacity     : 0.5
 		});
 
 		const project = new THREE.Mesh(geometry, material);
@@ -136,8 +129,8 @@ ProjectSphere.sceneMouseMove = function sceneMouseMove(event) {
 	}
 
 	this.pos = {
-		x:   ( evt.x / this.win.width()  ) * 2 - 1,
-		y: - ( evt.y / this.win.height() ) * 2 + 1
+		x:   ( evt.x / Win.width  ) * 2 - 1,
+		y: - ( evt.y / Win.height ) * 2 + 1
 	};
 
 }
@@ -150,8 +143,8 @@ ProjectSphere.projectMouseDown = function projectMouseDown(event) {
 	};
 
 	this.pos = {
-		x:   ( evt.x / this.win.width()  ) * 2 - 1,
-		y: - ( evt.y / this.win.height() ) * 2 + 1
+		x:   ( evt.x / Win.width  ) * 2 - 1,
+		y: - ( evt.y / Win.height ) * 2 + 1
 	};
 
 	const intersects = this.raycaster.intersectObjects(this.spheres);
@@ -172,7 +165,7 @@ ProjectSphere.projectMouseOver = function projectMouseOver() {
 	
 	this.fadeInProject(this.intersected);
 
-	this.el.css({ cursor: 'pointer' });
+	this.$el.css({ cursor: 'pointer' });
 
 }
 
@@ -182,7 +175,7 @@ ProjectSphere.projectMouseOut = function projectMouseOut() {
 		
 		this.fadeOutProject(this.intersected);
 
-		this.el.css({ cursor: 'ew-resize' });
+		this.$el.css({ cursor: 'ew-resize' });
 
 		TweenMax.to($('#home h1'), 0.5, { autoAlpha: 0, y: 0, scale: 0.9 });
 
@@ -209,7 +202,7 @@ ProjectSphere.update = function update() {
 
 		this.intersected = intersects[ 0 ].object;
 
-		if(!this.win.width() < 768) {
+		if(!Win.width < 768) {
 		
 			this.projectMouseOver();
 
@@ -217,7 +210,7 @@ ProjectSphere.update = function update() {
 
 	} else {
 
-		if(!this.win.width() < 768) {
+		if(!Win.width < 768) {
 
 			this.projectMouseOut();
 

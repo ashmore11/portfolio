@@ -2,7 +2,7 @@ const Request = function Request(url) {
 
   return new Promise((resolve, reject) => {
     
-    const req = new XMLHttpRequest();
+    const req = new XMLHttpRequest;
 
     req.open('GET', url);
 

@@ -70,9 +70,9 @@
 		init: function init() {
 			var _this = this;
 
-			var nav = new _navigation2.default();
+			_navigation2.default.init();
 
-			nav.on('url:changed', function (id) {
+			_navigation2.default.on('url:changed', function (id) {
 
 				if (_this.view) {
 
@@ -83,7 +83,7 @@
 				_this.renderView(id);
 			});
 
-			nav.init();
+			_navigation2.default.start();
 		},
 
 		renderView: function renderView(id) {
@@ -103,8 +103,6 @@
 
 	'use strict';
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
@@ -123,130 +121,118 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	var Navigation = {
 
-	var Navigation = (function () {
-		function Navigation() {
-			_classCallCheck(this, Navigation);
+		$el: (0, _jquery2.default)('#main'),
+		popEventListnerAdded: false,
+		url: null,
+		id: null
 
-			(0, _happens2.default)(this);
+	};
+
+	Navigation.init = function init() {
+
+		(0, _happens2.default)(this);
+	};
+
+	Navigation.start = function start() {
+
+		this.id = this.$el[0].children[0].id;
+
+		this.emit('url:changed', this.id);
+
+		this.bindEvents();
+	};
+
+	Navigation.bindEvents = function bindEvents() {
+
+		(0, _jquery2.default)('body').find('a').on('click', this.navigate.bind(this));
+	};
+
+	Navigation.navigate = function navigate(event) {
+
+		event.preventDefault();
+
+		var target = (0, _jquery2.default)(event.target);
+		var url = target.attr('href');
+
+		if (url === '/keystone') {
+
+			window.location = url;
+
+			return;
+		} else if (this.url !== url) {
+
+			this.url = url;
+			this.id = target.text().toLowerCase();
+		} else {
+
+			return;
 		}
 
-		_createClass(Navigation, [{
-			key: 'init',
-			value: function init() {
+		this.fadeOut();
+		this.pushState();
 
-				this.popEventListnerAdded = false;
+		if (!this.popEventListnerAdded) {
 
-				this.$main = (0, _jquery2.default)('#main');
+			this.popState();
+		}
+	};
 
-				this.id = this.$main[0].children[0].id;
+	Navigation.fadeOut = function fadeOut() {
+		var _this = this;
 
-				this.emit('url:changed', this.id);
-
-				this.bindEvents();
+		var params = {
+			autoAlpha: 0,
+			ease: Power1.easeOut,
+			onComplete: function onComplete() {
+				_this.loadPage();
 			}
-		}, {
-			key: 'bindEvents',
-			value: function bindEvents() {
+		};
 
-				(0, _jquery2.default)('body').find('a').on('click', this.navigate.bind(this));
-			}
-		}, {
-			key: 'navigate',
-			value: function navigate(event) {
+		_gsap2.default.to(this.$el, 0.25, params);
+	};
 
-				event.preventDefault();
+	Navigation.fadeIn = function fadeIn() {
 
-				var target = (0, _jquery2.default)(event.target);
-				var url = target.attr('href');
+		var params = {
+			autoAlpha: 1,
+			ease: Power1.easeInOut
+		};
 
-				if (url === '/keystone') {
+		_gsap2.default.to(this.$el, 0.25, params);
+	};
 
-					window.location = url;
+	Navigation.loadPage = function loadPage() {
+		var _this2 = this;
 
-					return;
-				} else if (this.url !== url) {
+		this.$el.load(this.url + ' .page', null, function () {
 
-					this.url = url;
-					this.id = target.text().toLowerCase();
-				} else {
+			_this2.emit('url:changed', _this2.id);
 
-					return;
-				}
+			_this2.fadeIn();
+		});
+	};
 
-				this.fadeOut();
-				this.pushState();
+	Navigation.pushState = function pushState() {
 
-				if (!this.popEventListnerAdded) {
+		history.pushState(this.url, null, this.url);
+	};
 
-					this.popState();
-				}
-			}
-		}, {
-			key: 'fadeOut',
-			value: function fadeOut() {
-				var _this = this;
+	Navigation.popState = function popState() {
+		var _this3 = this;
 
-				var params = {
-					autoAlpha: 0,
-					ease: Power1.easeOut,
-					onComplete: function onComplete() {
-						_this.loadPage();
-					}
-				};
+		(0, _jquery2.default)(window).on('popstate', function (event) {
 
-				_gsap2.default.to(this.$main, 0.25, params);
-			}
-		}, {
-			key: 'fadeIn',
-			value: function fadeIn() {
+			var state = event.originalEvent.state;
 
-				var params = {
-					autoAlpha: 1,
-					ease: Power1.easeInOut
-				};
+			_this3.url = state;
 
-				_gsap2.default.to(this.$main, 0.25, params);
-			}
-		}, {
-			key: 'loadPage',
-			value: function loadPage() {
-				var _this2 = this;
+			_this3.popEventListnerAdded = true;
 
-				this.$main.load(this.url + ' .page', null, function () {
-
-					_this2.emit('url:changed', _this2.id);
-
-					_this2.fadeIn();
-				});
-			}
-		}, {
-			key: 'pushState',
-			value: function pushState() {
-
-				history.pushState(this.url, null, this.url);
-			}
-		}, {
-			key: 'popState',
-			value: function popState() {
-				var _this3 = this;
-
-				(0, _jquery2.default)(window).on('popstate', function (event) {
-
-					var state = event.originalEvent.state;
-
-					_this3.url = state;
-
-					_this3.popEventListnerAdded = true;
-
-					_this3.fadeOut();
-				});
-			}
-		}]);
-
-		return Navigation;
-	})();
+			_this3.fadeOut();
+		});
+	};
 
 	exports.default = Navigation;
 
@@ -17274,20 +17260,18 @@
 	  this.camera.position.set(0, 2500, 5000);
 	  this.controls.pos.x = -0.00025;
 
-	  var tween = undefined;
-
-	  tween = new _tween2.default.Tween(this.camera.position);
-	  tween.to({ y: 25 }, 5000);
-	  tween.easing(_tween2.default.Easing.Sinusoidal.InOut);
-	  tween.onComplete(function () {
+	  var tweenCamY = new _tween2.default.Tween(this.camera.position);
+	  tweenCamY.to({ y: 25 }, 5000);
+	  tweenCamY.easing(_tween2.default.Easing.Sinusoidal.InOut);
+	  tweenCamY.onComplete(function () {
 	    _this2.camTweenComplete = true;
 	  });
-	  tween.start();
+	  tweenCamY.start();
 
-	  tween = new _tween2.default.Tween(this.camera.position);
-	  tween.to({ z: 1000 }, 6500);
-	  tween.easing(_tween2.default.Easing.Sinusoidal.InOut);
-	  tween.start();
+	  var tweenCamZ = new _tween2.default.Tween(this.camera.position);
+	  tweenCamZ.to({ z: 1000 }, 6500);
+	  tweenCamZ.easing(_tween2.default.Easing.Sinusoidal.InOut);
+	  tweenCamZ.start();
 	};
 
 	Home.resize = function resize() {
@@ -54407,8 +54391,6 @@
 
 	'use strict';
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
@@ -54423,81 +54405,74 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	var Window = {
 
-	var Window = (function () {
-		function Window() {
-			_classCallCheck(this, Window);
+		window: (0, _jquery2.default)(window),
+		width: 0,
+		height: 0
 
-			(0, _happens2.default)(this);
+	};
 
-			this.window = (0, _jquery2.default)(window);
-			this.width = 0;
-			this.height = 0;
+	Window.init = function init() {
 
-			this.resize();
-			this.bind();
+		(0, _happens2.default)(this);
+
+		this.resize();
+		this.bind();
+	};
+
+	Window.bind = function bind() {
+
+		this.window.on('resize', this.resize.bind(this));
+		this.window.on('keydown', this.keydown.bind(this));
+	};
+
+	Window.resize = function resize() {
+
+		this.width = this.window.width();
+		this.height = this.window.height();
+
+		this.emit('resize');
+	};
+
+	Window.keydown = function keydown(event) {
+
+		var key = null;
+
+		switch (event.keyCode) {
+
+			case 38:
+
+				key = 'up';
+
+				break;
+
+			case 40:
+
+				key = 'down';
+
+				break;
+
+			case 37:
+
+				key = 'left';
+
+				break;
+
+			case 39:
+
+				key = 'right';
+
+				break;
+
 		}
 
-		_createClass(Window, [{
-			key: 'bind',
-			value: function bind() {
+		this.emit('keydown', key);
+	};
 
-				this.window.on('resize', this.resize.bind(this));
-				this.window.on('keydown', this.keydown.bind(this));
-			}
-		}, {
-			key: 'resize',
-			value: function resize() {
+	Window.init();
 
-				this.width = this.window.width();
-				this.height = this.window.height();
-
-				this.emit('resize');
-			}
-		}, {
-			key: 'keydown',
-			value: function keydown(event) {
-
-				var code = event.keyCode;
-				var key = null;
-
-				switch (event.keyCode) {
-
-					case 38:
-
-						key = 'up';
-
-						break;
-
-					case 40:
-
-						key = 'down';
-
-						break;
-
-					case 37:
-
-						key = 'left';
-
-						break;
-
-					case 39:
-
-						key = 'right';
-
-						break;
-
-				}
-
-				this.emit('keydown', key);
-			}
-		}]);
-
-		return Window;
-	})();
-
-	exports.default = new Window();
+	exports.default = Window;
 
 /***/ },
 /* 10 */
@@ -54521,6 +54496,10 @@
 
 	var _tween2 = _interopRequireDefault(_tween);
 
+	var _window = __webpack_require__(9);
+
+	var _window2 = _interopRequireDefault(_window);
+
 	var _textureLoader = __webpack_require__(11);
 
 	var _textureLoader2 = _interopRequireDefault(_textureLoader);
@@ -54529,34 +54508,27 @@
 
 	var ProjectSphere = {
 
+		$el: (0, _jquery2.default)('#three-viewport'),
 		data: null,
 		scene: null,
 		camera: null,
-		el: (0, _jquery2.default)('#three-viewport'),
-		win: (0, _jquery2.default)(window),
-
-		raycaster: null,
-		camera_pos: null,
-
 		pos: {
 			x: 0,
 			y: 0
 		},
-
 		spheres: [],
 		intersected: null,
-
 		raycaster: new _three2.default.Raycaster(),
 		camera_pos: new _three2.default.Vector3(),
-
 		project: {
-			radius: 3000,
-			widthSegments: 16,
+			radiusTop: 3000,
+			radiusBottom: 3000,
+			height: 1200,
+			radiusSegments: 16,
 			heightSegments: 16,
-			phiStart: 0,
-			phiLength: Math.PI / 4.5,
-			thetaStart: 4.5,
-			thetaLength: Math.PI / 8
+			openEnded: true,
+			thetaStart: 0,
+			thetaLength: Math.PI / 4.5
 		}
 
 	};
@@ -54573,34 +54545,32 @@
 
 	ProjectSphere.bind = function bind() {
 
-		this.el.on('mousemove touchmove', this.sceneMouseMove.bind(this));
-		this.el.on('mousedown touchstart', this.projectMouseDown.bind(this));
+		this.$el.on('mousemove touchmove', this.sceneMouseMove.bind(this));
+		this.$el.on('mousedown touchstart', this.projectMouseDown.bind(this));
 	};
 
 	ProjectSphere.unbind = function unbind() {
 
-		this.el.off('mousemove touchmove', this.sceneMouseMove.bind(this));
-		this.el.off('mousedown touchstart', this.projectMouseDown.bind(this));
+		this.$el.off('mousemove touchmove', this.sceneMouseMove.bind(this));
+		this.$el.off('mousedown touchstart', this.projectMouseDown.bind(this));
 	};
 
 	ProjectSphere.createProjects = function createProjects() {
 		var _this = this;
 
 		var target = new _three2.default.Vector3();
-		var geometry = new _three2.default.SphereGeometry(this.project.radius, this.project.widthSegments, this.project.heightSegments, this.project.phiStart, this.project.phiLength, this.project.thetaStart, this.project.thetaLength);
+		var geometry = new _three2.default.CylinderGeometry(this.project.radiusTop, this.project.radiusBottom, this.project.height, this.project.radiusSegments, this.project.heightSegments, this.project.openEnded, this.project.thetaStart, this.project.thetaLength);
 
 		this.data.forEach(function (item, index) {
 
 			var texture = (0, _textureLoader2.default)(item.featuredImage.url);
 
 			texture.minFilter = _three2.default.LinearFilter;
-			texture.flipY = false;
 
 			var material = new _three2.default.MeshBasicMaterial({
 				map: texture,
 				transparent: true,
-				opacity: 0.5,
-				wireframe: false
+				opacity: 0.5
 			});
 
 			var project = new _three2.default.Mesh(geometry, material);
@@ -54646,8 +54616,8 @@
 		};
 
 		this.pos = {
-			x: evt.x / this.win.width() * 2 - 1,
-			y: -(evt.y / this.win.height()) * 2 + 1
+			x: evt.x / _window2.default.width * 2 - 1,
+			y: -(evt.y / _window2.default.height) * 2 + 1
 		};
 	};
 
@@ -54659,8 +54629,8 @@
 		};
 
 		this.pos = {
-			x: evt.x / this.win.width() * 2 - 1,
-			y: -(evt.y / this.win.height()) * 2 + 1
+			x: evt.x / _window2.default.width * 2 - 1,
+			y: -(evt.y / _window2.default.height) * 2 + 1
 		};
 
 		var intersects = this.raycaster.intersectObjects(this.spheres);
@@ -54679,7 +54649,7 @@
 
 		this.fadeInProject(this.intersected);
 
-		this.el.css({ cursor: 'pointer' });
+		this.$el.css({ cursor: 'pointer' });
 	};
 
 	ProjectSphere.projectMouseOut = function projectMouseOut() {
@@ -54688,7 +54658,7 @@
 
 			this.fadeOutProject(this.intersected);
 
-			this.el.css({ cursor: 'ew-resize' });
+			this.$el.css({ cursor: 'ew-resize' });
 
 			TweenMax.to((0, _jquery2.default)('#home h1'), 0.5, { autoAlpha: 0, y: 0, scale: 0.9 });
 		}
@@ -54709,13 +54679,13 @@
 
 			this.intersected = intersects[0].object;
 
-			if (!this.win.width() < 768) {
+			if (!_window2.default.width < 768) {
 
 				this.projectMouseOver();
 			}
 		} else {
 
-			if (!this.win.width() < 768) {
+			if (!_window2.default.width < 768) {
 
 				this.projectMouseOut();
 			}

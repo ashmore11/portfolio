@@ -27,7 +27,7 @@ Home.init = function init() {
     this.data = JSON.parse(response).filter(item => {
 
       return item.state === 'published';
-      
+
     })
 
     this.initScene();
@@ -81,18 +81,16 @@ Home.animateCameraPos = function animateCameraPos() {
   this.camera.position.set(0, 2500, 5000);
   this.controls.pos.x = -0.00025;
 
-  let tween;
+  const tweenCamY = new TWEEN.Tween(this.camera.position);
+  tweenCamY.to({ y: 25 }, 5000);
+  tweenCamY.easing(TWEEN.Easing.Sinusoidal.InOut);
+  tweenCamY.onComplete(() => { this.camTweenComplete = true; });
+  tweenCamY.start();
 
-  tween = new TWEEN.Tween(this.camera.position);
-  tween.to({ y: 25 }, 5000);
-  tween.easing(TWEEN.Easing.Sinusoidal.InOut);
-  tween.onComplete(() => { this.camTweenComplete = true; });
-  tween.start();
-
-  tween = new TWEEN.Tween(this.camera.position);
-  tween.to({ z: 1000 }, 6500);
-  tween.easing(TWEEN.Easing.Sinusoidal.InOut);
-  tween.start();
+  const tweenCamZ = new TWEEN.Tween(this.camera.position);
+  tweenCamZ.to({ z: 1000 }, 6500);
+  tweenCamZ.easing(TWEEN.Easing.Sinusoidal.InOut);
+  tweenCamZ.start();
 
 };
 

@@ -5,7 +5,7 @@ import TextureLoader       from 'app/utils/textureLoader';
 const ParticleSystem = {
 
 	scene      : null,
-	geometry   : new THREE.Geometry(),
+	geometry   : new THREE.Geometry,
 	materials  : [],
 	particles  : [],
 	count      : 5000,
