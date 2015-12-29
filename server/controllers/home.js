@@ -7,8 +7,7 @@ exports = module.exports = function(req, res) {
 	
 	locals.section = 'home';
 
-	view.query('page', keystone.list('page').model.findOne({slug: 'home'}));
-  view.query('images', keystone.list('images').model.find());
+	view.query('page', keystone.list('Page').model.findOne({slug: 'home'}));
 	
 	view.render('home');
 	

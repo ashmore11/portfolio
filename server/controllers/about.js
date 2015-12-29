@@ -5,10 +5,10 @@ exports = module.exports = function(req, res) {
 	var view   = new keystone.View(req, res);
 	var locals = res.locals;
 	
-	locals.section = 'example';
+	locals.section = 'about';
 
-	view.query('page', keystone.list('page').model.findOne({slug: 'example'}));
+	view.query('page', keystone.list('page').model.findOne({slug: 'about'}));
 	
-	view.render('example');
+	view.render('about');
 	
 };

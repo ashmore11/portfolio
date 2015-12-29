@@ -1,79 +1,85 @@
 import THREE from 'three';
 
-export default class ParticleSystem {
+const ParticleSystem = {
 
-	constructor(scene) {
-		
-		this.geometry   = null;
-		this.materials  = null;
-		this.particles  = null;
-		this.count      = null;
-		this.parameters = null;
+	scene      : null,
+	geometry   : new THREE.Geometry(),
+	materials  : [],
+	particles  : [],
+	count      : 5000,
+	parameters : [
+		[ [1, 1, 0.5], 5 ],
+		[ [0.95, 1, 0.5], 4 ],
+		[ [0.90, 1, 0.5], 3 ],
+		[ [0.85, 1, 0.5], 2 ],
+		[ [0.80, 1, 0.5], 1 ]
+	],
 
-		this.scene = scene;
+};
 
-		this.geometry  = new THREE.Geometry();
-		this.materials = [];
-		this.particles = [];
-		this.count     = 5000;
+ParticleSystem.init = function init(scene) {
 
-		for(let i = 0; i < this.count; i++) {
+	this.scene = scene;
 
-			const vertex = new THREE.Vector3();
+	this.pushVertices();
 
-			vertex.x = Math.random() * 8000 - 4000;
-			vertex.y = Math.random() * 8000 - 4000;
-			vertex.z = Math.random() * 8000 - 4000;
+	this.createParticles();
 
-			this.geometry.vertices.push(vertex);
+};
 
-		}
+ParticleSystem.pushVertices = function pushVertices() {
 
-		this.parameters = [
-			[ [1, 1, 0.5], 5 ],
-			[ [0.95, 1, 0.5], 4 ],
-			[ [0.90, 1, 0.5], 3 ],
-			[ [0.85, 1, 0.5], 2 ],
-			[ [0.80, 1, 0.5], 1 ]
-		];
+	for(let i = 0; i < this.count; i++) {
 
-		for(let i = 0; i < this.parameters.length; i++) {
+		const vertex = new THREE.Vector3();
 
-			const size = this.parameters[i][1];
+		vertex.x = Math.random() * 8000 - 4000;
+		vertex.y = Math.random() * 8000 - 4000;
+		vertex.z = Math.random() * 8000 - 4000;
 
-			this.materials[ i ] = new THREE.PointsMaterial({
-				size        : size,
-				map         : THREE.ImageUtils.loadTexture('images/_tmp/particle.jpg'),
-				blending    : THREE.NormalBlending,
-				transparent : true
-			});
-
-			const particle = new THREE.Points(this.geometry, this.materials[i]);
-
-			particle.rotation.x = Math.random() * 6;
-			particle.rotation.y = Math.random() * 6;
-			particle.rotation.z = Math.random() * 6;
-
-			this.particles.push(particle);
-
-			this.scene.add(particle);
-
-		}
-
-	}
-	
-	update() {
-
-		const time = Date.now() * 0.00002;
-
-		for(let i = 0; i < this.particles.length; i++) {
-
-			const object = this.particles[i];
-
-			object.rotation.y = time * (i < 4 ? i + 1 : - (i + 1));
-
-		}
+		this.geometry.vertices.push(vertex);
 
 	}
 
-}
+};
+
+ParticleSystem.createParticles = function createParticles() {
+
+	this.parameters.map((item, index) => {
+
+		const size = item[1];
+
+		this.materials[index] = new THREE.PointsMaterial({
+			size        : size,
+			map         : THREE.ImageUtils.loadTexture('images/_tmp/particle.jpg'),
+			blending    : THREE.NormalBlending,
+			transparent : true
+		});
+
+		const particle = new THREE.Points(this.geometry, this.materials[index]);
+
+		particle.rotation.x = Math.random() * 6;
+		particle.rotation.y = Math.random() * 6;
+		particle.rotation.z = Math.random() * 6;
+
+		this.particles.push(particle);
+
+		this.scene.add(particle);
+
+	});
+
+};
+
+ParticleSystem.update = function update() {
+
+	const time = Date.now() * 0.00001;
+
+	this.particles.map((item, index) => {
+
+		item.rotation.y = time * (index < 4 ? index + 1 : - (index + 1));
+
+	});
+
+};
+
+export default ParticleSystem;

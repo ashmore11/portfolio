@@ -2,7 +2,7 @@ var keystone = require('keystone');
 
 var Types = keystone.Field.Types;
 
-var Pages = new keystone.List('page', {
+var page = new keystone.List('Page', {
 	map: { name: 'title' },
 	autokey: { 
 		path: 'slug', 
@@ -11,7 +11,7 @@ var Pages = new keystone.List('page', {
 	}
 });
 
-Pages.add({
+page.add({
 	meta:{
 		title: { type: Types.Text },
 		description: { type: Types.Text },
@@ -35,5 +35,5 @@ Pages.add({
 	},
 });
 
-Pages.defaultColumns = 'title';
-Pages.register();
+page.defaultColumns = 'title';
+page.register();

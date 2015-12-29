@@ -58,7 +58,7 @@ keystone.set('routes', require('./server/routes'));
  */
 keystone.set('nav', {
 	'pages': 'pages',
-	'gallery': 'images',
+	'posts': 'posts',
 	'users': 'users'
 });
 

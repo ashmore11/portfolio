@@ -1,38 +1,43 @@
 import Navigation  from 'app/utils/navigation';
 import HomeView    from 'app/views/home';
-import ExampleView from 'app/views/example';
+import AboutView   from 'app/views/about';
 
-class App {
+const App = {
 
-	constructor() {
+	views: {
+		home    : HomeView,
+		example : AboutView,
+	},
+
+	init: function init() {
 
 		const nav = new Navigation();
 
 		nav.on('url:changed', id => {
 			
+			if(this.view) {
+				
+				this.view.destroy();
+				this.view = null;
+
+			}
+
 			this.renderView(id);
 
 		});
 
 		nav.init();
 
-	}
+	},
 
-	get views() {
+	renderView: function renderView(id) {
 
-		return {
-			home    : HomeView,
-			example : ExampleView,
-		};
+		this.views[id].init();
 
-	}
+	},
 
-	renderView(id) {
+};
 
-		const view = new this.views[id]();
+App.init();
 
-	}
-
-}
-
-const APP = new App();
+window.APP = App;

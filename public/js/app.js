@@ -46,8 +46,6 @@
 
 	'use strict';
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 	var _navigation = __webpack_require__(1);
 
 	var _navigation2 = _interopRequireDefault(_navigation);
@@ -56,51 +54,48 @@
 
 	var _home2 = _interopRequireDefault(_home);
 
-	var _example = __webpack_require__(13);
+	var _about = __webpack_require__(13);
 
-	var _example2 = _interopRequireDefault(_example);
+	var _about2 = _interopRequireDefault(_about);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	var App = {
 
-	var App = (function () {
-		function App() {
+		views: {
+			home: _home2.default,
+			example: _about2.default
+		},
+
+		init: function init() {
 			var _this = this;
-
-			_classCallCheck(this, App);
 
 			var nav = new _navigation2.default();
 
 			nav.on('url:changed', function (id) {
 
+				if (_this.view) {
+
+					_this.view.destroy();
+					_this.view = null;
+				}
+
 				_this.renderView(id);
 			});
 
 			nav.init();
+		},
+
+		renderView: function renderView(id) {
+
+			this.views[id].init();
 		}
 
-		_createClass(App, [{
-			key: 'renderView',
-			value: function renderView(id) {
+	};
 
-				var view = new this.views[id]();
-			}
-		}, {
-			key: 'views',
-			get: function get() {
+	App.init();
 
-				return {
-					home: _home2.default,
-					example: _example2.default
-				};
-			}
-		}]);
-
-		return App;
-	})();
-
-	var APP = new App();
+	window.APP = App;
 
 /***/ },
 /* 1 */
@@ -358,13 +353,13 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global) {/*!
-	 * VERSION: 1.18.0
-	 * DATE: 2015-09-05
+	 * VERSION: 1.18.2
+	 * DATE: 2015-12-22
 	 * UPDATES AND DOCS AT: http://greensock.com
 	 * 
 	 * Includes all of the following: TweenLite, TweenMax, TimelineLite, TimelineMax, EasePack, CSSPlugin, RoundPropsPlugin, BezierPlugin, AttrPlugin, DirectionalRotationPlugin
 	 *
-	 * @license Copyright (c) 2008-2015, GreenSock. All rights reserved.
+	 * @license Copyright (c) 2008-2016, GreenSock. All rights reserved.
 	 * This work is subject to the terms at http://greensock.com/standard-license or for
 	 * Club GreenSock members, the software agreement that was issued with your membership.
 	 * 
@@ -409,7 +404,7 @@
 				p = TweenMax.prototype = TweenLite.to({}, 0.1, {}),
 				_blankArray = [];
 
-			TweenMax.version = "1.18.0";
+			TweenMax.version = "1.18.2";
 			p.constructor = TweenMax;
 			p.kill()._gc = false;
 			TweenMax.killTweensOf = TweenMax.killDelayedCallsTo = TweenLite.killTweensOf;
@@ -456,20 +451,22 @@
 							TweenLite._onPluginEvent("_onDisable", this); //in case a plugin like MotionBlur must perform some cleanup tasks
 						}
 						if (this._time / this._duration > 0.998) { //if the tween has finished (or come extremely close to finishing), we just need to rewind it to 0 and then render it again at the end which forces it to re-initialize (parsing the new vars). We allow tweens that are close to finishing (but haven't quite finished) to work this way too because otherwise, the values are so small when determining where to project the starting values that binary math issues creep in and can make the tween appear to render incorrectly when run backwards. 
-							var prevTime = this._time;
+							var prevTime = this._totalTime;
 							this.render(0, true, false);
 							this._initted = false;
 							this.render(prevTime, true, false);
-						} else if (this._time > 0 || immediate) {
+						} else {
 							this._initted = false;
 							this._init();
-							var inv = 1 / (1 - curRatio),
-								pt = this._firstPT, endValue;
-							while (pt) {
-								endValue = pt.s + pt.c; 
-								pt.c *= inv;
-								pt.s = endValue - pt.c;
-								pt = pt._next;
+							if (this._time > 0 || immediate) {
+								var inv = 1 / (1 - curRatio),
+									pt = this._firstPT, endValue;
+								while (pt) {
+									endValue = pt.s + pt.c;
+									pt.c *= inv;
+									pt.s = endValue - pt.c;
+									pt = pt._next;
+								}
 							}
 						}
 					}
@@ -488,7 +485,7 @@
 					duration = this._duration,
 					prevRawPrevTime = this._rawPrevTime,
 					isComplete, callback, pt, cycleDuration, r, type, pow, rawPrevTime;
-				if (time >= totalDur) {
+				if (time >= totalDur - 0.0000001) { //to work around occasional floating point math artifacts.
 					this._totalTime = totalDur;
 					this._cycle = this._repeat;
 					if (this._yoyo && (this._cycle & 1) !== 0) {
@@ -507,7 +504,7 @@
 						if (this._startTime === this._timeline._duration) { //if a zero-duration tween is at the VERY end of a timeline and that timeline renders at its end, it will typically add a tiny bit of cushion to the render time to prevent rounding errors from getting in the way of tweens rendering their VERY end. If we then reverse() that timeline, the zero-duration tween will trigger its onReverseComplete even though technically the playhead didn't pass over it again. It's a very specific edge case we must accommodate.
 							time = 0;
 						}
-						if (time === 0 || prevRawPrevTime < 0 || prevRawPrevTime === _tinyNum) if (prevRawPrevTime !== time) {
+						if (prevRawPrevTime < 0 || (time <= 0 && time >= -0.0000001) || (prevRawPrevTime === _tinyNum && this.data !== "isPause")) if (prevRawPrevTime !== time) { //note: when this.data is "isPause", it's a callback added by addPause() on a timeline that we should not be triggered when LEAVING its exact start time. In other words, tl.addPause(1).play(1) shouldn't pause.
 							force = true;
 							if (prevRawPrevTime > _tinyNum) {
 								callback = "onReverseComplete";
@@ -700,7 +697,7 @@
 			
 			TweenMax.staggerTo = TweenMax.allTo = function(targets, duration, vars, stagger, onCompleteAll, onCompleteAllParams, onCompleteAllScope) {
 				stagger = stagger || 0;
-				var delay = vars.delay || 0,
+				var delay = 0,
 					a = [],
 					finalComplete = function() {
 						if (vars.onComplete) {
@@ -741,7 +738,7 @@
 						}
 						_applyCycle(copy.startAt, targets, i);
 					}
-					copy.delay = delay;
+					copy.delay = delay + (copy.delay || 0);
 					if (i === l && onCompleteAll) {
 						copy.onComplete = finalComplete;
 					}
@@ -1041,7 +1038,7 @@
 				},
 				p = TimelineLite.prototype = new SimpleTimeline();
 
-			TimelineLite.version = "1.18.0";
+			TimelineLite.version = "1.18.2";
 			p.constructor = TimelineLite;
 			p.kill()._gc = p._forcingPlayhead = p._hasPause = false;
 
@@ -1341,14 +1338,14 @@
 					prevStart = this._startTime,
 					prevTimeScale = this._timeScale,
 					prevPaused = this._paused,
-					tween, isComplete, next, callback, internalForce, pauseTween;
-				if (time >= totalDur) {
+					tween, isComplete, next, callback, internalForce, pauseTween, curTime;
+				if (time >= totalDur - 0.0000001) { //to work around occasional floating point math artifacts.
 					this._totalTime = this._time = totalDur;
 					if (!this._reversed) if (!this._hasPausedChild()) {
 						isComplete = true;
 						callback = "onComplete";
 						internalForce = !!this._timeline.autoRemoveChildren; //otherwise, if the animation is unpaused/activated after it's already finished, it doesn't get removed from the parent timeline.
-						if (this._duration === 0) if (time === 0 || this._rawPrevTime < 0 || this._rawPrevTime === _tinyNum) if (this._rawPrevTime !== time && this._first) {
+						if (this._duration === 0) if ((time <= 0 && time >= -0.0000001) || this._rawPrevTime < 0 || this._rawPrevTime === _tinyNum) if (this._rawPrevTime !== time && this._first) {
 							internalForce = true;
 							if (this._rawPrevTime > _tinyNum) {
 								callback = "onReverseComplete";
@@ -1432,13 +1429,14 @@
 					this._callback("onStart");
 				}
 
-				if (this._time >= prevTime) {
+				curTime = this._time;
+				if (curTime >= prevTime) {
 					tween = this._first;
 					while (tween) {
 						next = tween._next; //record it here because the value could change after rendering...
-						if (this._paused && !prevPaused) { //in case a tween pauses the timeline when rendering
+						if (curTime !== this._time || (this._paused && !prevPaused)) { //in case a tween pauses or seeks the timeline when rendering, like inside of an onUpdate/onComplete
 							break;
-						} else if (tween._active || (tween._startTime <= this._time && !tween._paused && !tween._gc)) {
+						} else if (tween._active || (tween._startTime <= curTime && !tween._paused && !tween._gc)) {
 							if (pauseTween === tween) {
 								this.pause();
 							}
@@ -1454,7 +1452,7 @@
 					tween = this._last;
 					while (tween) {
 						next = tween._prev; //record it here because the value could change after rendering...
-						if (this._paused && !prevPaused) { //in case a tween pauses the timeline when rendering
+						if (curTime !== this._time || (this._paused && !prevPaused)) { //in case a tween pauses or seeks the timeline when rendering, like inside of an onUpdate/onComplete
 							break;
 						} else if (tween._active || (tween._startTime <= prevTime && !tween._paused && !tween._gc)) {
 							if (pauseTween === tween) {
@@ -1697,10 +1695,7 @@
 					}
 					return this._totalDuration;
 				}
-				if (this.totalDuration() !== 0) if (value !== 0) {
-					this.timeScale(this._totalDuration / value);
-				}
-				return this;
+				return (value && this.totalDuration()) ? this.timeScale(this._totalDuration / value) : this;
 			};
 
 			p.paused = function(value) {
@@ -1732,7 +1727,7 @@
 			return TimelineLite;
 
 		}, true);
-		
+
 
 
 
@@ -1769,7 +1764,7 @@
 
 			p.constructor = TimelineMax;
 			p.kill()._gc = false;
-			TimelineMax.version = "1.18.0";
+			TimelineMax.version = "1.18.2";
 
 			p.invalidate = function() {
 				this._yoyo = (this.vars.yoyo === true);
@@ -1849,8 +1844,8 @@
 					prevRawPrevTime = this._rawPrevTime,
 					prevPaused = this._paused,
 					prevCycle = this._cycle,
-					tween, isComplete, next, callback, internalForce, cycleDuration, pauseTween;
-				if (time >= totalDur) {
+					tween, isComplete, next, callback, internalForce, cycleDuration, pauseTween, curTime;
+				if (time >= totalDur - 0.0000001) { //to work around occasional floating point math artifacts.
 					if (!this._locked) {
 						this._totalTime = totalDur;
 						this._cycle = this._repeat;
@@ -1859,7 +1854,7 @@
 						isComplete = true;
 						callback = "onComplete";
 						internalForce = !!this._timeline.autoRemoveChildren; //otherwise, if the animation is unpaused/activated after it's already finished, it doesn't get removed from the parent timeline.
-						if (this._duration === 0) if (time === 0 || prevRawPrevTime < 0 || prevRawPrevTime === _tinyNum) if (prevRawPrevTime !== time && this._first) {
+						if (this._duration === 0) if ((time <= 0 && time >= -0.0000001) || prevRawPrevTime < 0 || prevRawPrevTime === _tinyNum) if (prevRawPrevTime !== time && this._first) {
 							internalForce = true;
 							if (prevRawPrevTime > _tinyNum) {
 								callback = "onReverseComplete";
@@ -1998,6 +1993,9 @@
 							this._callback("onRepeat");
 						}
 					}
+					if (prevTime !== this._time) { //in case there's a callback like onComplete in a nested tween/timeline that changes the playhead position, like via seek(), we should just abort.
+						return;
+					}
 					if (wrap) {
 						prevTime = (backwards) ? dur + 0.0001 : -0.0001;
 						this.render(prevTime, true, false);
@@ -2029,11 +2027,12 @@
 					this._callback("onStart");
 				}
 
-				if (this._time >= prevTime) {
+				curTime = this._time;
+				if (curTime >= prevTime) {
 					tween = this._first;
 					while (tween) {
 						next = tween._next; //record it here because the value could change after rendering...
-						if (this._paused && !prevPaused) { //in case a tween pauses the timeline when rendering
+						if (curTime !== this._time || (this._paused && !prevPaused)) { //in case a tween pauses or seeks the timeline when rendering, like inside of an onUpdate/onComplete
 							break;
 						} else if (tween._active || (tween._startTime <= this._time && !tween._paused && !tween._gc)) {
 							if (pauseTween === tween) {
@@ -2051,7 +2050,7 @@
 					tween = this._last;
 					while (tween) {
 						next = tween._prev; //record it here because the value could change after rendering...
-						if (this._paused && !prevPaused) { //in case a tween pauses the timeline when rendering
+						if (curTime !== this._time || (this._paused && !prevPaused)) { //in case a tween pauses or seeks the timeline when rendering, like inside of an onUpdate/onComplete
 							break;
 						} else if (tween._active || (tween._startTime <= prevTime && !tween._paused && !tween._gc)) {
 							if (pauseTween === tween) {
@@ -2182,7 +2181,7 @@
 					}
 					return this._totalDuration;
 				}
-				return (this._repeat === -1) ? this : this.duration( (value - (this._repeat * this._repeatDelay)) / (this._repeat + 1) );
+				return (this._repeat === -1 || !value) ? this : this.timeScale( this.totalDuration() / value );
 			};
 
 			p.time = function(value, suppressEvents) {
@@ -2858,7 +2857,7 @@
 				p = CSSPlugin.prototype = new TweenPlugin("css");
 
 			p.constructor = CSSPlugin;
-			CSSPlugin.version = "1.18.0";
+			CSSPlugin.version = "1.18.2";
 			CSSPlugin.API = 2;
 			CSSPlugin.defaultTransformPerspective = 0;
 			CSSPlugin.defaultSkewType = "compensated";
@@ -3339,7 +3338,7 @@
 					}
 					return parsed;
 				},
-				_colorExp = "(?:\\b(?:(?:rgb|rgba|hsl|hsla)\\(.+?\\))|\\B#.+?\\b"; //we'll dynamically build this Regular Expression to conserve file size. After building it, it will be able to find rgb(), rgba(), # (hexadecimal), and named color values like red, blue, purple, etc.
+				_colorExp = "(?:\\b(?:(?:rgb|rgba|hsl|hsla)\\(.+?\\))|\\B#(?:[0-9a-f]{3}){1,2}\\b"; //we'll dynamically build this Regular Expression to conserve file size. After building it, it will be able to find rgb(), rgba(), # (hexadecimal), and named color values like red, blue, purple, etc.
 
 			for (p in _colorLookup) {
 				_colorExp += "|" + p + "\\b";
@@ -3456,7 +3455,7 @@
 						proxy = d.proxy,
 						mpt = d.firstMPT,
 						min = 0.000001,
-						val, pt, i, str;
+						val, pt, i, str, p;
 					while (mpt) {
 						val = proxy[mpt.v];
 						if (mpt.r) {
@@ -3470,19 +3469,20 @@
 					if (d.autoRotate) {
 						d.autoRotate.rotation = proxy.rotation;
 					}
-					//at the end, we must set the CSSPropTween's "e" (end) value dynamically here because that's what is used in the final setRatio() method.
-					if (v === 1) {
+					//at the end, we must set the CSSPropTween's "e" (end) value dynamically here because that's what is used in the final setRatio() method. Same for "b" at the beginning.
+					if (v === 1 || v === 0) {
 						mpt = d.firstMPT;
+						p = (v === 1) ? "e" : "b";
 						while (mpt) {
 							pt = mpt.t;
 							if (!pt.type) {
-								pt.e = pt.s + pt.xs0;
+								pt[p] = pt.s + pt.xs0;
 							} else if (pt.type === 1) {
 								str = pt.xs0 + pt.s + pt.xs1;
 								for (i = 1; i < pt.l; i++) {
 									str += pt["xn"+i] + pt["xs"+(i+1)];
 								}
-								pt.e = str;
+								pt[p] = str;
 							}
 							mpt = mpt._next;
 						}
@@ -3708,7 +3708,7 @@
 
 							//if no number is found, treat it as a non-tweening value and just append the string to the current xs.
 							if (!bnums) {
-								pt["xs" + pt.l] += pt.l ? " " + bv : bv;
+								pt["xs" + pt.l] += pt.l ? " " + ev : ev;
 
 							//loop through all the numbers that are found and construct the extra values on the pt.
 							} else {
@@ -4153,7 +4153,7 @@
 								a32 = t3;
 							}
 							//rotationY
-							angle = Math.atan2(a13, a33);
+							angle = Math.atan2(-a31, a33);
 							tm.rotationY = angle * _RAD2DEG;
 							if (angle) {
 								cos = Math.cos(-angle);
@@ -4183,7 +4183,7 @@
 
 							if (tm.rotationX && Math.abs(tm.rotationX) + Math.abs(tm.rotation) > 359.9) { //when rotationY is set, it will often be parsed as 180 degrees different than it should be, and rotationX and rotation both being 180 (it looks the same), so we adjust for that here.
 								tm.rotationX = tm.rotation = 0;
-								tm.rotationY += 180;
+								tm.rotationY = 180 - tm.rotationY;
 							}
 
 							tm.scaleX = ((Math.sqrt(a11 * a11 + a21 * a21) * rnd + 0.5) | 0) / rnd;
@@ -4366,7 +4366,7 @@
 						a11, a12, a13, a21, a22, a23, a31, a32, a33, a41, a42, a43,
 						zOrigin, min, cos, sin, t1, t2, transform, comma, zero, skew, rnd;
 					//check to see if we should render as 2D (and SVGs must use 2D when _useSVGTransformAttr is true)
-					if (((((v === 1 || v === 0) && force3D === "auto" && (this.tween._totalTime === this.tween._totalDuration || !this.tween._totalTime)) || !force3D) && !z && !perspective && !rotationY && !rotationX) || (_useSVGTransformAttr && isSVG) || !_supports3D) { //on the final render (which could be 0 for a from tween), if there are no 3D aspects, render in 2D to free up memory and improve performance especially on mobile devices. Check the tween's totalTime/totalDuration too in order to make sure it doesn't happen between repeats if it's a repeating tween.
+					if (((((v === 1 || v === 0) && force3D === "auto" && (this.tween._totalTime === this.tween._totalDuration || !this.tween._totalTime)) || !force3D) && !z && !perspective && !rotationY && !rotationX && sz === 1) || (_useSVGTransformAttr && isSVG) || !_supports3D) { //on the final render (which could be 0 for a from tween), if there are no 3D aspects, render in 2D to free up memory and improve performance especially on mobile devices. Check the tween's totalTime/totalDuration too in order to make sure it doesn't happen between repeats if it's a repeating tween.
 
 						//2D
 						if (angle || t.skewX || isSVG) {
@@ -4556,7 +4556,7 @@
 					transform = ((t.xPercent || t.yPercent) ? "translate(" + t.xPercent + "%," + t.yPercent + "%) matrix3d(" : "matrix3d(");
 					transform += ((a11 < min && a11 > -min) ? zero : a11) + comma + ((a21 < min && a21 > -min) ? zero : a21) + comma + ((a31 < min && a31 > -min) ? zero : a31);
 					transform += comma + ((a41 < min && a41 > -min) ? zero : a41) + comma + ((a12 < min && a12 > -min) ? zero : a12) + comma + ((a22 < min && a22 > -min) ? zero : a22);
-					if (rotationX || rotationY) { //performance optimization (often there's no rotationX or rotationY, so we can skip these calculations)
+					if (rotationX || rotationY || sz !== 1) { //performance optimization (often there's no rotationX or rotationY, so we can skip these calculations)
 						transform += comma + ((a32 < min && a32 > -min) ? zero : a32) + comma + ((a42 < min && a42 > -min) ? zero : a42) + comma + ((a13 < min && a13 > -min) ? zero : a13);
 						transform += comma + ((a23 < min && a23 > -min) ? zero : a23) + comma + ((a33 < min && a33 > -min) ? zero : a33) + comma + ((a43 < min && a43 > -min) ? zero : a43) + comma;
 					} else {
@@ -4999,6 +4999,7 @@
 						if (transform) {
 							if (transform.svg) {
 								this.t.removeAttribute("data-svg-origin");
+								this.t.removeAttribute("transform");
 							}
 							delete this.t._gsTransform;
 						}
@@ -5199,7 +5200,7 @@
 										bs = bn + "%";
 									}
 
-								} else if (esfx === "em" || esfx === "rem") {
+								} else if (esfx === "em" || esfx === "rem" || esfx === "vw" || esfx === "vh") {
 									bn /= _convertToPixels(target, p, 1, esfx);
 
 								//otherwise convert to pixels.
@@ -6333,7 +6334,7 @@
 			_class("Ticker", function(fps, useRAF) {
 				var _self = this,
 					_startTime = _getTime(),
-					_useRAF = (useRAF !== false && _reqAnimFrame),
+					_useRAF = (useRAF !== false && _reqAnimFrame) ? "auto" : false,
 					_lagThreshold = 500,
 					_adjustedLag = 33,
 					_tickWord = "tick", //helps reduce gc burden
@@ -6387,9 +6388,11 @@
 					}
 				};
 
-				_self.wake = function() {
+				_self.wake = function(seamless) {
 					if (_id !== null) {
 						_self.sleep();
+					} else if (seamless) {
+						_startTime += -_lastUpdate + (_lastUpdate = _getTime());
 					} else if (_self.frame > 10) { //don't trigger lagSmoothing if we're just waking up, and make sure that at least 10 frames have elapsed because of the iOS bug that we work around below with the 1.5-second setTimout().
 						_lastUpdate = _getTime() - _lagThreshold + 5;
 					}
@@ -6422,7 +6425,7 @@
 
 				//a bug in iOS 6 Safari occasionally prevents the requestAnimationFrame from working initially, so we use a 1.5-second timeout that automatically falls back to setTimeout() if it senses this condition.
 				setTimeout(function() {
-					if (_useRAF && _self.frame < 5) {
+					if (_useRAF === "auto" && _self.frame < 5 && document.visibilityState !== "hidden") {
 						_self.useRAF(false);
 					}
 				}, 1500);
@@ -6969,7 +6972,7 @@
 			p._firstPT = p._targets = p._overwrittenProps = p._startAt = null;
 			p._notifyPluginsOfEnabled = p._lazy = false;
 
-			TweenLite.version = "1.18.0";
+			TweenLite.version = "1.18.2";
 			TweenLite.defaultEase = p._ease = new Ease(null, null, 1, 1);
 			TweenLite.defaultOverwrite = "auto";
 			TweenLite.ticker = _ticker;
@@ -7083,7 +7086,8 @@
 							blob = _blobDif(s, end, stringFilter || TweenLite.defaultStringFilter, pt);
 							pt = {t:blob, p:"setRatio", s:0, c:1, f:2, pg:0, n:overwriteProp || prop, pr:0}; //"2" indicates it's a Blob property tween. Needed for RoundPropsPlugin for example.
 						} else if (!isRelative) {
-							pt.c = (parseFloat(end) - parseFloat(s)) || 0;
+							pt.s = parseFloat(s);
+							pt.c = (parseFloat(end) - pt.s) || 0;
 						}
 					}
 					if (pt.c) { //only add it to the linked list if there's a change.
@@ -7428,7 +7432,7 @@
 					duration = this._duration,
 					prevRawPrevTime = this._rawPrevTime,
 					isComplete, callback, pt, rawPrevTime;
-				if (time >= duration) {
+				if (time >= duration - 0.0000001) { //to work around occasional floating point math artifacts.
 					this._totalTime = this._time = duration;
 					this.ratio = this._ease._calcEnd ? this._ease.getRatio(1) : 1;
 					if (!this._reversed ) {
@@ -7440,7 +7444,7 @@
 						if (this._startTime === this._timeline._duration) { //if a zero-duration tween is at the VERY end of a timeline and that timeline renders at its end, it will typically add a tiny bit of cushion to the render time to prevent rounding errors from getting in the way of tweens rendering their VERY end. If we then reverse() that timeline, the zero-duration tween will trigger its onReverseComplete even though technically the playhead didn't pass over it again. It's a very specific edge case we must accommodate.
 							time = 0;
 						}
-						if (time === 0 || prevRawPrevTime < 0 || (prevRawPrevTime === _tinyNum && this.data !== "isPause")) if (prevRawPrevTime !== time) { //note: when this.data is "isPause", it's a callback added by addPause() on a timeline that we should not be triggered when LEAVING its exact start time. In other words, tl.addPause(1).play(1) shouldn't pause.
+						if (prevRawPrevTime < 0 || (time <= 0 && time >= -0.0000001) || (prevRawPrevTime === _tinyNum && this.data !== "isPause")) if (prevRawPrevTime !== time) { //note: when this.data is "isPause", it's a callback added by addPause() on a timeline that we should not be triggered when LEAVING its exact start time. In other words, tl.addPause(1).play(1) shouldn't pause.
 							force = true;
 							if (prevRawPrevTime > _tinyNum) {
 								callback = "onReverseComplete";
@@ -17161,8 +17165,6 @@
 
 	'use strict';
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
@@ -17201,130 +17203,127 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	var Home = {
 
-	var Home = (function () {
-	  function Home() {
-	    var _this = this;
+	  $el: (0, _jquery2.default)('#three-viewport'),
+	  win: {
+	    w: (0, _jquery2.default)(window).width(),
+	    h: (0, _jquery2.default)(window).height()
+	  },
+	  controls: _orbitControls2.default,
+	  particles: _particleSystem2.default
 
-	    _classCallCheck(this, Home);
+	};
 
-	    (0, _happens2.default)(this);
+	Home.init = function init() {
+	  var _this = this;
 
-	    this.$el = (0, _jquery2.default)('#three-viewport');
-	    this.win = {
-	      el: (0, _jquery2.default)(window),
-	      w: (0, _jquery2.default)(window).width(),
-	      h: (0, _jquery2.default)(window).height()
-	    };
+	  (0, _happens2.default)(this);
 
-	    _jquery2.default.get('json/data.json', function (data) {
+	  _jquery2.default.get('json/data.json', function (data) {
 
-	      _this.data = data;
-	      _this.init();
-	    });
-	  }
+	    _this.data = data;
 
-	  _createClass(Home, [{
-	    key: 'init',
-	    value: function init() {
+	    _this.initScene();
+	  });
+	};
 
-	      this.scene = new _three2.default.Scene();
-	      this.scene.fog = new _three2.default.Fog(0x000000, 10, 10000);
+	Home.initScene = function initScene() {
 
-	      this.camera = new _three2.default.PerspectiveCamera(50, _window2.default.width / _window2.default.height, 0.1, 10000);
-	      this.controls = new _orbitControls2.default(this.scene, this.camera);
+	  this.scene = new _three2.default.Scene();
+	  this.scene.fog = new _three2.default.Fog(0x000000, 10, 10000);
 
-	      this.particles = new _particleSystem2.default(this.scene);
-	      this.projects = new _projectSphere2.default(this.data, this.scene, this.camera);
+	  this.camera = new _three2.default.PerspectiveCamera(50, _window2.default.width / _window2.default.height, 0.1, 10000);
 
-	      this.renderer = new _three2.default.WebGLRenderer({ antialias: true });
-	      this.renderer.setSize(_window2.default.width, _window2.default.height);
-	      this.renderer.setClearColor(0x000000);
+	  this.controls.init(this.scene, this.camera);
+	  this.particles.init(this.scene);
 
-	      this.$el.append(this.renderer.domElement);
+	  this.projects = new _projectSphere2.default(this.data, this.scene, this.camera);
 
-	      // this.animateCameraPos();
+	  this.renderer = new _three2.default.WebGLRenderer({ antialias: true });
+	  this.renderer.setSize(_window2.default.width, _window2.default.height);
+	  this.renderer.setClearColor(0x000000);
 
-	      this.camTweenComplete = true;
-	      this.camera.position.set(0, 25, 1000);
-	      this.controls.pos.x = -0.00025;
+	  this.$el.append(this.renderer.domElement);
 
-	      this.render();
-	      this.bind();
-	    }
-	  }, {
-	    key: 'bind',
-	    value: function bind() {
+	  // this.animateCameraPos();
 
-	      _window2.default.on('resize', this.resize.bind(this));
-	    }
-	  }, {
-	    key: 'animateCameraPos',
-	    value: function animateCameraPos() {
-	      var _this2 = this;
+	  this.camTweenComplete = true;
+	  this.camera.position.set(0, 25, 1000);
+	  this.controls.pos.x = -0.00025;
 
-	      this.camera.position.set(0, 2500, 5000);
-	      this.controls.pos.x = -0.00025;
+	  this.render();
+	  this.bind();
+	};
 
-	      var tween = undefined;
+	Home.bind = function bind() {
 
-	      tween = new _tween2.default.Tween(this.camera.position);
-	      tween.to({ y: 25 }, 5000);
-	      tween.easing(_tween2.default.Easing.Sinusoidal.InOut);
-	      tween.onComplete(function () {
-	        _this2.camTweenComplete = true;
-	      });
-	      tween.start();
+	  _window2.default.on('resize', this.resize.bind(this));
+	};
 
-	      tween = new _tween2.default.Tween(this.camera.position);
-	      tween.to({ z: 1000 }, 6500);
-	      tween.easing(_tween2.default.Easing.Sinusoidal.InOut);
-	      tween.start();
-	    }
-	  }, {
-	    key: 'resize',
-	    value: function resize() {
+	Home.unbind = function unbind() {
 
-	      this.renderer.setSize(_window2.default.width, _window2.default.height);
-	      this.camera.aspect = _window2.default.width / _window2.default.height;
+	  // unbind logic
 
-	      this.camera.updateProjectionMatrix();
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
+	};
 
-	      this.RAF = requestAnimationFrame(this.render.bind(this));
+	Home.animateCameraPos = function animateCameraPos() {
+	  var _this2 = this;
 
-	      this.renderer.render(this.scene, this.camera);
+	  this.camera.position.set(0, 2500, 5000);
+	  this.controls.pos.x = -0.00025;
 
-	      this.update();
-	    }
-	  }, {
-	    key: 'update',
-	    value: function update() {
+	  var tween = undefined;
 
-	      _tween2.default.update();
+	  tween = new _tween2.default.Tween(this.camera.position);
+	  tween.to({ y: 25 }, 5000);
+	  tween.easing(_tween2.default.Easing.Sinusoidal.InOut);
+	  tween.onComplete(function () {
+	    _this2.camTweenComplete = true;
+	  });
+	  tween.start();
 
-	      this.controls.update();
-	      this.particles.update();
-	      this.projects.update();
-	    }
-	  }, {
-	    key: 'destroy',
-	    value: function destroy() {
+	  tween = new _tween2.default.Tween(this.camera.position);
+	  tween.to({ z: 1000 }, 6500);
+	  tween.easing(_tween2.default.Easing.Sinusoidal.InOut);
+	  tween.start();
+	};
 
-	      this.projects.unbind();
-	      this.controls.unbind();
-	      this.unbind();
-	      cancelAnimationFrame(this.RAF);
-	      this.RAF = null;
-	    }
-	  }]);
+	Home.resize = function resize() {
 
-	  return Home;
-	})();
+	  this.renderer.setSize(_window2.default.width, _window2.default.height);
+	  this.camera.aspect = _window2.default.width / _window2.default.height;
+
+	  this.camera.updateProjectionMatrix();
+	};
+
+	Home.render = function render() {
+
+	  this.RAF = requestAnimationFrame(this.render.bind(this));
+
+	  this.renderer.render(this.scene, this.camera);
+
+	  this.update();
+	};
+
+	Home.update = function update() {
+
+	  _tween2.default.update();
+
+	  this.controls.update();
+	  this.particles.update();
+	  this.projects.update();
+	};
+
+	Home.destroy = function destroy() {
+
+	  this.projects.unbind();
+	  this.controls.unbind();
+	  this.unbind();
+
+	  cancelAnimationFrame(this.RAF);
+	  this.RAF = null;
+	};
 
 	exports.default = Home;
 
@@ -54731,8 +54730,6 @@
 
 	'use strict';
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
@@ -54743,78 +54740,75 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	var ParticleSystem = {
 
-	var ParticleSystem = (function () {
-		function ParticleSystem(scene) {
-			_classCallCheck(this, ParticleSystem);
+		scene: null,
+		geometry: new _three2.default.Geometry(),
+		materials: [],
+		particles: [],
+		count: 5000,
+		parameters: [[[1, 1, 0.5], 5], [[0.95, 1, 0.5], 4], [[0.90, 1, 0.5], 3], [[0.85, 1, 0.5], 2], [[0.80, 1, 0.5], 1]]
 
-			this.geometry = null;
-			this.materials = null;
-			this.particles = null;
-			this.count = null;
-			this.parameters = null;
+	};
 
-			this.scene = scene;
+	ParticleSystem.init = function init(scene) {
 
-			this.geometry = new _three2.default.Geometry();
-			this.materials = [];
-			this.particles = [];
-			this.count = 5000;
+		this.scene = scene;
 
-			for (var i = 0; i < this.count; i++) {
+		this.pushVertices();
 
-				var vertex = new _three2.default.Vector3();
+		this.createParticles();
+	};
 
-				vertex.x = Math.random() * 8000 - 4000;
-				vertex.y = Math.random() * 8000 - 4000;
-				vertex.z = Math.random() * 8000 - 4000;
+	ParticleSystem.pushVertices = function pushVertices() {
 
-				this.geometry.vertices.push(vertex);
-			}
+		for (var i = 0; i < this.count; i++) {
 
-			this.parameters = [[[1, 1, 0.5], 5], [[0.95, 1, 0.5], 4], [[0.90, 1, 0.5], 3], [[0.85, 1, 0.5], 2], [[0.80, 1, 0.5], 1]];
+			var vertex = new _three2.default.Vector3();
 
-			for (var i = 0; i < this.parameters.length; i++) {
+			vertex.x = Math.random() * 8000 - 4000;
+			vertex.y = Math.random() * 8000 - 4000;
+			vertex.z = Math.random() * 8000 - 4000;
 
-				var size = this.parameters[i][1];
-
-				this.materials[i] = new _three2.default.PointsMaterial({
-					size: size,
-					map: _three2.default.ImageUtils.loadTexture('images/_tmp/particle.jpg'),
-					blending: _three2.default.NormalBlending,
-					transparent: true
-				});
-
-				var particle = new _three2.default.Points(this.geometry, this.materials[i]);
-
-				particle.rotation.x = Math.random() * 6;
-				particle.rotation.y = Math.random() * 6;
-				particle.rotation.z = Math.random() * 6;
-
-				this.particles.push(particle);
-
-				this.scene.add(particle);
-			}
+			this.geometry.vertices.push(vertex);
 		}
+	};
 
-		_createClass(ParticleSystem, [{
-			key: 'update',
-			value: function update() {
+	ParticleSystem.createParticles = function createParticles() {
+		var _this = this;
 
-				var time = Date.now() * 0.00002;
+		this.parameters.map(function (item, index) {
 
-				for (var i = 0; i < this.particles.length; i++) {
+			var size = item[1];
 
-					var object = this.particles[i];
+			_this.materials[index] = new _three2.default.PointsMaterial({
+				size: size,
+				map: _three2.default.ImageUtils.loadTexture('images/_tmp/particle.jpg'),
+				blending: _three2.default.NormalBlending,
+				transparent: true
+			});
 
-					object.rotation.y = time * (i < 4 ? i + 1 : -(i + 1));
-				}
-			}
-		}]);
+			var particle = new _three2.default.Points(_this.geometry, _this.materials[index]);
 
-		return ParticleSystem;
-	})();
+			particle.rotation.x = Math.random() * 6;
+			particle.rotation.y = Math.random() * 6;
+			particle.rotation.z = Math.random() * 6;
+
+			_this.particles.push(particle);
+
+			_this.scene.add(particle);
+		});
+	};
+
+	ParticleSystem.update = function update() {
+
+		var time = Date.now() * 0.00001;
+
+		this.particles.map(function (item, index) {
+
+			item.rotation.y = time * (index < 4 ? index + 1 : -(index + 1));
+		});
+	};
 
 	exports.default = ParticleSystem;
 
@@ -54823,8 +54817,6 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 	Object.defineProperty(exports, "__esModule", {
 		value: true
@@ -54844,106 +54836,96 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	var OrbitControls = {
 
-	var OrbitControls = (function () {
-		function OrbitControls(scene, camera) {
-			_classCallCheck(this, OrbitControls);
+		$el: (0, _jquery2.default)('#three-viewport'),
 
-			this.$el = (0, _jquery2.default)('#three-viewport');
+		scene: null,
+		camera: null,
 
-			this.scene = scene;
-			this.camera = camera;
+		pivot: null,
+		tween: null,
 
-			this.pivot = null;
-			this.tween = null;
+		pos: {
+			a: 0,
+			x: 0
+		},
 
-			this.pos = {
-				a: 0,
-				x: 0
-			};
+		pivot: new _three2.default.Object3D()
 
-			this.pivot = new _three2.default.Object3D();
+	};
 
-			this.scene.add(this.pivot);
-			this.pivot.add(this.camera);
+	OrbitControls.init = function init(scene, camera) {
 
-			this.bind();
+		this.scene = scene;
+		this.camera = camera;
+
+		this.scene.add(this.pivot);
+		this.pivot.add(this.camera);
+
+		this.bind();
+	};
+
+	OrbitControls.bind = function bind() {
+
+		this.$el.on('mousemove', this.mouseMove.bind(this));
+		this.$el.on('touchstart', this.touchStart.bind(this));
+		this.$el.on('touchmove', this.touchMove.bind(this));
+		this.$el.on('touchend', this.touchEnd.bind(this));
+	};
+
+	OrbitControls.unbind = function unbind() {
+
+		this.$el.off('mousemove');
+		this.$el.off('touchstart');
+		this.$el.off('touchmove');
+		this.$el.off('touchend');
+	};
+
+	OrbitControls.mouseMove = function mouseMove() {
+
+		this.pos.x = event.pageX;
+		this.pos.x = this.pos.x - (0, _jquery2.default)(window).width() / 2;
+		this.pos.x = this.pos.x * 0.000025;
+	};
+
+	OrbitControls.touchStart = function touchStart() {
+
+		this.pos.a = event.originalEvent.touches[0].pageX;
+	};
+
+	OrbitControls.touchMove = function touchMove() {
+
+		if (tween) {
+			tween.stop();
 		}
 
-		_createClass(OrbitControls, [{
-			key: 'bind',
-			value: function bind() {
+		this.pos.x = event.originalEvent.touches[0].pageX;
+		this.pos.x = this.pos.x - this.pos.a;
+		this.pos.x = this.pos.x * -0.000075;
+	};
 
-				this.$el.on('mousemove', this.mouseMove.bind(this));
-				this.$el.on('touchstart', this.touchStart.bind(this));
-				this.$el.on('touchmove', this.touchMove.bind(this));
-				this.$el.on('touchend', this.touchEnd.bind(this));
-			}
-		}, {
-			key: 'unbind',
-			value: function unbind() {
+	OrbitControls.touchEnd = function touchEnd() {
 
-				this.$el.off('mousemove');
-				this.$el.off('touchstart');
-				this.$el.off('touchmove');
-				this.$el.off('touchend');
-			}
-		}, {
-			key: 'mouseMove',
-			value: function mouseMove() {
+		var duration = Math.round(Math.abs(this.pos.x * 100000));
+		var tween = new _tween2.default.Tween(this.pos);
 
-				this.pos.x = event.pageX;
-				this.pos.x = this.pos.x - (0, _jquery2.default)(window).width() / 2;
-				this.pos.x = this.pos.x * 0.000025;
-			}
-		}, {
-			key: 'touchStart',
-			value: function touchStart() {
+		tween.to({ x: 0 }, duration);
+		tween.easing(_tween2.default.Easing.Sinusoidal.Out);
+		tween.start();
+	};
 
-				this.pos.a = event.originalEvent.touches[0].pageX;
-			}
-		}, {
-			key: 'touchMove',
-			value: function touchMove() {
+	OrbitControls.watchTarget = function watchTarget() {
 
-				if (tween) {
-					tween.stop();
-				}
+		this.camera.lookAt(this.scene.position);
+	};
 
-				this.pos.x = event.originalEvent.touches[0].pageX;
-				this.pos.x = this.pos.x - this.pos.a;
-				this.pos.x = this.pos.x * -0.000075;
-			}
-		}, {
-			key: 'touchEnd',
-			value: function touchEnd() {
+	OrbitControls.update = function update() {
 
-				var duration = Math.round(Math.abs(this.pos.x * 100000));
-				var tween = new _tween2.default.Tween(this.pos);
+		this.pivot.rotation.y = this.pivot.rotation.y - this.pos.x;
 
-				tween.to({ x: 0 }, duration);
-				tween.easing(_tween2.default.Easing.Sinusoidal.Out);
-				tween.start();
-			}
-		}, {
-			key: 'watchTarget',
-			value: function watchTarget() {
-
-				this.camera.lookAt(this.scene.position);
-			}
-		}, {
-			key: 'update',
-			value: function update() {
-
-				this.pivot.rotation.y = this.pivot.rotation.y - this.pos.x;
-
-				this.watchTarget();
-			}
-		}]);
-
-		return OrbitControls;
-	})();
+		this.watchTarget();
+	};
 
 	exports.default = OrbitControls;
 
@@ -54953,19 +54935,34 @@
 
 	'use strict';
 
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Example = function Example() {
-		_classCallCheck(this, Example);
+	var About = (function () {
+		function About() {
+			_classCallCheck(this, About);
 
-		console.log('---[ VIEW EXAMPLE ]---');
-	};
+			console.log('---[ VIEW ABOUT ]---');
+		}
 
-	exports.default = Example;
+		_createClass(About, [{
+			key: 'unbind',
+			value: function unbind() {
+
+				// unbind logic
+
+			}
+		}]);
+
+		return About;
+	})();
+
+	exports.default = About;
 
 /***/ }
 /******/ ]);
