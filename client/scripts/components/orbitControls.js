@@ -67,7 +67,7 @@ OrbitControls.touchStart = function touchStart() {
 
 OrbitControls.touchMove = function touchMove() {
 
-	if(this.tween) this.tween.stop();
+	if (this.tween) this.tween.stop();
 
 	this.pos.x = event.originalEvent.touches[0].pageX;
 	this.pos.x = this.pos.x - this.pos.a;

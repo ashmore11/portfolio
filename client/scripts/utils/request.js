@@ -1,30 +1,34 @@
-const Request = function Request(url) {
+const Request = {
 
-  return new Promise((resolve, reject) => {
-    
-    const req = new XMLHttpRequest;
+  get: function get(url) {
 
-    req.open('GET', url);
+    return new Promise((resolve, reject) => {
+      
+      const req = new XMLHttpRequest;
 
-    req.onload = () => {
+      req.open('GET', url);
 
-      if (req.status == 200) {
-        
-        resolve(req.response);
+      req.onload = () => {
 
-      } else {
+        if (req.status == 200) {
+          
+          resolve(req.response);
 
-        reject(Error(req.statusText));
+        } else {
 
-      }
+          reject(Error(req.statusText));
 
-    };
+        }
 
-    req.onerror = () => { reject(Error("Network Error")); };
+      };
 
-    req.send();
+      req.onerror = () => { reject(Error("Network Error")); };
 
-  });
+      req.send();
+
+    });
+
+  },
 
 };
 

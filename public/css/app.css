@@ -1,5 +1,5 @@
 
-/* line 36 : /Users/scott/Desktop/work/portfolio/client/styles/app.styl */
+/* line 37 : /Users/scott/Desktop/work/portfolio/client/styles/app.styl */
 
 /* line 1 : /Users/scott/Desktop/work/portfolio/node_modules/stylus/lib/functions/index.styl */
 
@@ -418,7 +418,19 @@ h2 {
 /* line 1 : /Users/scott/Desktop/work/portfolio/client/styles/views/home.styl */
 
 /* line 3 : /Users/scott/Desktop/work/portfolio/client/styles/views/home.styl */
-#home #three-viewport {
+#home h1 {
+  position: absolute;
+  bottom: 20%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  letter-spacing: 10px;
+  color: #efefef;
+  z-index: 1;
+}
+
+/* line 11 : /Users/scott/Desktop/work/portfolio/client/styles/views/home.styl */
+#three-viewport {
   position: absolute;
   top: 0;
   left: 0;
@@ -427,9 +439,15 @@ h2 {
   height: 100%;
 }
 
-/* line 6 : /Users/scott/Desktop/work/portfolio/client/styles/views/home.styl */
+/* line 14 : /Users/scott/Desktop/work/portfolio/client/styles/views/home.styl */
 
-/* line 6 : /Users/scott/Desktop/work/portfolio/client/styles/views/about.styl */
+/* line 14 : /Users/scott/Desktop/work/portfolio/client/styles/views/project.styl */
+
+/* line 1 : /Users/scott/Desktop/work/portfolio/client/styles/views/project.styl */
+
+/* line 2 : /Users/scott/Desktop/work/portfolio/client/styles/views/project.styl */
+
+/* line 2 : /Users/scott/Desktop/work/portfolio/client/styles/views/about.styl */
 
 /* line 1 : /Users/scott/Desktop/work/portfolio/client/styles/views/about.styl */
 

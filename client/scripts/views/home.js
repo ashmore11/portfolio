@@ -5,7 +5,7 @@ import Win            from 'app/utils/window';
 import ProjectSphere  from 'app/components/projectSphere';
 import ParticleSystem from 'app/components/particleSystem';
 import OrbitControls  from 'app/components/orbitControls';
-import GET            from 'app/utils/request';
+import Request        from 'app/utils/request';
 
 const Home = {
 
@@ -22,7 +22,7 @@ Home.init = function init() {
   const host = window.location.origin;
   const url  = `${host}/api/posts`;
 
-  GET(url).then(response => {
+  Request.get(url).then(response => {
 
     this.data = JSON.parse(response).filter(item => {
 
@@ -53,7 +53,7 @@ Home.initScene = function initScene() {
 
   this.$el.append(this.renderer.domElement);
 
-  // this.animateCameraPos();
+  this.animateCameraPos();
   
   this.camTweenComplete = true;
   this.camera.position.set(0, 25, 1000);

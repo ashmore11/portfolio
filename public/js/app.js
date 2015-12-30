@@ -50,11 +50,15 @@
 
 	var _navigation2 = _interopRequireDefault(_navigation);
 
-	var _home = __webpack_require__(6);
+	var _home = __webpack_require__(8);
 
 	var _home2 = _interopRequireDefault(_home);
 
-	var _about = __webpack_require__(16);
+	var _project = __webpack_require__(17);
+
+	var _project2 = _interopRequireDefault(_project);
+
+	var _about = __webpack_require__(18);
 
 	var _about2 = _interopRequireDefault(_about);
 
@@ -64,11 +68,14 @@
 
 		views: {
 			home: _home2.default,
+			project: _project2.default,
 			example: _about2.default
 		},
 
 		init: function init() {
 			var _this = this;
+
+			_home2.default.init();
 
 			_navigation2.default.init();
 
@@ -82,8 +89,6 @@
 
 				_this.renderView(id);
 			});
-
-			_navigation2.default.start();
 		},
 
 		renderView: function renderView(id) {
@@ -111,11 +116,15 @@
 
 	var _happens2 = _interopRequireDefault(_happens);
 
-	var _gsap = __webpack_require__(3);
+	var _transitions = __webpack_require__(3);
 
-	var _gsap2 = _interopRequireDefault(_gsap);
+	var _transitions2 = _interopRequireDefault(_transitions);
 
-	var _jquery = __webpack_require__(5);
+	var _request = __webpack_require__(6);
+
+	var _request2 = _interopRequireDefault(_request);
+
+	var _jquery = __webpack_require__(7);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -123,115 +132,49 @@
 
 	var Navigation = {
 
-		$el: (0, _jquery2.default)('#main'),
-		popEventListnerAdded: false,
-		url: null,
-		id: null
+		url: null
 
 	};
 
 	Navigation.init = function init() {
 
 		(0, _happens2.default)(this);
+
+		this.bind();
 	};
 
-	Navigation.start = function start() {
+	Navigation.bind = function bind() {
 
-		this.id = this.$el[0].children[0].id;
-
-		this.emit('url:changed', this.id);
-
-		this.bindEvents();
+		(0, _jquery2.default)(window).on('popstate', this.popState.bind(this));
 	};
 
-	Navigation.bindEvents = function bindEvents() {
+	Navigation.go = function go(url) {
 
-		(0, _jquery2.default)('body').find('a').on('click', this.navigate.bind(this));
-	};
+		if (this.url === url) return;
 
-	Navigation.navigate = function navigate(event) {
+		this.url = url;
 
-		event.preventDefault();
-
-		var target = (0, _jquery2.default)(event.target);
-		var url = target.attr('href');
-
-		if (url === '/keystone') {
-
-			window.location = url;
-
-			return;
-		} else if (this.url !== url) {
-
-			this.url = url;
-			this.id = target.text().toLowerCase();
-		} else {
-
-			return;
-		}
-
-		this.fadeOut();
 		this.pushState();
-
-		if (!this.popEventListnerAdded) {
-
-			this.popState();
-		}
-	};
-
-	Navigation.fadeOut = function fadeOut() {
-		var _this = this;
-
-		var params = {
-			autoAlpha: 0,
-			ease: Power1.easeOut,
-			onComplete: function onComplete() {
-				_this.loadPage();
-			}
-		};
-
-		_gsap2.default.to(this.$el, 0.25, params);
-	};
-
-	Navigation.fadeIn = function fadeIn() {
-
-		var params = {
-			autoAlpha: 1,
-			ease: Power1.easeInOut
-		};
-
-		_gsap2.default.to(this.$el, 0.25, params);
-	};
-
-	Navigation.loadPage = function loadPage() {
-		var _this2 = this;
-
-		this.$el.load(this.url + ' .page', null, function () {
-
-			_this2.emit('url:changed', _this2.id);
-
-			_this2.fadeIn();
-		});
 	};
 
 	Navigation.pushState = function pushState() {
 
-		history.pushState(this.url, null, this.url);
+		console.log('pushstate');
+
+		var stateObj = {
+			url: this.url
+		};
+
+		history.pushState(stateObj, null, this.url);
 	};
 
-	Navigation.popState = function popState() {
-		var _this3 = this;
+	Navigation.popState = function popState(event) {
 
-		(0, _jquery2.default)(window).on('popstate', function (event) {
+		console.log('popstate', event);
 
-			var state = event.originalEvent.state;
+		// this.url = event.originalEvent.state;
 
-			_this3.url = state;
-
-			_this3.popEventListnerAdded = true;
-
-			_this3.fadeOut();
-		});
+		// this.emit('url:changed')
 	};
 
 	exports.default = Navigation;
@@ -336,6 +279,72 @@
 
 /***/ },
 /* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _happens = __webpack_require__(2);
+
+	var _happens2 = _interopRequireDefault(_happens);
+
+	var _gsap = __webpack_require__(4);
+
+	var _gsap2 = _interopRequireDefault(_gsap);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Transitions = {
+
+	  init: function init() {
+
+	    (0, _happens2.default)(this);
+	  },
+
+	  fadeIn: function fadeIn(el, duration) {
+	    var _this = this;
+
+	    var params = {
+	      autoAlpha: 1,
+	      ease: Power2.easeInOut,
+	      onComplete: function onComplete() {
+	        _this.emit('fadeIn:complete');
+	      }
+	    };
+
+	    this.tween(el, duration, params);
+	  },
+
+	  fadeOut: function fadeOut(el, duration) {
+	    var _this2 = this;
+
+	    var params = {
+	      autoAlpha: 0,
+	      ease: Power2.easeOut,
+	      onComplete: function onComplete() {
+	        _this2.emit('fadeOut:complete');
+	      }
+	    };
+
+	    this.tween(el, duration, params);
+	  },
+
+	  tween: function tween(el, duration, params) {
+
+	    _gsap2.default.to(el, duration, params);
+	  }
+
+	};
+
+	Transitions.init();
+
+	exports.default = Transitions;
+
+/***/ },
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global) {/*!
@@ -6137,7 +6146,7 @@
 							if (global) {
 								_globals[n] = cl; //provides a way to avoid global namespace pollution. By default, the main classes like TweenLite, Power1, Strong, etc. are added to window unless a GreenSockGlobals is defined. So if you want to have things added to a custom object instead, just do something like window.GreenSockGlobals = {} before loading any GreenSock files. You can even set up an alias like window.GreenSockGlobals = windows.gs = {} so that you can access everything like gs.TweenLite. Also remember that ALL classes are added to the window.com.greensock object (in their respective packages, like com.greensock.easing.Power1, com.greensock.TweenLite, etc.)
 								hasModule = (typeof(module) !== "undefined" && module.exports);
-								if (!hasModule && "function" === "function" && __webpack_require__(4)){ //AMD
+								if (!hasModule && "function" === "function" && __webpack_require__(5)){ //AMD
 									!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function() { return cl; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 								} else if (ns === moduleName && hasModule){ //node
 									module.exports = cl;
@@ -7922,7 +7931,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 4 */
+/* 5 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
@@ -7930,7 +7939,49 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, {}))
 
 /***/ },
-/* 5 */
+/* 6 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var Request = {
+
+	  get: function get(url) {
+
+	    return new Promise(function (resolve, reject) {
+
+	      var req = new XMLHttpRequest();
+
+	      req.open('GET', url);
+
+	      req.onload = function () {
+
+	        if (req.status == 200) {
+
+	          resolve(req.response);
+	        } else {
+
+	          reject(Error(req.statusText));
+	        }
+	      };
+
+	      req.onerror = function () {
+	        reject(Error("Network Error"));
+	      };
+
+	      req.send();
+	    });
+	  }
+
+	};
+
+	exports.default = Request;
+
+/***/ },
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -17146,7 +17197,7 @@
 
 
 /***/ },
-/* 6 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17155,35 +17206,35 @@
 	  value: true
 	});
 
-	var _jquery = __webpack_require__(5);
+	var _jquery = __webpack_require__(7);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _three = __webpack_require__(7);
+	var _three = __webpack_require__(9);
 
 	var _three2 = _interopRequireDefault(_three);
 
-	var _tween = __webpack_require__(8);
+	var _tween = __webpack_require__(10);
 
 	var _tween2 = _interopRequireDefault(_tween);
 
-	var _window = __webpack_require__(9);
+	var _window = __webpack_require__(11);
 
 	var _window2 = _interopRequireDefault(_window);
 
-	var _projectSphere = __webpack_require__(10);
+	var _projectSphere = __webpack_require__(12);
 
 	var _projectSphere2 = _interopRequireDefault(_projectSphere);
 
-	var _particleSystem = __webpack_require__(12);
+	var _particleSystem = __webpack_require__(14);
 
 	var _particleSystem2 = _interopRequireDefault(_particleSystem);
 
-	var _orbitControls = __webpack_require__(14);
+	var _orbitControls = __webpack_require__(16);
 
 	var _orbitControls2 = _interopRequireDefault(_orbitControls);
 
-	var _request = __webpack_require__(15);
+	var _request = __webpack_require__(6);
 
 	var _request2 = _interopRequireDefault(_request);
 
@@ -17205,7 +17256,7 @@
 	  var host = window.location.origin;
 	  var url = host + '/api/posts';
 
-	  (0, _request2.default)(url).then(function (response) {
+	  _request2.default.get(url).then(function (response) {
 
 	    _this.data = JSON.parse(response).filter(function (item) {
 
@@ -17233,7 +17284,7 @@
 
 	  this.$el.append(this.renderer.domElement);
 
-	  // this.animateCameraPos();
+	  this.animateCameraPos();
 
 	  this.camTweenComplete = true;
 	  this.camera.position.set(0, 25, 1000);
@@ -17313,7 +17364,7 @@
 	exports.default = Home;
 
 /***/ },
-/* 7 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;var self = self || {};// File:src/Three.js
@@ -53506,7 +53557,7 @@
 
 
 /***/ },
-/* 8 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -54386,7 +54437,7 @@
 
 
 /***/ },
-/* 9 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -54395,7 +54446,7 @@
 		value: true
 	});
 
-	var _jquery = __webpack_require__(5);
+	var _jquery = __webpack_require__(7);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -54475,7 +54526,7 @@
 	exports.default = Window;
 
 /***/ },
-/* 10 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -54484,42 +54535,46 @@
 		value: true
 	});
 
-	var _jquery = __webpack_require__(5);
+	var _jquery = __webpack_require__(7);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _three = __webpack_require__(7);
+	var _three = __webpack_require__(9);
 
 	var _three2 = _interopRequireDefault(_three);
 
-	var _tween = __webpack_require__(8);
+	var _tween = __webpack_require__(10);
 
 	var _tween2 = _interopRequireDefault(_tween);
 
-	var _window = __webpack_require__(9);
+	var _window = __webpack_require__(11);
 
 	var _window2 = _interopRequireDefault(_window);
 
-	var _textureLoader = __webpack_require__(11);
+	var _textureLoader = __webpack_require__(13);
 
 	var _textureLoader2 = _interopRequireDefault(_textureLoader);
+
+	var _navigation = __webpack_require__(1);
+
+	var _navigation2 = _interopRequireDefault(_navigation);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var ProjectSphere = {
 
 		$el: (0, _jquery2.default)('#three-viewport'),
+
 		data: null,
 		scene: null,
 		camera: null,
-		pos: {
-			x: 0,
-			y: 0
-		},
+
+		pos: {},
 		spheres: [],
 		intersected: null,
 		raycaster: new _three2.default.Raycaster(),
 		camera_pos: new _three2.default.Vector3(),
+
 		project: {
 			radiusTop: 3000,
 			radiusBottom: 3000,
@@ -54568,9 +54623,10 @@
 			texture.minFilter = _three2.default.LinearFilter;
 
 			var material = new _three2.default.MeshBasicMaterial({
-				map: texture,
+				// map         : texture,
 				transparent: true,
-				opacity: 0.5
+				opacity: 0.5,
+				wireframe: true
 			});
 
 			var project = new _three2.default.Mesh(geometry, material);
@@ -54579,7 +54635,7 @@
 			project.material.side = _three2.default.DoubleSide;
 			project.name = 'project';
 			project.title = item.title;
-			project.url = item.slug;
+			project.url = 'project/' + item.slug;
 
 			var x = Math.cos(index * (Math.PI * 2) / _this.data.length);
 			var z = Math.sin(index * (Math.PI * 2) / _this.data.length);
@@ -54615,10 +54671,8 @@
 			y: event.pageY || event.originalEvent.touches[0].pageY
 		};
 
-		this.pos = {
-			x: evt.x / _window2.default.width * 2 - 1,
-			y: -(evt.y / _window2.default.height) * 2 + 1
-		};
+		this.pos.x = evt.x / _window2.default.width * 2 - 1;
+		this.pos.y = -(evt.y / _window2.default.height) * 2 + 1;
 	};
 
 	ProjectSphere.projectMouseDown = function projectMouseDown(event) {
@@ -54628,16 +54682,14 @@
 			y: event.pageY || event.originalEvent.touches[0].pageY
 		};
 
-		this.pos = {
-			x: evt.x / _window2.default.width * 2 - 1,
-			y: -(evt.y / _window2.default.height) * 2 + 1
-		};
+		this.pos.x = evt.x / _window2.default.width * 2 - 1;
+		this.pos.y = -(evt.y / _window2.default.height) * 2 + 1;
 
 		var intersects = this.raycaster.intersectObjects(this.spheres);
 
 		if (intersects.length > 0) {
 
-			this.controller.go(intersects[0].object.url);
+			_navigation2.default.go(intersects[0].object.url);
 		}
 	};
 
@@ -54679,16 +54731,10 @@
 
 			this.intersected = intersects[0].object;
 
-			if (!_window2.default.width < 768) {
-
-				this.projectMouseOver();
-			}
+			if (!_window2.default.width < 768) this.projectMouseOver();
 		} else {
 
-			if (!_window2.default.width < 768) {
-
-				this.projectMouseOut();
-			}
+			if (!_window2.default.width < 768) this.projectMouseOut();
 
 			this.intersected = null;
 		}
@@ -54697,7 +54743,7 @@
 	exports.default = ProjectSphere;
 
 /***/ },
-/* 11 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -54706,7 +54752,7 @@
 	  value: true
 	});
 
-	var _three = __webpack_require__(7);
+	var _three = __webpack_require__(9);
 
 	var _three2 = _interopRequireDefault(_three);
 
@@ -54727,7 +54773,7 @@
 	exports.default = TextureLoader;
 
 /***/ },
-/* 12 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -54736,13 +54782,13 @@
 		value: true
 	});
 
-	var _three = __webpack_require__(7);
+	var _three = __webpack_require__(9);
 
 	var _three2 = _interopRequireDefault(_three);
 
-	var _underscore = __webpack_require__(13);
+	var _underscore = __webpack_require__(15);
 
-	var _textureLoader = __webpack_require__(11);
+	var _textureLoader = __webpack_require__(13);
 
 	var _textureLoader2 = _interopRequireDefault(_textureLoader);
 
@@ -54822,7 +54868,7 @@
 	exports.default = ParticleSystem;
 
 /***/ },
-/* 13 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscore.js 1.8.3
@@ -56376,7 +56422,7 @@
 
 
 /***/ },
-/* 14 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -56385,15 +56431,15 @@
 		value: true
 	});
 
-	var _jquery = __webpack_require__(5);
+	var _jquery = __webpack_require__(7);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _three = __webpack_require__(7);
+	var _three = __webpack_require__(9);
 
 	var _three2 = _interopRequireDefault(_three);
 
-	var _tween = __webpack_require__(8);
+	var _tween = __webpack_require__(10);
 
 	var _tween2 = _interopRequireDefault(_tween);
 
@@ -56492,45 +56538,36 @@
 	exports.default = OrbitControls;
 
 /***/ },
-/* 15 */
-/***/ function(module, exports) {
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	var Request = function Request(url) {
 
-	  return new Promise(function (resolve, reject) {
+	var _jquery = __webpack_require__(7);
 
-	    var req = new XMLHttpRequest();
+	var _jquery2 = _interopRequireDefault(_jquery);
 
-	    req.open('GET', url);
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	    req.onload = function () {
+	var Project = {
 
-	      if (req.status == 200) {
+	  $el: (0, _jquery2.default)('#project')
 
-	        resolve(req.response);
-	      } else {
-
-	        reject(Error(req.statusText));
-	      }
-	    };
-
-	    req.onerror = function () {
-	      reject(Error("Network Error"));
-	    };
-
-	    req.send();
-	  });
 	};
 
-	exports.default = Request;
+	Project.init = function init() {
+
+	  console.log('init PROJECT');
+	};
+
+	exports.default = Project;
 
 /***/ },
-/* 16 */
+/* 18 */
 /***/ function(module, exports) {
 
 	'use strict';

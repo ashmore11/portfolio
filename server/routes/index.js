@@ -21,10 +21,12 @@ var routes = {
 exports = module.exports = function(app) {
 	
   // views
-	app.get('/',      routes.controllers.home);
+	app.get('/', routes.controllers.home);
+  app.get('/project/:id', routes.controllers.project);
 	app.get('/about', routes.controllers.about);
 
   // api
-  app.get('/api/posts', keystone.middleware.api, routes.api.posts.get);
+  app.get('/api/posts', keystone.middleware.api, routes.api.posts.getPosts);
+  app.get('/api/post/:slug', keystone.middleware.api, routes.api.posts.getPost);
 	
 };

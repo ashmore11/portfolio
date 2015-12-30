@@ -3,21 +3,22 @@ import THREE         from 'three';
 import TWEEN         from 'tween.js';
 import Win           from 'app/utils/window';
 import TextureLoader from 'app/utils/textureLoader';
+import Nav           from 'app/utils/navigation';
 
 const ProjectSphere = {
 
 	$el: $('#three-viewport'),
+
 	data: null,
 	scene: null,
 	camera: null,
-	pos: {
-		x: 0,
-		y: 0
-	},
+
+	pos: {},
 	spheres: [],
 	intersected: null,
 	raycaster: new THREE.Raycaster,
 	camera_pos: new THREE.Vector3,
+
 	project: {
 		radiusTop: 3000,
 		radiusBottom: 3000,
@@ -77,9 +78,10 @@ ProjectSphere.createProjects = function createProjects() {
 		texture.minFilter = THREE.LinearFilter;
 
 		const material = new THREE.MeshBasicMaterial({
-			map         : texture,
+			// map         : texture,
 			transparent : true,
-			opacity     : 0.5
+			opacity     : 0.5,
+			wireframe   : true
 		});
 
 		const project = new THREE.Mesh(geometry, material);
@@ -88,7 +90,7 @@ ProjectSphere.createProjects = function createProjects() {
 		project.material.side = THREE.DoubleSide;
 		project.name          = 'project';
 		project.title         = item.title;
-		project.url           = item.slug;
+		project.url           = `project/${item.slug}`;
 
 		const x = Math.cos(index * ( Math.PI * 2 ) / this.data.length);
 		const z = Math.sin(index * ( Math.PI * 2 ) / this.data.length);
@@ -124,34 +126,30 @@ ProjectSphere.fadeOutProject = function fadeOutProject(object) {
 ProjectSphere.sceneMouseMove = function sceneMouseMove(event) {
 
 	const evt = {
-		x: event.pageX || event.originalEvent.touches[ 0 ].pageX,
-		y: event.pageY || event.originalEvent.touches[ 0 ].pageY
+		x: event.pageX || event.originalEvent.touches[0].pageX,
+		y: event.pageY || event.originalEvent.touches[0].pageY
 	}
 
-	this.pos = {
-		x:   ( evt.x / Win.width  ) * 2 - 1,
-		y: - ( evt.y / Win.height ) * 2 + 1
-	};
+	this.pos.x = ( evt.x / Win.width  ) * 2 - 1;
+	this.pos.y = - ( evt.y / Win.height ) * 2 + 1;
 
 }
 
 ProjectSphere.projectMouseDown = function projectMouseDown(event) {
 
 	const evt = {
-		x: event.pageX || event.originalEvent.touches[ 0 ].pageX,
-		y: event.pageY || event.originalEvent.touches[ 0 ].pageY
+		x: event.pageX || event.originalEvent.touches[0].pageX,
+		y: event.pageY || event.originalEvent.touches[0].pageY
 	};
 
-	this.pos = {
-		x:   ( evt.x / Win.width  ) * 2 - 1,
-		y: - ( evt.y / Win.height ) * 2 + 1
-	};
+	this.pos.x = (evt.x / Win.width) * 2 - 1;
+	this.pos.y = - (evt.y / Win.height) * 2 + 1;
 
 	const intersects = this.raycaster.intersectObjects(this.spheres);
 
 	if(intersects.length > 0) {
 
-		this.controller.go(intersects[ 0 ].object.url);
+		Nav.go(intersects[0].object.url);
 
 	}
 
@@ -200,21 +198,13 @@ ProjectSphere.update = function update() {
 
 	if(intersects.length > 0) {
 
-		this.intersected = intersects[ 0 ].object;
+		this.intersected = intersects[0].object;
 
-		if(!Win.width < 768) {
-		
-			this.projectMouseOver();
-
-		}
+		if (!Win.width < 768) this.projectMouseOver();
 
 	} else {
 
-		if(!Win.width < 768) {
-
-			this.projectMouseOut();
-
-		}
+		if (!Win.width < 768) this.projectMouseOut();
 
 		this.intersected = null;
 

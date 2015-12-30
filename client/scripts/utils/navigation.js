@@ -1,13 +1,11 @@
-import Happens  from 'happens';
-import TweenMax from 'gsap';
-import $        from 'jquery';
+import Happens     from 'happens';
+import Transitions from 'app/utils/transitions';
+import Request     from 'app/utils/request';
+import $           from 'jquery';
 
 const Navigation = {
 
-	$el: $('#main'),
-	popEventListnerAdded: false,
 	url: null,
-	id: null,
 
 };
 
@@ -15,113 +13,45 @@ Navigation.init = function init() {
 
 	Happens(this);
 
-};
-
-Navigation.start = function start() {
-
-	this.id = this.$el[0].children[0].id;
-
-	this.emit('url:changed', this.id);
-
-	this.bindEvents();
+	this.bind();
 
 };
 
-Navigation.bindEvents = function bindEvents() {
+Navigation.bind = function bind() {
 
-	$('body').find('a').on('click', this.navigate.bind(this));
+	$(window).on('popstate', this.popState.bind(this));
 
 };
 
-Navigation.navigate = function navigate(event) {
+Navigation.go = function go(url) {
 
-	event.preventDefault();
+	if (this.url === url) return;
 
-	const target = $(event.target);
-	const url    = target.attr('href');
+	this.url = url;
 
-	if(url === '/keystone') {
-
-		window.location = url;
-		
-		return;
-	
-	} else if(this.url !== url) {
-
-		this.url = url;
-		this.id  = target.text().toLowerCase();
-
-	} else {
-		
-		return;
-
-	}
-
-	this.fadeOut();
 	this.pushState();
-
-	if(!this.popEventListnerAdded) {
-
-		this.popState();
-
-	}
-
-};
-
-Navigation.fadeOut = function fadeOut() {
-
-	const params = {
-		autoAlpha: 0,
-		ease: Power1.easeOut,
-		onComplete: () => { this.loadPage(); }
-	};
-
-	TweenMax.to(this.$el, 0.25, params);
-
-};
-
-Navigation.fadeIn = function fadeIn() {
-
-	const params = {
-		autoAlpha: 1,
-		ease: Power1.easeInOut
-	};
-
-	TweenMax.to(this.$el, 0.25, params);
-
-};
-
-Navigation.loadPage = function loadPage() {
-
-	this.$el.load(`${this.url} .page`, null, () => {
-
-		this.emit('url:changed', this.id);
-		
-		this.fadeIn();
-
-	});
 
 };
 
 Navigation.pushState = function pushState() {
 
-	history.pushState(this.url, null, this.url);
+	console.log('pushstate');
+
+	const stateObj = {
+		url: this.url,
+	}
+
+	history.pushState(stateObj, null, this.url);
 
 };
 
-Navigation.popState = function popState() {
+Navigation.popState = function popState(event) {
 
-	$(window).on('popstate', event => {
+	console.log('popstate', event);
 
-		const state = event.originalEvent.state;
+	// this.url = event.originalEvent.state;
 
-		this.url = state;
-
-		this.popEventListnerAdded = true;
-
-		this.fadeOut();
-
-	});
+	// this.emit('url:changed')
 
 };
 

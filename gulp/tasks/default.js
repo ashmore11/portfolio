@@ -1,4 +1,4 @@
 import gulp from 'gulp';
 
-gulp.task('build', ['server', 'scripts', 'styles']);
-gulp.task('default', ['build', 'watch']);
+gulp.task('build', ['scripts', 'styles']);
+gulp.task('default', ['build', 'watch', 'server']);
