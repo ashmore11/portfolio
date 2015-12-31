@@ -1,6 +1,7 @@
 import $             from 'jquery';
 import THREE         from 'three';
 import TWEEN         from 'tween.js';
+import TM            from 'gsap';
 import Win           from 'app/utils/window';
 import TextureLoader from 'app/utils/textureLoader';
 import Nav           from 'app/utils/navigation';
@@ -90,7 +91,7 @@ ProjectSphere.createProjects = function createProjects() {
 		project.material.side = THREE.DoubleSide;
 		project.name          = 'project';
 		project.title         = item.title;
-		project.url           = `project/${item.slug}`;
+		project.url           = `/project/${item.slug}`;
 
 		const x = Math.cos(index * ( Math.PI * 2 ) / this.data.length);
 		const z = Math.sin(index * ( Math.PI * 2 ) / this.data.length);
@@ -159,7 +160,7 @@ ProjectSphere.projectMouseOver = function projectMouseOver() {
 
 	$('#home h1').html(this.intersected.title);
 
-	TweenMax.to($('#home h1'), 0.5, { autoAlpha: 1, y: -10, scale: 1 });
+	TM.to($('#home h1'), 0.5, { autoAlpha: 1, y: -10, scale: 1 });
 	
 	this.fadeInProject(this.intersected);
 
@@ -175,7 +176,7 @@ ProjectSphere.projectMouseOut = function projectMouseOut() {
 
 		this.$el.css({ cursor: 'ew-resize' });
 
-		TweenMax.to($('#home h1'), 0.5, { autoAlpha: 0, y: 0, scale: 0.9 });
+		TM.to($('#home h1'), 0.5, { autoAlpha: 0, y: 0, scale: 0.9 });
 
 	}
 

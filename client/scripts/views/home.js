@@ -53,7 +53,7 @@ Home.initScene = function initScene() {
 
   this.$el.append(this.renderer.domElement);
 
-  this.animateCameraPos();
+  // this.animateCameraPos();
   
   this.camTweenComplete = true;
   this.camera.position.set(0, 25, 1000);

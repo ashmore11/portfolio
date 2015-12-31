@@ -1,11 +1,12 @@
-import Happens     from 'happens';
-import Transitions from 'app/utils/transitions';
-import Request     from 'app/utils/request';
-import $           from 'jquery';
+import Happens from 'happens';
+import $       from 'jquery';
 
 const Navigation = {
 
+	originalState: window.location.pathname.split('/').pop() || '/',
+	popped: false,
 	url: null,
+	id: null,
 
 };
 
@@ -19,7 +20,7 @@ Navigation.init = function init() {
 
 Navigation.bind = function bind() {
 
-	$(window).on('popstate', this.popState.bind(this));
+	$(window).bind('popstate', this.popState.bind(this));
 
 };
 
@@ -27,31 +28,36 @@ Navigation.go = function go(url) {
 
 	if (this.url === url) return;
 
-	this.url = url;
-
-	this.pushState();
+	this.pushState(url);
 
 };
 
-Navigation.pushState = function pushState() {
+Navigation.pushState = function pushState(url) {
 
-	console.log('pushstate');
+	this.url = url;
+	this.id  = this.getID();
 
-	const stateObj = {
-		url: this.url,
-	}
+	history.pushState(this.url, null, this.url);
 
-	history.pushState(stateObj, null, this.url);
+	this.emit('url:changed', this.id);
 
 };
 
 Navigation.popState = function popState(event) {
 
-	console.log('popstate', event);
+	this.url = event.originalEvent.state || this.originalState;
 
-	// this.url = event.originalEvent.state;
+	this.id = this.getID();
 
-	// this.emit('url:changed')
+	this.emit('url:changed', this.id);
+
+};
+
+Navigation.getID = function getID() {
+
+	if(this.url === '/') return 'home';
+		
+	return this.url.split('/').pop();
 
 };
 

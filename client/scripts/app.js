@@ -18,19 +18,21 @@ const App = {
 		Navigation.init();
 
 		Navigation.on('url:changed', id => {
+
+			console.log(id);
 			
-			if (this.view) {
+			// if (this.view) {
 				
-				this.view.destroy();
-				this.view = null;
+			// 	this.view.destroy();
+			// 	this.view = null;
 
-			}
+			// }
 
-			this.renderView(id);
+			// this.renderView(url);
 
 		});
 
-	},
+	}, 
 
 	renderView: function renderView(id) {
 
