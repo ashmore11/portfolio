@@ -1,5 +1,5 @@
 import HomeView   from 'app/views/home';
-import RenderView from 'app/utils/renderView';
+import RenderView from 'app/utils/view';
 
 const App = {
 

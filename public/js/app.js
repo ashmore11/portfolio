@@ -50,9 +50,9 @@
 
 	var _home2 = _interopRequireDefault(_home);
 
-	var _renderView = __webpack_require__(16);
+	var _view = __webpack_require__(16);
 
-	var _renderView2 = _interopRequireDefault(_renderView);
+	var _view2 = _interopRequireDefault(_view);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -61,7 +61,7 @@
 	  init: function init() {
 
 	    _home2.default.init();
-	    _renderView2.default.init();
+	    _view2.default.init();
 	  }
 
 	};
@@ -116,7 +116,7 @@
 
 	var Home = {
 
-	  $el: (0, _jquery2.default)('#three-viewport'),
+	  $el: null,
 
 	  projectSphere: _projectSphere2.default,
 	  controls: _orbitControls2.default,
@@ -126,6 +126,8 @@
 
 	Home.init = function init() {
 	  var _this = this;
+
+	  this.$el = (0, _jquery2.default)('#three-viewport');
 
 	  var host = window.location.origin;
 	  var url = host + '/api/posts';
@@ -46750,7 +46752,7 @@
 
 	var ProjectSphere = {
 
-		$el: (0, _jquery2.default)('#three-viewport'),
+		$el: null,
 
 		data: null,
 		scene: null,
@@ -46776,6 +46778,8 @@
 	};
 
 	ProjectSphere.init = function init(data, scene, camera) {
+
+		this.$el = (0, _jquery2.default)('#three-viewport');
 
 		this.data = data;
 		this.scene = scene;
@@ -56481,11 +56485,9 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var RenderView = {
+	var View = {
 
 	  $el: (0, _jquery2.default)('#main'),
-	  id: null,
-	  html: null,
 	  view: null,
 	  views: {
 	    home: _home2.default,
@@ -56495,42 +56497,37 @@
 
 	};
 
-	RenderView.init = function init() {
+	View.init = function init() {
 
-	  _navigation2.default.on('url:changed', this.getView.bind(this));
+	  _navigation2.default.on('url:changed', this.load.bind(this));
 	};
 
-	RenderView.getView = function getView(path, id) {
+	View.load = function load(url, id) {
 	  var _this = this;
-
-	  this.id = id;
-
-	  var url = '' + window.location.origin + path;
 
 	  _request2.default.get(url).then(function (response) {
 
-	    var html = _jquery2.default.parseHTML(response);
-
-	    _this.html = (0, _jquery2.default)(html.filter(function (item) {
+	    var parsedHtml = _jquery2.default.parseHTML(response);
+	    var html = (0, _jquery2.default)(parsedHtml.filter(function (item) {
 	      return item.id === 'main';
-	    }))[0];
+	    }));
 
-	    _this.render();
+	    _this.render(html, id);
 	  });
 	};
 
-	RenderView.render = function render() {
+	View.render = function render(html, id) {
 
-	  this.$el.html(this.html);
+	  this.$el.html(html);
 
 	  if (this.view) this.view.destroy();
 
-	  this.view = this.views[this.id];
+	  this.view = this.views[id];
 
 	  this.view.init();
 	};
 
-	exports.default = RenderView;
+	exports.default = View;
 
 /***/ },
 /* 17 */

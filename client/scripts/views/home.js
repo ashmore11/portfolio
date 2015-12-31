@@ -9,7 +9,7 @@ import Request        from 'app/utils/request';
 
 const Home = {
 
-  $el: $('#three-viewport'),
+  $el: null,
 
   projectSphere: ProjectSphere,
   controls: OrbitControls,
@@ -18,6 +18,8 @@ const Home = {
 };
 
 Home.init = function init() {
+
+  this.$el = $('#three-viewport');
 
   const host = window.location.origin;
   const url  = `${host}/api/posts`;

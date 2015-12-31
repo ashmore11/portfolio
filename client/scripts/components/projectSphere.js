@@ -8,7 +8,7 @@ import Nav           from 'app/utils/navigation';
 
 const ProjectSphere = {
 
-	$el: $('#three-viewport'),
+	$el: null,
 
 	data: null,
 	scene: null,
@@ -34,6 +34,8 @@ const ProjectSphere = {
 };
 
 ProjectSphere.init = function init(data, scene, camera) {
+
+	this.$el = $('#three-viewport');
 
 	this.data   = data;
 	this.scene  = scene;

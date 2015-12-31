@@ -6,11 +6,9 @@ import HomeView    from 'app/views/home';
 import ProjectView from 'app/views/project';
 import AboutView   from 'app/views/about';
 
-const RenderView = {
+const View = {
 
   $el: $('#main'),
-  id: null,
-  html: null,
   view: null,
   views: {
     home: HomeView,
@@ -20,40 +18,35 @@ const RenderView = {
 
 };
 
-RenderView.init = function init() {
+View.init = function init() {
 
-  Nav.on('url:changed', this.getView.bind(this));
+  Nav.on('url:changed', this.load.bind(this));
 
 };
 
-RenderView.getView = function getView(path, id) {
-
-  this.id = id;
-
-  const url = `${window.location.origin}${path}`;
+View.load = function load(url, id) {
 
   Request.get(url).then(response => {
 
-    const html = $.parseHTML(response);
-    
-    this.html = $(html.filter(item => { return item.id === 'main'; }))[0];
+    const parsedHtml = $.parseHTML(response);
+    const html = $(parsedHtml.filter(item => { return item.id === 'main'; }));
 
-    this.render();
+    this.render(html, id);
   
   });
 
 };
 
-RenderView.render = function render() {
+View.render = function render(html, id) {
 
-  this.$el.html(this.html);
+  this.$el.html(html);
 
   if (this.view) this.view.destroy();
 
-  this.view = this.views[this.id];
+  this.view = this.views[id];
 
   this.view.init();
 
 };
 
-export default RenderView;
+export default View;
