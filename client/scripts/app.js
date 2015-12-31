@@ -1,44 +1,14 @@
-import Navigation  from 'app/utils/navigation';
-import HomeView    from 'app/views/home';
-import ProjectView from 'app/views/project';
-import AboutView   from 'app/views/about';
+import HomeView   from 'app/views/home';
+import RenderView from 'app/utils/renderView';
 
 const App = {
 
-	views: {
-		home    : HomeView,
-		project : ProjectView,
-		example : AboutView,
-	},
+  init: function init() {
 
-	init: function init() {
+    HomeView.init();
+    RenderView.init();
 
-		HomeView.init();
-
-		Navigation.init();
-
-		Navigation.on('url:changed', id => {
-
-			console.log(id);
-			
-			// if (this.view) {
-				
-			// 	this.view.destroy();
-			// 	this.view = null;
-
-			// }
-
-			// this.renderView(url);
-
-		});
-
-	}, 
-
-	renderView: function renderView(id) {
-
-		this.views[id].init();
-
-	},
+  },
 
 };
 

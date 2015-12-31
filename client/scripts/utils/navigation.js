@@ -4,9 +4,7 @@ import $       from 'jquery';
 const Navigation = {
 
 	originalState: window.location.pathname.split('/').pop() || '/',
-	popped: false,
 	url: null,
-	id: null,
 
 };
 
@@ -35,29 +33,39 @@ Navigation.go = function go(url) {
 Navigation.pushState = function pushState(url) {
 
 	this.url = url;
-	this.id  = this.getID();
 
 	history.pushState(this.url, null, this.url);
 
-	this.emit('url:changed', this.id);
+	this.emit('url:changed', this.url, this.getID());
 
 };
 
 Navigation.popState = function popState(event) {
 
 	this.url = event.originalEvent.state || this.originalState;
-	this.id  = this.getID();
 
-	this.emit('url:changed', this.id);
+	this.emit('url:changed', this.url, this.getID());
 
 };
 
 Navigation.getID = function getID() {
 
-	if(this.url === '/') return 'home';
+	if (this.url === '/') {
+
+		return 'home';
+
+	} else if (this.url === '/about') {
+
+		return 'about';
+
+	} else {
 		
-	return this.url.split('/').pop();
+		return 'project';
+
+	}
 
 };
+
+Navigation.init();
 
 export default Navigation;

@@ -70,12 +70,6 @@ Home.bind = function bind() {
 
 };
 
-Home.unbind = function unbind() {
-
-  // unbind logic
-
-};
-
 Home.animateCameraPos = function animateCameraPos() {
 
   this.camera.position.set(0, 2500, 5000);
@@ -125,9 +119,10 @@ Home.update = function update() {
 
 Home.destroy = function destroy() {
 
+  console.log('destroy HOME');
+
   this.projectSphere.unbind();
   this.controls.unbind();
-  this.unbind();
 
   cancelAnimationFrame(this.RAF);
   this.RAF = null;

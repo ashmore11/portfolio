@@ -46,57 +46,23 @@
 
 	'use strict';
 
-	var _navigation = __webpack_require__(1);
-
-	var _navigation2 = _interopRequireDefault(_navigation);
-
-	var _home = __webpack_require__(4);
+	var _home = __webpack_require__(1);
 
 	var _home2 = _interopRequireDefault(_home);
 
-	var _project = __webpack_require__(16);
+	var _renderView = __webpack_require__(16);
 
-	var _project2 = _interopRequireDefault(_project);
-
-	var _about = __webpack_require__(17);
-
-	var _about2 = _interopRequireDefault(_about);
+	var _renderView2 = _interopRequireDefault(_renderView);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var App = {
 
-		views: {
-			home: _home2.default,
-			project: _project2.default,
-			example: _about2.default
-		},
+	  init: function init() {
 
-		init: function init() {
-
-			_home2.default.init();
-
-			_navigation2.default.init();
-
-			_navigation2.default.on('url:changed', function (id) {
-
-				console.log(id);
-
-				// if (this.view) {
-
-				// 	this.view.destroy();
-				// 	this.view = null;
-
-				// }
-
-				// this.renderView(url);
-			});
-		},
-
-		renderView: function renderView(id) {
-
-			this.views[id].init();
-		}
+	    _home2.default.init();
+	    _renderView2.default.init();
+	  }
 
 	};
 
@@ -111,174 +77,163 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 
-	var _happens = __webpack_require__(2);
-
-	var _happens2 = _interopRequireDefault(_happens);
-
-	var _jquery = __webpack_require__(3);
+	var _jquery = __webpack_require__(2);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
+	var _three = __webpack_require__(3);
+
+	var _three2 = _interopRequireDefault(_three);
+
+	var _tween = __webpack_require__(4);
+
+	var _tween2 = _interopRequireDefault(_tween);
+
+	var _window = __webpack_require__(5);
+
+	var _window2 = _interopRequireDefault(_window);
+
+	var _projectSphere = __webpack_require__(7);
+
+	var _projectSphere2 = _interopRequireDefault(_projectSphere);
+
+	var _particleSystem = __webpack_require__(12);
+
+	var _particleSystem2 = _interopRequireDefault(_particleSystem);
+
+	var _orbitControls = __webpack_require__(14);
+
+	var _orbitControls2 = _interopRequireDefault(_orbitControls);
+
+	var _request = __webpack_require__(15);
+
+	var _request2 = _interopRequireDefault(_request);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var Navigation = {
+	var Home = {
 
-		originalState: window.location.pathname.split('/').pop() || '/',
-		popped: false,
-		url: null,
-		id: null
+	  $el: (0, _jquery2.default)('#three-viewport'),
+
+	  projectSphere: _projectSphere2.default,
+	  controls: _orbitControls2.default,
+	  particles: _particleSystem2.default
 
 	};
 
-	Navigation.init = function init() {
+	Home.init = function init() {
+	  var _this = this;
 
-		(0, _happens2.default)(this);
+	  var host = window.location.origin;
+	  var url = host + '/api/posts';
 
-		this.bind();
+	  _request2.default.get(url).then(function (response) {
+
+	    _this.data = JSON.parse(response).filter(function (item) {
+
+	      return item.state === 'published';
+	    });
+
+	    _this.initScene();
+	  });
 	};
 
-	Navigation.bind = function bind() {
+	Home.initScene = function initScene() {
 
-		(0, _jquery2.default)(window).bind('popstate', this.popState.bind(this));
+	  this.scene = new _three2.default.Scene();
+	  this.scene.fog = new _three2.default.Fog(0x000000, 10, 10000);
+
+	  this.camera = new _three2.default.PerspectiveCamera(50, _window2.default.width / _window2.default.height, 0.1, 10000);
+
+	  this.projectSphere.init(this.data, this.scene, this.camera);
+	  this.controls.init(this.scene, this.camera);
+	  this.particles.init(this.scene);
+
+	  this.renderer = new _three2.default.WebGLRenderer({ antialias: true });
+	  this.renderer.setSize(_window2.default.width, _window2.default.height);
+	  this.renderer.setClearColor(0x000000);
+
+	  this.$el.append(this.renderer.domElement);
+
+	  // this.animateCameraPos();
+
+	  this.camTweenComplete = true;
+	  this.camera.position.set(0, 25, 1000);
+	  this.controls.pos.x = -0.00025;
+
+	  this.render();
+	  this.bind();
 	};
 
-	Navigation.go = function go(url) {
+	Home.bind = function bind() {
 
-		if (this.url === url) return;
-
-		this.pushState(url);
+	  _window2.default.on('resize', this.resize.bind(this));
 	};
 
-	Navigation.pushState = function pushState(url) {
+	Home.animateCameraPos = function animateCameraPos() {
+	  var _this2 = this;
 
-		this.url = url;
-		this.id = this.getID();
+	  this.camera.position.set(0, 2500, 5000);
+	  this.controls.pos.x = -0.00025;
 
-		history.pushState(this.url, null, this.url);
+	  var tweenCamY = new _tween2.default.Tween(this.camera.position);
+	  tweenCamY.to({ y: 25 }, 5000);
+	  tweenCamY.easing(_tween2.default.Easing.Sinusoidal.InOut);
+	  tweenCamY.onComplete(function () {
+	    _this2.camTweenComplete = true;
+	  });
+	  tweenCamY.start();
 
-		this.emit('url:changed', this.id);
+	  var tweenCamZ = new _tween2.default.Tween(this.camera.position);
+	  tweenCamZ.to({ z: 1000 }, 6500);
+	  tweenCamZ.easing(_tween2.default.Easing.Sinusoidal.InOut);
+	  tweenCamZ.start();
 	};
 
-	Navigation.popState = function popState(event) {
+	Home.resize = function resize() {
 
-		this.url = event.originalEvent.state || this.originalState;
-		this.id = this.getID();
+	  this.renderer.setSize(_window2.default.width, _window2.default.height);
+	  this.camera.aspect = _window2.default.width / _window2.default.height;
 
-		this.emit('url:changed', this.id);
+	  this.camera.updateProjectionMatrix();
 	};
 
-	Navigation.getID = function getID() {
+	Home.render = function render() {
 
-		if (this.url === '/') return 'home';
+	  this.RAF = requestAnimationFrame(this.render.bind(this));
 
-		return this.url.split('/').pop();
+	  this.renderer.render(this.scene, this.camera);
+
+	  this.update();
 	};
 
-	exports.default = Navigation;
+	Home.update = function update() {
+
+	  _tween2.default.update();
+
+	  this.controls.update();
+	  this.particles.update();
+	  this.projectSphere.update();
+	};
+
+	Home.destroy = function destroy() {
+
+	  console.log('destroy HOME');
+
+	  this.projectSphere.unbind();
+	  this.controls.unbind();
+
+	  cancelAnimationFrame(this.RAF);
+	  this.RAF = null;
+	};
+
+	exports.default = Home;
 
 /***/ },
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
-
-	(function (global, factory) {
-	   true ? module.exports = factory() :
-	  "function" === typeof define && define.amd ? define(factory) :
-	  global.Happens = factory();
-	}(this, function () {
-
-	  'use strict'
-
-	  /**
-	   * Module constructor
-	   * @param  {Object} target Target object to extends methods and properties into
-	   * @return {Object}        Target after with extended methods and properties
-	   */
-	  function Happens(target){
-	    var nu = this instanceof Happens;
-	    if(target){
-	      if(!nu)
-	        for(var prop in Happens.prototype)
-	          target[prop] = Happens.prototype[prop];
-	      else
-	        throw new Error("You can't pass a target when instantiating with the `new` keyword");
-	    }
-	    else if(!nu)
-	      return new Happens
-	  };
-
-	  /**
-	   * Initializes event
-	   * @param  {String} event Event name to initialize
-	   * @return {Array}        Initialized event pool
-	   */
-	  Happens.prototype.__init = function(event) {
-	    var tmp = this.__listeners || (this.__listeners = []);
-	    return tmp[event] || (tmp[event] = []);
-	  };
-
-	  /**
-	   * Adds listener
-	   * @param  {String}   event Event name
-	   * @param  {Function} fn    Event handler
-	   */
-	  Happens.prototype.on = function(event, fn) {
-	    validate(fn);
-	    this.__init(event).push(fn);
-	  };
-
-	  /**
-	   * Removes listener
-	   * @param  {String}   event Event name
-	   * @param  {Function} fn    Event handler
-	   */
-	  Happens.prototype.off = function(event, fn) {
-	    var pool = this.__init(event);
-	    pool.splice(pool.indexOf(fn), 1);
-	  };
-
-	  /**
-	   * Add listener the fires once and auto-removes itself
-	   * @param  {String}   event Event name
-	   * @param  {Function} fn    Event handler
-	   */
-	  Happens.prototype.once = function(event, fn) {
-	    validate(fn);
-	    var self = this, wrapper = function() {
-	      self.off(event, wrapper);
-	      fn.apply(this, arguments);
-	    };
-	    this.on(event, wrapper );
-	  };
-
-	  /**
-	   * Emit some event
-	   * @param  {String} event Event name -- subsequent params after `event` will
-	   * be passed along to the event's handlers
-	   */
-	  Happens.prototype.emit = function(event /*, arg1, arg2 */ ) {
-	    var i, pool = this.__init(event).slice(0);
-	    for(i in pool)
-	      pool[i].apply(this, [].slice.call(arguments, 1));
-	  };
-
-	  /**
-	   * Validates if a function exists and is an instanceof Function, and throws
-	   * an error if needed
-	   * @param  {Function} fn Function to validate
-	   */
-	  function validate(fn) {
-	    if(!(fn && fn instanceof Function))
-	      throw new Error(fn + ' is not a Function');
-	  }
-
-	  return Happens;
-	}));
-
-/***/ },
-/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -9494,174 +9449,7 @@
 
 
 /***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _jquery = __webpack_require__(3);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	var _three = __webpack_require__(5);
-
-	var _three2 = _interopRequireDefault(_three);
-
-	var _tween = __webpack_require__(6);
-
-	var _tween2 = _interopRequireDefault(_tween);
-
-	var _window = __webpack_require__(7);
-
-	var _window2 = _interopRequireDefault(_window);
-
-	var _projectSphere = __webpack_require__(8);
-
-	var _projectSphere2 = _interopRequireDefault(_projectSphere);
-
-	var _particleSystem = __webpack_require__(12);
-
-	var _particleSystem2 = _interopRequireDefault(_particleSystem);
-
-	var _orbitControls = __webpack_require__(14);
-
-	var _orbitControls2 = _interopRequireDefault(_orbitControls);
-
-	var _request = __webpack_require__(15);
-
-	var _request2 = _interopRequireDefault(_request);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var Home = {
-
-	  $el: (0, _jquery2.default)('#three-viewport'),
-
-	  projectSphere: _projectSphere2.default,
-	  controls: _orbitControls2.default,
-	  particles: _particleSystem2.default
-
-	};
-
-	Home.init = function init() {
-	  var _this = this;
-
-	  var host = window.location.origin;
-	  var url = host + '/api/posts';
-
-	  _request2.default.get(url).then(function (response) {
-
-	    _this.data = JSON.parse(response).filter(function (item) {
-
-	      return item.state === 'published';
-	    });
-
-	    _this.initScene();
-	  });
-	};
-
-	Home.initScene = function initScene() {
-
-	  this.scene = new _three2.default.Scene();
-	  this.scene.fog = new _three2.default.Fog(0x000000, 10, 10000);
-
-	  this.camera = new _three2.default.PerspectiveCamera(50, _window2.default.width / _window2.default.height, 0.1, 10000);
-
-	  this.projectSphere.init(this.data, this.scene, this.camera);
-	  this.controls.init(this.scene, this.camera);
-	  this.particles.init(this.scene);
-
-	  this.renderer = new _three2.default.WebGLRenderer({ antialias: true });
-	  this.renderer.setSize(_window2.default.width, _window2.default.height);
-	  this.renderer.setClearColor(0x000000);
-
-	  this.$el.append(this.renderer.domElement);
-
-	  // this.animateCameraPos();
-
-	  this.camTweenComplete = true;
-	  this.camera.position.set(0, 25, 1000);
-	  this.controls.pos.x = -0.00025;
-
-	  this.render();
-	  this.bind();
-	};
-
-	Home.bind = function bind() {
-
-	  _window2.default.on('resize', this.resize.bind(this));
-	};
-
-	Home.unbind = function unbind() {
-
-	  // unbind logic
-
-	};
-
-	Home.animateCameraPos = function animateCameraPos() {
-	  var _this2 = this;
-
-	  this.camera.position.set(0, 2500, 5000);
-	  this.controls.pos.x = -0.00025;
-
-	  var tweenCamY = new _tween2.default.Tween(this.camera.position);
-	  tweenCamY.to({ y: 25 }, 5000);
-	  tweenCamY.easing(_tween2.default.Easing.Sinusoidal.InOut);
-	  tweenCamY.onComplete(function () {
-	    _this2.camTweenComplete = true;
-	  });
-	  tweenCamY.start();
-
-	  var tweenCamZ = new _tween2.default.Tween(this.camera.position);
-	  tweenCamZ.to({ z: 1000 }, 6500);
-	  tweenCamZ.easing(_tween2.default.Easing.Sinusoidal.InOut);
-	  tweenCamZ.start();
-	};
-
-	Home.resize = function resize() {
-
-	  this.renderer.setSize(_window2.default.width, _window2.default.height);
-	  this.camera.aspect = _window2.default.width / _window2.default.height;
-
-	  this.camera.updateProjectionMatrix();
-	};
-
-	Home.render = function render() {
-
-	  this.RAF = requestAnimationFrame(this.render.bind(this));
-
-	  this.renderer.render(this.scene, this.camera);
-
-	  this.update();
-	};
-
-	Home.update = function update() {
-
-	  _tween2.default.update();
-
-	  this.controls.update();
-	  this.particles.update();
-	  this.projectSphere.update();
-	};
-
-	Home.destroy = function destroy() {
-
-	  this.projectSphere.unbind();
-	  this.controls.unbind();
-	  this.unbind();
-
-	  cancelAnimationFrame(this.RAF);
-	  this.RAF = null;
-	};
-
-	exports.default = Home;
-
-/***/ },
-/* 5 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;var self = self || {};// File:src/Three.js
@@ -45854,7 +45642,7 @@
 
 
 /***/ },
-/* 6 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -46734,7 +46522,7 @@
 
 
 /***/ },
-/* 7 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -46743,11 +46531,11 @@
 		value: true
 	});
 
-	var _jquery = __webpack_require__(3);
+	var _jquery = __webpack_require__(2);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _happens = __webpack_require__(2);
+	var _happens = __webpack_require__(6);
 
 	var _happens2 = _interopRequireDefault(_happens);
 
@@ -46823,7 +46611,105 @@
 	exports.default = Window;
 
 /***/ },
-/* 8 */
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(function (global, factory) {
+	   true ? module.exports = factory() :
+	  "function" === typeof define && define.amd ? define(factory) :
+	  global.Happens = factory();
+	}(this, function () {
+
+	  'use strict'
+
+	  /**
+	   * Module constructor
+	   * @param  {Object} target Target object to extends methods and properties into
+	   * @return {Object}        Target after with extended methods and properties
+	   */
+	  function Happens(target){
+	    var nu = this instanceof Happens;
+	    if(target){
+	      if(!nu)
+	        for(var prop in Happens.prototype)
+	          target[prop] = Happens.prototype[prop];
+	      else
+	        throw new Error("You can't pass a target when instantiating with the `new` keyword");
+	    }
+	    else if(!nu)
+	      return new Happens
+	  };
+
+	  /**
+	   * Initializes event
+	   * @param  {String} event Event name to initialize
+	   * @return {Array}        Initialized event pool
+	   */
+	  Happens.prototype.__init = function(event) {
+	    var tmp = this.__listeners || (this.__listeners = []);
+	    return tmp[event] || (tmp[event] = []);
+	  };
+
+	  /**
+	   * Adds listener
+	   * @param  {String}   event Event name
+	   * @param  {Function} fn    Event handler
+	   */
+	  Happens.prototype.on = function(event, fn) {
+	    validate(fn);
+	    this.__init(event).push(fn);
+	  };
+
+	  /**
+	   * Removes listener
+	   * @param  {String}   event Event name
+	   * @param  {Function} fn    Event handler
+	   */
+	  Happens.prototype.off = function(event, fn) {
+	    var pool = this.__init(event);
+	    pool.splice(pool.indexOf(fn), 1);
+	  };
+
+	  /**
+	   * Add listener the fires once and auto-removes itself
+	   * @param  {String}   event Event name
+	   * @param  {Function} fn    Event handler
+	   */
+	  Happens.prototype.once = function(event, fn) {
+	    validate(fn);
+	    var self = this, wrapper = function() {
+	      self.off(event, wrapper);
+	      fn.apply(this, arguments);
+	    };
+	    this.on(event, wrapper );
+	  };
+
+	  /**
+	   * Emit some event
+	   * @param  {String} event Event name -- subsequent params after `event` will
+	   * be passed along to the event's handlers
+	   */
+	  Happens.prototype.emit = function(event /*, arg1, arg2 */ ) {
+	    var i, pool = this.__init(event).slice(0);
+	    for(i in pool)
+	      pool[i].apply(this, [].slice.call(arguments, 1));
+	  };
+
+	  /**
+	   * Validates if a function exists and is an instanceof Function, and throws
+	   * an error if needed
+	   * @param  {Function} fn Function to validate
+	   */
+	  function validate(fn) {
+	    if(!(fn && fn instanceof Function))
+	      throw new Error(fn + ' is not a Function');
+	  }
+
+	  return Happens;
+	}));
+
+/***/ },
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -46832,31 +46718,31 @@
 		value: true
 	});
 
-	var _jquery = __webpack_require__(3);
+	var _jquery = __webpack_require__(2);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _three = __webpack_require__(5);
+	var _three = __webpack_require__(3);
 
 	var _three2 = _interopRequireDefault(_three);
 
-	var _tween = __webpack_require__(6);
+	var _tween = __webpack_require__(4);
 
 	var _tween2 = _interopRequireDefault(_tween);
 
-	var _gsap = __webpack_require__(9);
+	var _gsap = __webpack_require__(8);
 
 	var _gsap2 = _interopRequireDefault(_gsap);
 
-	var _window = __webpack_require__(7);
+	var _window = __webpack_require__(5);
 
 	var _window2 = _interopRequireDefault(_window);
 
-	var _textureLoader = __webpack_require__(11);
+	var _textureLoader = __webpack_require__(10);
 
 	var _textureLoader2 = _interopRequireDefault(_textureLoader);
 
-	var _navigation = __webpack_require__(1);
+	var _navigation = __webpack_require__(11);
 
 	var _navigation2 = _interopRequireDefault(_navigation);
 
@@ -47044,7 +46930,7 @@
 	exports.default = ProjectSphere;
 
 /***/ },
-/* 9 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global) {/*!
@@ -52846,7 +52732,7 @@
 							if (global) {
 								_globals[n] = cl; //provides a way to avoid global namespace pollution. By default, the main classes like TweenLite, Power1, Strong, etc. are added to window unless a GreenSockGlobals is defined. So if you want to have things added to a custom object instead, just do something like window.GreenSockGlobals = {} before loading any GreenSock files. You can even set up an alias like window.GreenSockGlobals = windows.gs = {} so that you can access everything like gs.TweenLite. Also remember that ALL classes are added to the window.com.greensock object (in their respective packages, like com.greensock.easing.Power1, com.greensock.TweenLite, etc.)
 								hasModule = (typeof(module) !== "undefined" && module.exports);
-								if (!hasModule && "function" === "function" && __webpack_require__(10)){ //AMD
+								if (!hasModule && "function" === "function" && __webpack_require__(9)){ //AMD
 									!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function() { return cl; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 								} else if (ns === moduleName && hasModule){ //node
 									module.exports = cl;
@@ -54631,7 +54517,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 10 */
+/* 9 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
@@ -54639,7 +54525,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, {}))
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -54648,7 +54534,7 @@
 	  value: true
 	});
 
-	var _three = __webpack_require__(5);
+	var _three = __webpack_require__(3);
 
 	var _three2 = _interopRequireDefault(_three);
 
@@ -54669,6 +54555,86 @@
 	exports.default = TextureLoader;
 
 /***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _happens = __webpack_require__(6);
+
+	var _happens2 = _interopRequireDefault(_happens);
+
+	var _jquery = __webpack_require__(2);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Navigation = {
+
+		originalState: window.location.pathname.split('/').pop() || '/',
+		url: null
+
+	};
+
+	Navigation.init = function init() {
+
+		(0, _happens2.default)(this);
+
+		this.bind();
+	};
+
+	Navigation.bind = function bind() {
+
+		(0, _jquery2.default)(window).bind('popstate', this.popState.bind(this));
+	};
+
+	Navigation.go = function go(url) {
+
+		if (this.url === url) return;
+
+		this.pushState(url);
+	};
+
+	Navigation.pushState = function pushState(url) {
+
+		this.url = url;
+
+		history.pushState(this.url, null, this.url);
+
+		this.emit('url:changed', this.url, this.getID());
+	};
+
+	Navigation.popState = function popState(event) {
+
+		this.url = event.originalEvent.state || this.originalState;
+
+		this.emit('url:changed', this.url, this.getID());
+	};
+
+	Navigation.getID = function getID() {
+
+		if (this.url === '/') {
+
+			return 'home';
+		} else if (this.url === '/about') {
+
+			return 'about';
+		} else {
+
+			return 'project';
+		}
+	};
+
+	Navigation.init();
+
+	exports.default = Navigation;
+
+/***/ },
 /* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -54678,13 +54644,13 @@
 		value: true
 	});
 
-	var _three = __webpack_require__(5);
+	var _three = __webpack_require__(3);
 
 	var _three2 = _interopRequireDefault(_three);
 
 	var _underscore = __webpack_require__(13);
 
-	var _textureLoader = __webpack_require__(11);
+	var _textureLoader = __webpack_require__(10);
 
 	var _textureLoader2 = _interopRequireDefault(_textureLoader);
 
@@ -56327,15 +56293,15 @@
 		value: true
 	});
 
-	var _jquery = __webpack_require__(3);
+	var _jquery = __webpack_require__(2);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _three = __webpack_require__(5);
+	var _three = __webpack_require__(3);
 
 	var _three2 = _interopRequireDefault(_three);
 
-	var _tween = __webpack_require__(6);
+	var _tween = __webpack_require__(4);
 
 	var _tween2 = _interopRequireDefault(_tween);
 
@@ -56485,7 +56451,164 @@
 	  value: true
 	});
 
-	var _jquery = __webpack_require__(3);
+	var _jquery = __webpack_require__(2);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _navigation = __webpack_require__(11);
+
+	var _navigation2 = _interopRequireDefault(_navigation);
+
+	var _transitions = __webpack_require__(17);
+
+	var _transitions2 = _interopRequireDefault(_transitions);
+
+	var _request = __webpack_require__(15);
+
+	var _request2 = _interopRequireDefault(_request);
+
+	var _home = __webpack_require__(1);
+
+	var _home2 = _interopRequireDefault(_home);
+
+	var _project = __webpack_require__(18);
+
+	var _project2 = _interopRequireDefault(_project);
+
+	var _about = __webpack_require__(19);
+
+	var _about2 = _interopRequireDefault(_about);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var RenderView = {
+
+	  $el: (0, _jquery2.default)('#main'),
+	  id: null,
+	  html: null,
+	  view: null,
+	  views: {
+	    home: _home2.default,
+	    project: _project2.default,
+	    about: _about2.default
+	  }
+
+	};
+
+	RenderView.init = function init() {
+
+	  _navigation2.default.on('url:changed', this.getView.bind(this));
+	};
+
+	RenderView.getView = function getView(path, id) {
+	  var _this = this;
+
+	  this.id = id;
+
+	  var url = '' + window.location.origin + path;
+
+	  _request2.default.get(url).then(function (response) {
+
+	    var html = _jquery2.default.parseHTML(response);
+
+	    _this.html = (0, _jquery2.default)(html.filter(function (item) {
+	      return item.id === 'main';
+	    }))[0];
+
+	    _this.render();
+	  });
+	};
+
+	RenderView.render = function render() {
+
+	  this.$el.html(this.html);
+
+	  if (this.view) this.view.destroy();
+
+	  this.view = this.views[this.id];
+
+	  this.view.init();
+	};
+
+	exports.default = RenderView;
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _happens = __webpack_require__(6);
+
+	var _happens2 = _interopRequireDefault(_happens);
+
+	var _gsap = __webpack_require__(8);
+
+	var _gsap2 = _interopRequireDefault(_gsap);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Transitions = {
+
+	  init: function init() {
+
+	    (0, _happens2.default)(this);
+	  },
+
+	  fadeIn: function fadeIn(el, duration) {
+	    var _this = this;
+
+	    var params = {
+	      autoAlpha: 1,
+	      ease: Power2.easeInOut,
+	      onComplete: function onComplete() {
+	        _this.emit('fadeIn:complete');
+	      }
+	    };
+
+	    this.tween(el, duration, params);
+	  },
+
+	  fadeOut: function fadeOut(el, duration) {
+	    var _this2 = this;
+
+	    var params = {
+	      autoAlpha: 0,
+	      ease: Power2.easeOut,
+	      onComplete: function onComplete() {
+	        _this2.emit('fadeOut:complete');
+	      }
+	    };
+
+	    this.tween(el, duration, params);
+	  },
+
+	  tween: function tween(el, duration, params) {
+
+	    _gsap2.default.to(el, duration, params);
+	  }
+
+	};
+
+	Transitions.init();
+
+	exports.default = Transitions;
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _jquery = __webpack_require__(2);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -56502,40 +56625,44 @@
 	  console.log('init PROJECT');
 	};
 
+	Project.destroy = function destroy() {
+
+	  console.log('destroy PROJECT');
+	};
+
 	exports.default = Project;
 
 /***/ },
-/* 17 */
-/***/ function(module, exports) {
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	var _jquery = __webpack_require__(2);
 
-	var About = (function () {
-		function About() {
-			_classCallCheck(this, About);
+	var _jquery2 = _interopRequireDefault(_jquery);
 
-			console.log('---[ VIEW ABOUT ]---');
-		}
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-		_createClass(About, [{
-			key: 'unbind',
-			value: function unbind() {
+	var About = {
 
-				// unbind logic
+	  $el: (0, _jquery2.default)('#about')
 
-			}
-		}]);
+	};
 
-		return About;
-	})();
+	About.init = function init() {
+
+	  console.log('init ABOUT');
+	};
+
+	About.destroy = function destroy() {
+
+	  console.log('destroy ABOUT');
+	};
 
 	exports.default = About;
 

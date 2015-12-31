@@ -12,4 +12,10 @@ Project.init = function init() {
 
 };
 
+Project.destroy = function destroy() {
+
+  console.log('destroy PROJECT');
+
+};
+
 export default Project;

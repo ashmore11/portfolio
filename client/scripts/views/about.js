@@ -1,15 +1,21 @@
-export default class About {
-	
-	constructor() {
+import $ from 'jquery';
 
-		console.log('---[ VIEW ABOUT ]---');
-	
-	}
+const About = {
 
-  unbind() {
+  $el: $('#about'),
 
-    // unbind logic
+};
 
-  }
+About.init = function init() {
 
-}
+  console.log('init ABOUT');
+
+};
+
+About.destroy = function destroy() {
+
+  console.log('destroy ABOUT');
+
+};
+
+export default About;
