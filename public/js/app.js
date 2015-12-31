@@ -165,7 +165,6 @@
 	Navigation.popState = function popState(event) {
 
 		this.url = event.originalEvent.state || this.originalState;
-
 		this.id = this.getID();
 
 		this.emit('url:changed', this.id);
