@@ -11,25 +11,24 @@ const Transitions = {
 
   fadeIn: function fadeIn(el, duration) {
 
+    TM.set(el, { autoAlpha: 0 });
+
     const params = {
       autoAlpha: 1,
       ease: Power2.easeInOut,
-      onComplete: () => {
-        this.emit('fadeIn:complete');
-      },
     };
 
     this.tween(el, duration, params);
 
   },
 
-  fadeOut: function fadeOut(el, duration) {
+  fadeOut: function fadeOut(el, duration, callback) {
 
     const params = {
       autoAlpha: 0,
       ease: Power2.easeOut,
       onComplete: () => {
-        this.emit('fadeOut:complete');
+        callback();
       },
     };
 

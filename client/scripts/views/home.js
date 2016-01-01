@@ -43,7 +43,7 @@ Home.initScene = function initScene() {
   this.scene     = new THREE.Scene();
   this.scene.fog = new THREE.Fog(0x000000, 10, 10000);
 
-  this.camera = new THREE.PerspectiveCamera(50, Win.width / Win.height, 0.1, 10000);
+  this.camera = new THREE.PerspectiveCamera(60, Win.width / Win.height, 0.1, 10000);
   
   this.projectSphere.init(this.data, this.scene, this.camera);
   this.controls.init(this.scene, this.camera);

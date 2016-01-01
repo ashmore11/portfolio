@@ -148,7 +148,7 @@
 	  this.scene = new _three2.default.Scene();
 	  this.scene.fog = new _three2.default.Fog(0x000000, 10, 10000);
 
-	  this.camera = new _three2.default.PerspectiveCamera(50, _window2.default.width / _window2.default.height, 0.1, 10000);
+	  this.camera = new _three2.default.PerspectiveCamera(60, _window2.default.width / _window2.default.height, 0.1, 10000);
 
 	  this.projectSphere.init(this.data, this.scene, this.camera);
 	  this.controls.init(this.scene, this.camera);
@@ -46797,8 +46797,8 @@
 
 	ProjectSphere.unbind = function unbind() {
 
-		this.$el.off('mousemove touchmove', this.sceneMouseMove.bind(this));
-		this.$el.off('mousedown touchstart', this.projectMouseDown.bind(this));
+		this.$el.off('mousemove touchmove');
+		this.$el.off('mousedown touchstart');
 	};
 
 	ProjectSphere.createProjects = function createProjects() {
@@ -56313,7 +56313,7 @@
 
 	var OrbitControls = {
 
-		$el: (0, _jquery2.default)('#three-viewport'),
+		$el: null,
 
 		scene: null,
 		camera: null,
@@ -56331,6 +56331,8 @@
 	};
 
 	OrbitControls.init = function init(scene, camera) {
+
+		this.$el = (0, _jquery2.default)('#three-viewport');
 
 		this.scene = scene;
 		this.camera = camera;
@@ -56512,7 +56514,10 @@
 	      return item.id === 'main';
 	    }));
 
-	    _this.render(html, id);
+	    _transitions2.default.fadeOut(_this.$el, 1, function () {
+
+	      _this.render(html, id);
+	    });
 	  });
 	};
 
@@ -56525,6 +56530,8 @@
 	  this.view = this.views[id];
 
 	  this.view.init();
+
+	  _transitions2.default.fadeIn(this.$el, 0.5);
 	};
 
 	exports.default = View;
@@ -56557,27 +56564,24 @@
 	  },
 
 	  fadeIn: function fadeIn(el, duration) {
-	    var _this = this;
+
+	    _gsap2.default.set(el, { autoAlpha: 0 });
 
 	    var params = {
 	      autoAlpha: 1,
-	      ease: Power2.easeInOut,
-	      onComplete: function onComplete() {
-	        _this.emit('fadeIn:complete');
-	      }
+	      ease: Power2.easeInOut
 	    };
 
 	    this.tween(el, duration, params);
 	  },
 
-	  fadeOut: function fadeOut(el, duration) {
-	    var _this2 = this;
+	  fadeOut: function fadeOut(el, duration, callback) {
 
 	    var params = {
 	      autoAlpha: 0,
 	      ease: Power2.easeOut,
 	      onComplete: function onComplete() {
-	        _this2.emit('fadeOut:complete');
+	        callback();
 	      }
 	    };
 

@@ -31,7 +31,11 @@ View.load = function load(url, id) {
     const parsedHtml = $.parseHTML(response);
     const html = $(parsedHtml.filter(item => { return item.id === 'main'; }));
 
-    this.render(html, id);
+    Transitions.fadeOut(this.$el, 1, () => {
+
+      this.render(html, id);
+
+    });
   
   });
 
@@ -46,6 +50,8 @@ View.render = function render(html, id) {
   this.view = this.views[id];
 
   this.view.init();
+
+  Transitions.fadeIn(this.$el, 0.5);
 
 };
 

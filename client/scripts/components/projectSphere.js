@@ -55,8 +55,8 @@ ProjectSphere.bind = function bind() {
 
 ProjectSphere.unbind = function unbind() {
 	
-	this.$el.off('mousemove touchmove', this.sceneMouseMove.bind(this));
-	this.$el.off('mousedown touchstart', this.projectMouseDown.bind(this));
+	this.$el.off('mousemove touchmove');
+	this.$el.off('mousedown touchstart');
 
 }
 

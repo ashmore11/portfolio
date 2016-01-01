@@ -4,7 +4,7 @@ import TWEEN from 'tween.js';
 
 const OrbitControls = {
 	
-	$el: $('#three-viewport'),
+	$el: null,
 
 	scene: null,
 	camera: null,
@@ -22,6 +22,8 @@ const OrbitControls = {
 };
 
 OrbitControls.init = function init(scene, camera) {
+
+	this.$el = $('#three-viewport');
 
 	this.scene  = scene;
 	this.camera = camera;
