@@ -29,7 +29,7 @@ View.load = function load(url, id) {
   Request.get(url).then(response => {
 
     const parsedHtml = $.parseHTML(response);
-    const html = $(parsedHtml.filter(item => { return item.id === 'main'; }));
+    const html = parsedHtml.filter(item => { return item.id === 'main'; });
 
     Transitions.fadeOut(this.$el, 1, () => {
 

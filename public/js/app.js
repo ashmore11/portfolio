@@ -148,7 +148,7 @@
 	  this.scene = new _three2.default.Scene();
 	  this.scene.fog = new _three2.default.Fog(0x000000, 10, 10000);
 
-	  this.camera = new _three2.default.PerspectiveCamera(60, _window2.default.width / _window2.default.height, 0.1, 10000);
+	  this.camera = new _three2.default.PerspectiveCamera(55, _window2.default.width / _window2.default.height, 0.1, 10000);
 
 	  this.projectSphere.init(this.data, this.scene, this.camera);
 	  this.controls.init(this.scene, this.camera);
@@ -46814,10 +46814,10 @@
 			texture.minFilter = _three2.default.LinearFilter;
 
 			var material = new _three2.default.MeshBasicMaterial({
-				// map         : texture,
+				map: texture,
 				transparent: true,
 				opacity: 0.5,
-				wireframe: true
+				wireframe: false
 			});
 
 			var project = new _three2.default.Mesh(geometry, material);
@@ -56377,7 +56377,7 @@
 
 		this.pos.x = event.originalEvent.touches[0].pageX;
 		this.pos.x = this.pos.x - this.pos.a;
-		this.pos.x = this.pos.x * -0.000075;
+		this.pos.x = this.pos.x * -0.000025;
 	};
 
 	OrbitControls.touchEnd = function touchEnd() {
@@ -56510,9 +56510,9 @@
 	  _request2.default.get(url).then(function (response) {
 
 	    var parsedHtml = _jquery2.default.parseHTML(response);
-	    var html = (0, _jquery2.default)(parsedHtml.filter(function (item) {
+	    var html = parsedHtml.filter(function (item) {
 	      return item.id === 'main';
-	    }));
+	    });
 
 	    _transitions2.default.fadeOut(_this.$el, 1, function () {
 
@@ -56572,7 +56572,7 @@
 	      ease: Power2.easeInOut
 	    };
 
-	    this.tween(el, duration, params);
+	    _gsap2.default.to(el, duration, params);
 	  },
 
 	  fadeOut: function fadeOut(el, duration, callback) {
@@ -56584,11 +56584,6 @@
 	        callback();
 	      }
 	    };
-
-	    this.tween(el, duration, params);
-	  },
-
-	  tween: function tween(el, duration, params) {
 
 	    _gsap2.default.to(el, duration, params);
 	  }

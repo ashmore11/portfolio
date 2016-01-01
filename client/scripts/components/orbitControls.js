@@ -73,7 +73,7 @@ OrbitControls.touchMove = function touchMove() {
 
 	this.pos.x = event.originalEvent.touches[0].pageX;
 	this.pos.x = this.pos.x - this.pos.a;
-	this.pos.x = this.pos.x * -0.000075;
+	this.pos.x = this.pos.x * -0.000025;
 
 };
 

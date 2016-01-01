@@ -81,10 +81,10 @@ ProjectSphere.createProjects = function createProjects() {
 		texture.minFilter = THREE.LinearFilter;
 
 		const material = new THREE.MeshBasicMaterial({
-			// map         : texture,
+			map         : texture,
 			transparent : true,
 			opacity     : 0.5,
-			wireframe   : true
+			wireframe   : false
 		});
 
 		const project = new THREE.Mesh(geometry, material);

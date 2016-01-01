@@ -4,4 +4,26 @@ block content
 
   #project.page
 
-    h1 #{post.title}
+    .copy( layout="column" )
+    
+      h1.title #{post.title}
+
+      p.description !{post.description}
+
+      //- p.tools #{post.tools}
+
+    if post.video
+      
+      .video
+        video(
+          controls
+          poster="images/_tmp/transparent.png"
+          style="background-image: url('#{post.images[0].path}');"
+        )
+          source( ng-src="#{post.video}" type="video/mp4" )
+
+    .images
+
+      for image in post.images
+    
+        img(src="#{image.url}")

@@ -18,7 +18,7 @@ const Transitions = {
       ease: Power2.easeInOut,
     };
 
-    this.tween(el, duration, params);
+    TM.to(el, duration, params);
 
   },
 
@@ -32,19 +32,9 @@ const Transitions = {
       },
     };
 
-    this.tween(el, duration, params);
+    TM.to(el, duration, params);
 
   },
-
-  tween: function tween(el, duration, params) {
-
-    TM.to(
-      el, 
-      duration, 
-      params
-    );
-
-  }
 
 };
 
