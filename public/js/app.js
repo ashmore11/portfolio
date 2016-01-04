@@ -420,23 +420,25 @@
 	};
 
 	Home.animateCameraPos = function animateCameraPos() {
-	  var _this2 = this;
+
+	  var params = undefined;
 
 	  this.camera.position.set(0, 2500, 5000);
 	  this.controls.pos.x = -0.00025;
 
-	  var tweenCamY = new TWEEN.Tween(this.camera.position);
-	  tweenCamY.to({ y: 25 }, 5000);
-	  tweenCamY.easing(TWEEN.Easing.Sinusoidal.InOut);
-	  tweenCamY.onComplete(function () {
-	    _this2.camTweenComplete = true;
-	  });
-	  tweenCamY.start();
+	  params = {
+	    y: 25,
+	    easing: Sine.easeInOut
+	  };
 
-	  var tweenCamZ = new TWEEN.Tween(this.camera.position);
-	  tweenCamZ.to({ z: 1000 }, 6500);
-	  tweenCamZ.easing(TWEEN.Easing.Sinusoidal.InOut);
-	  tweenCamZ.start();
+	  TweenMax.to(this.camera.position, 5, params);
+
+	  params = {
+	    z: 1000,
+	    easing: Sine.easeInOut
+	  };
+
+	  TweenMax.to(this.camera.position, 6.5, params);
 	};
 
 	Home.resize = function resize() {
@@ -538,7 +540,7 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 
 	var _window = __webpack_require__(6);
@@ -557,193 +559,223 @@
 
 	var ProjectSphere = {
 
-		$el: null,
-		data: null,
-		scene: null,
-		camera: null,
-		pos: {},
-		projects: [],
-		intersected: null,
-		raycaster: new THREE.Raycaster(),
-		camera_pos: new THREE.Vector3(),
-		cylinder: {
-			radiusTop: 3000,
-			radiusBottom: 3000,
-			height: 1200,
-			radiusSegments: 16,
-			heightSegments: 16,
-			openEnded: true,
-			thetaStart: 0,
-			thetaLength: Math.PI * 2 / 6.25
-		}
+	  $el: null,
+	  data: null,
+	  scene: null,
+	  camera: null,
+	  pos: {},
+	  projects: [],
+	  faces: [],
+	  intersected: null,
+	  raycaster: new THREE.Raycaster(),
+	  camera_pos: new THREE.Vector3(),
+	  cylinder: {
+	    radiusTop: 3000,
+	    radiusBottom: 3000,
+	    height: 1200,
+	    radiusSegments: 16,
+	    heightSegments: 16,
+	    openEnded: true,
+	    thetaStart: 0,
+	    thetaLength: Math.PI * 2 / 6.25
+	  }
 
 	};
 
 	ProjectSphere.init = function init(data, scene, camera) {
 
-		this.$el = $('#three-viewport');
+	  this.$el = $('#three-viewport');
 
-		this.data = [0, 1, 2, 3, 4, 5];
-		this.scene = scene;
-		this.camera = camera;
+	  this.data = [0, 1, 2, 3, 4, 5];
+	  this.scene = scene;
+	  this.camera = camera;
 
-		this.bind();
-		this.createProjects();
+	  this.bind();
+	  this.createProjects();
+	  this.createFaceArray();
 	};
 
 	ProjectSphere.bind = function bind() {
 
-		this.$el.on('mousemove touchmove', this.mouseMove.bind(this));
-		this.$el.on('mousedown touchstart', this.mouseDown.bind(this));
+	  this.$el.on('mousemove touchmove', this.mouseMove.bind(this));
+	  this.$el.on('mousedown touchstart', this.mouseDown.bind(this));
 	};
 
 	ProjectSphere.unbind = function unbind() {
 
-		this.$el.off('mousemove touchmove');
-		this.$el.off('mousedown touchstart');
+	  this.$el.off('mousemove touchmove');
+	  this.$el.off('mousedown touchstart');
 	};
 
 	ProjectSphere.createProjects = function createProjects() {
-		var _this = this;
+	  var _this = this;
 
-		var target = new THREE.Vector3();
-		var geometry = new THREE.CylinderGeometry(this.cylinder.radiusTop, this.cylinder.radiusBottom, this.cylinder.height, this.cylinder.radiusSegments, this.cylinder.heightSegments, this.cylinder.openEnded, this.cylinder.thetaStart, this.cylinder.thetaLength);
+	  var target = new THREE.Vector3();
+	  var geometry = new THREE.CylinderGeometry(this.cylinder.radiusTop, this.cylinder.radiusBottom, this.cylinder.height, this.cylinder.radiusSegments, this.cylinder.heightSegments, this.cylinder.openEnded, this.cylinder.thetaStart, this.cylinder.thetaLength);
 
-		this.data.forEach(function (item, index) {
+	  this.data.forEach(function (item, index) {
 
-			// const texture = TextureLoader(item.featuredImage.url);
+	    // const texture = TextureLoader(item.featuredImage.url);
 
-			// texture.minFilter = THREE.LinearFilter;
+	    // texture.minFilter = THREE.LinearFilter;
 
-			var material = new THREE.MeshBasicMaterial({
-				// map         : texture,
-				transparent: true,
-				opacity: 0.5,
-				wireframe: true
-			});
+	    var material = new THREE.MeshBasicMaterial({
+	      // map         : texture,
+	      transparent: true,
+	      opacity: 0.5,
+	      wireframe: true
+	    });
 
-			var project = new THREE.Mesh(geometry, material);
+	    var project = new THREE.Mesh(geometry, material);
 
-			project.scale.x = -1;
-			project.material.side = THREE.DoubleSide;
-			project.name = 'project';
-			// project.title         = item.title;
-			// project.url           = `/project/${item.slug}`;
+	    project.scale.x = -1;
+	    project.material.side = THREE.DoubleSide;
+	    project.name = 'project';
+	    // project.title         = item.title;
+	    // project.url           = `/project/${item.slug}`;
 
-			var x = Math.cos(index * (Math.PI * 2) / _this.data.length);
-			var z = Math.sin(index * (Math.PI * 2) / _this.data.length);
+	    var x = Math.cos(index * (Math.PI * 2) / _this.data.length);
+	    var z = Math.sin(index * (Math.PI * 2) / _this.data.length);
 
-			project.position.set(x, 0, z);
-			project.lookAt(target);
+	    project.position.set(x, 0, z);
+	    project.lookAt(target);
 
-			_this.projects.push(project);
-			_this.scene.add(project);
-		});
+	    _this.projects.push(project);
+	    _this.scene.add(project);
+	  });
 	};
 
 	ProjectSphere.mouseMove = function mouseMove(event) {
 
-		var evt = {
-			x: event.pageX || event.originalEvent.touches[0].pageX,
-			y: event.pageY || event.originalEvent.touches[0].pageY
-		};
+	  var evt = {
+	    x: event.pageX || event.originalEvent.touches[0].pageX,
+	    y: event.pageY || event.originalEvent.touches[0].pageY
+	  };
 
-		this.pos.x = evt.x / _window2.default.width * 2 - 1;
-		this.pos.y = -(evt.y / _window2.default.height) * 2 + 1;
+	  this.pos.x = evt.x / _window2.default.width * 2 - 1;
+	  this.pos.y = -(evt.y / _window2.default.height) * 2 + 1;
 	};
 
 	ProjectSphere.mouseDown = function mouseDown(event) {
 
-		var evt = {
-			x: event.pageX || event.originalEvent.touches[0].pageX,
-			y: event.pageY || event.originalEvent.touches[0].pageY
-		};
+	  var evt = {
+	    x: event.pageX || event.originalEvent.touches[0].pageX,
+	    y: event.pageY || event.originalEvent.touches[0].pageY
+	  };
 
-		this.pos.x = evt.x / _window2.default.width * 2 - 1;
-		this.pos.y = -(evt.y / _window2.default.height) * 2 + 1;
+	  this.pos.x = evt.x / _window2.default.width * 2 - 1;
+	  this.pos.y = -(evt.y / _window2.default.height) * 2 + 1;
 
-		var intersects = this.raycaster.intersectObjects(this.projects);
+	  var intersects = this.raycaster.intersectObjects(this.projects);
 
-		if (intersects.length > 0) {
+	  if (intersects.length > 0) {
 
-			_navigation2.default.go(intersects[0].object.url);
-		}
+	    _navigation2.default.go(intersects[0].object.url);
+	  }
 	};
 
 	ProjectSphere.mouseOver = function mouseOver() {
 
-		var title = $('#home h1');
-		var material = this.intersected.material;
+	  var title = $('#home h1');
+	  var material = this.intersected.material;
 
-		var params = undefined;
+	  var params = undefined;
 
-		this.$el.css({ cursor: 'pointer' });
+	  this.$el.css({ cursor: 'pointer' });
 
-		title.html(this.intersected.title);
+	  title.html(this.intersected.title);
 
-		params = {
-			autoAlpha: 1,
-			y: -10,
-			scale: 1
-		};
+	  params = {
+	    autoAlpha: 1,
+	    y: -10,
+	    scale: 1
+	  };
 
-		TweenMax.to(title, 0.5, params);
+	  TweenMax.to(title, 0.5, params);
 
-		params = {
-			opacity: 0.75,
-			easing: Sine.easeOut
-		};
+	  params = {
+	    opacity: 0.75,
+	    easing: Sine.easeOut
+	  };
 
-		TweenMax.to(material, 0.75, { opacity: 1 });
+	  TweenMax.to(material, 0.75, { opacity: 1 });
 	};
 
 	ProjectSphere.mouseOut = function mouseOut() {
 
-		var title = $('#home h1');
-		var material = this.intersected.material;
+	  var title = $('#home h1');
+	  var material = this.intersected.material;
 
-		var params = undefined;
+	  var params = undefined;
 
-		this.$el.css({ cursor: 'ew-resize' });
+	  this.$el.css({ cursor: 'ew-resize' });
 
-		params = {
-			autoAlpha: 0,
-			y: 0,
-			scale: 0.9
-		};
+	  params = {
+	    autoAlpha: 0,
+	    y: 0,
+	    scale: 0.9
+	  };
 
-		TweenMax.to(title, 0.5, params);
+	  TweenMax.to(title, 0.5, params);
 
-		params = {
-			opacity: 0.5,
-			easing: Sine.easeOut
-		};
+	  params = {
+	    opacity: 0.5,
+	    easing: Sine.easeOut
+	  };
 
-		TweenMax.to(material, 0.75, params);
+	  TweenMax.to(material, 0.75, params);
+	};
+
+	ProjectSphere.createFaceArray = function () {
+	  var _this2 = this;
+
+	  var arr = undefined;
+
+	  _.forEach(this.projects, function (project) {
+
+	    _.forEach(project.geometry.vertices, function (vertex, i) {
+
+	      if (i === project.geometry.vertices.length - 1) arr.push(vertex);
+
+	      if (i % 3 === 0) {
+
+	        if (i !== 0) _this2.faces.push(arr);
+
+	        arr = [];
+	      }
+
+	      arr.push(vertex);
+	    });
+	  });
 	};
 
 	ProjectSphere.update = function update() {
 
-		// taking the camera's world position into consideration
-		this.camera_pos.setFromMatrixPosition(this.camera.matrixWorld);
+	  // taking the camera's world position into consideration
+	  this.camera_pos.setFromMatrixPosition(this.camera.matrixWorld);
 
-		this.raycaster.ray.origin.copy(this.camera_pos);
+	  this.raycaster.ray.origin.copy(this.camera_pos);
 
-		this.raycaster.ray.direction.set(this.pos.x, this.pos.y, 0).unproject(this.camera).sub(this.camera_pos).normalize();
+	  this.raycaster.ray.direction.set(this.pos.x, this.pos.y, 0).unproject(this.camera).sub(this.camera_pos).normalize();
 
-		var intersects = this.raycaster.intersectObjects(this.projects);
+	  var intersects = this.raycaster.intersectObjects(this.projects);
 
-		if (intersects.length > 0) {
+	  if (intersects.length > 0) {
 
-			this.intersected = intersects[0].object;
+	    this.intersected = intersects[0].object;
 
-			if (!_window2.default.width < 768) this.mouseOver();
-		} else {
+	    if (!_window2.default.width < 768) this.mouseOver();
+	  } else {
 
-			if (!_window2.default.width < 768 && this.intersected) this.mouseOut();
+	    if (!_window2.default.width < 768 && this.intersected) this.mouseOut();
 
-			this.intersected = null;
-		}
+	    this.intersected = null;
+	  }
+
+	  _.forEach(this.projects, function (project) {
+
+	    project.geometry.verticesNeedUpdate = true;
+	  });
 	};
 
 	exports.default = ProjectSphere;

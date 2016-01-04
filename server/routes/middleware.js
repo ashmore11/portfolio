@@ -7,7 +7,6 @@
  * you have more middleware you may want to group it as separate
  * modules in your project's /lib directory.
  */
-var _ = require('underscore');
 
 /**
  * Initialises the standard view locals

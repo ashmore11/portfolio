@@ -74,19 +74,24 @@ Home.bind = function bind() {
 
 Home.animateCameraPos = function animateCameraPos() {
 
+	let params;
+
   this.camera.position.set(0, 2500, 5000);
   this.controls.pos.x = -0.00025;
 
-  const tweenCamY = new TWEEN.Tween(this.camera.position);
-  tweenCamY.to({ y: 25 }, 5000);
-  tweenCamY.easing(TWEEN.Easing.Sinusoidal.InOut);
-  tweenCamY.onComplete(() => { this.camTweenComplete = true; });
-  tweenCamY.start();
+  params = {
+  	y: 25,
+  	easing: Sine.easeInOut,
+  };
 
-  const tweenCamZ = new TWEEN.Tween(this.camera.position);
-  tweenCamZ.to({ z: 1000 }, 6500);
-  tweenCamZ.easing(TWEEN.Easing.Sinusoidal.InOut);
-  tweenCamZ.start();
+  TweenMax.to(this.camera.position, 5, params);
+
+  params = {
+  	z: 1000,
+  	easing: Sine.easeInOut,
+  };
+
+  TweenMax.to(this.camera.position, 6.5, params);
 
 };
 
