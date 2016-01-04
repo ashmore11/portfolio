@@ -1,22 +1,16 @@
-import $     from 'jquery';
-import THREE from 'three';
-import TWEEN from 'tween.js';
+import Win from 'app/utils/window';
 
 const OrbitControls = {
 	
 	$el: null,
-
 	scene: null,
 	camera: null,
-
 	pivot: null,
 	tween: null,
-	
 	pos: {
 		a: 0,
 		x: 0,
 	},
-
 	pivot: new THREE.Object3D(),
 
 };
@@ -25,7 +19,7 @@ OrbitControls.init = function init(scene, camera) {
 
 	this.$el = $('#three-viewport');
 
-	this.scene  = scene;
+	this.scene = scene;
 	this.camera = camera;
 
 	this.scene.add(this.pivot);
@@ -56,7 +50,7 @@ OrbitControls.unbind = function unbind() {
 OrbitControls.mouseMove = function mouseMove() {
 
 	this.pos.x = event.pageX;
-	this.pos.x = this.pos.x - $( window ).width() / 2;
+	this.pos.x = this.pos.x - Win.width / 2;
 	this.pos.x = this.pos.x * 0.000025;
 
 };
@@ -69,8 +63,6 @@ OrbitControls.touchStart = function touchStart() {
 
 OrbitControls.touchMove = function touchMove() {
 
-	if (this.tween) this.tween.stop();
-
 	this.pos.x = event.originalEvent.touches[0].pageX;
 	this.pos.x = this.pos.x - this.pos.a;
 	this.pos.x = this.pos.x * -0.000025;
@@ -80,18 +72,8 @@ OrbitControls.touchMove = function touchMove() {
 OrbitControls.touchEnd = function touchEnd() {
 
 	const duration = Math.round(Math.abs(this.pos.x * 100000));
-	
-	this.tween = new TWEEN.Tween(this.pos);
 
-	this.tween.to({ x: 0 }, duration);
-	this.tween.easing(TWEEN.Easing.Sinusoidal.Out);
-	this.tween.start();
-
-};
-
-OrbitControls.watchTarget = function watchTarget() {
-
-	this.camera.lookAt(this.scene.position);
+	TweenMax.to(this.pos, duration, { x: 0, easing: Sine.easeOut })
 
 };
 
@@ -99,7 +81,7 @@ OrbitControls.update = function update() {
 		
 	this.pivot.rotation.y = this.pivot.rotation.y - this.pos.x;
 
-	this.watchTarget();
+	this.camera.lookAt(this.scene.position);
 
 };
 

@@ -1,6 +1,3 @@
-import $              from 'jquery';
-import THREE          from 'three';
-import TWEEN          from 'tween.js';
 import Win            from 'app/utils/window';
 import ProjectSphere  from 'app/components/projectSphere';
 import ParticleSystem from 'app/components/particleSystem';
@@ -10,7 +7,6 @@ import Request        from 'app/utils/request';
 const Home = {
 
   $el: null,
-
   projectSphere: ProjectSphere,
   controls: OrbitControls,
   particles: ParticleSystem,
@@ -18,6 +14,8 @@ const Home = {
 };
 
 Home.init = function init() {
+
+	Happens(this);
 
   this.$el = $('#three-viewport');
 
@@ -30,9 +28,11 @@ Home.init = function init() {
 
       return item.state === 'published';
 
-    })
+    });
 
     this.initScene();
+
+    this.emit('view:ready');
   
   });
 
@@ -110,8 +110,6 @@ Home.render = function render() {
 };
 
 Home.update = function update() {
-  
-  TWEEN.update();
   
   this.controls.update();
   this.particles.update();

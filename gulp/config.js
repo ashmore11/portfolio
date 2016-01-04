@@ -12,6 +12,10 @@ export default {
 	 * Paths for all the source files
 	 */
 	paths: {
+		vendor: {
+			destination: './public/js/',
+			filename: 'vendor.js',
+		},
 		scripts: {
 			source: './client/scripts/app.js',
 			watch: './client/scripts/**/*.js',
@@ -33,7 +37,14 @@ export default {
 	 */
 	nodemon: {
 		script: 'keystone.js',
-		ignore: ['gulp', 'client', 'node_modules', 'public']
+		ignore: [
+			'gulp', 
+			'client', 
+			'node_modules', 
+			'public', 
+			'package.json', 
+			'bower.json'
+		],
 	},
 
 	/**

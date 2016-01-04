@@ -1,6 +1,4 @@
-import THREE               from 'three';
-import { times as _times } from 'underscore';
-import TextureLoader       from 'app/utils/textureLoader';
+import TextureLoader from 'app/utils/textureLoader';
 
 const ParticleSystem = {
 
@@ -31,7 +29,7 @@ ParticleSystem.init = function init(scene) {
 
 ParticleSystem.pushVertices = function pushVertices() {
 
-	_times(this.count, n => {
+	_.times(this.count, () => {
 
 		const vertex = new THREE.Vector3();
 

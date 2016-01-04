@@ -1,6 +1,3 @@
-import Happens from 'happens';
-import TM      from 'gsap';
-
 const Transitions = {
 
   init: function init() {
@@ -11,14 +8,14 @@ const Transitions = {
 
   fadeIn: function fadeIn(el, duration) {
 
-    TM.set(el, { autoAlpha: 0 });
+    TweenMax.set(el, { autoAlpha: 0 });
 
     const params = {
       autoAlpha: 1,
       ease: Power2.easeInOut,
     };
 
-    TM.to(el, duration, params);
+    TweenMax.to(el, duration, params);
 
   },
 
@@ -32,7 +29,7 @@ const Transitions = {
       },
     };
 
-    TM.to(el, duration, params);
+    TweenMax.to(el, duration, params);
 
   },
 

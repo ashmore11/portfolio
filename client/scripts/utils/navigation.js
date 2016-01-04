@@ -1,9 +1,6 @@
-import Happens from 'happens';
-import $       from 'jquery';
-
 const Navigation = {
 
-	originalState: window.location.pathname.split('/').pop() || '/',
+	originalState: window.location.pathname,
 	url: null,
 
 };
@@ -11,6 +8,8 @@ const Navigation = {
 Navigation.init = function init() {
 
 	Happens(this);
+
+	this.url = this.originalState;
 
 	this.bind();
 

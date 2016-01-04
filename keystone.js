@@ -15,8 +15,8 @@ var keystone = require('keystone');
  * and documentation.
  */
 keystone.init({
-	'name': 'node-web-app',
-	'brand': 'Node Web App',
+	'name': 'Scott Ashmore - Portfolio',
+	'brand': 'Scott Ashmore - Portfolio CMS',
 	
 	'stylus': 'public',
 	'static': 'public',
@@ -42,7 +42,6 @@ keystone.import('./server/models');
  * for each request) should be added to ./routes/middleware.js
  */
 keystone.set('locals', {
-	_: require('underscore'),
 	env: keystone.get('env'),
 	utils: keystone.utils,
 	editable: keystone.content.editable
@@ -59,6 +58,7 @@ keystone.set('routes', require('./server/routes'));
 keystone.set('nav', {
 	'pages': 'pages',
 	'posts': 'posts',
+	'tags' : 'tags',
 	'users': 'users'
 });
 

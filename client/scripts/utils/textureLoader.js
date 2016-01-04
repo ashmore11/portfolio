@@ -1,5 +1,3 @@
-import THREE from 'three';
-
 const TextureLoader = function TextureLoader(url) {
 
   const loader = new THREE.TextureLoader();

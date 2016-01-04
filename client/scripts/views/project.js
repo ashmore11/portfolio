@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 const Project = {
 
   $el: $('#project'),
@@ -8,7 +6,11 @@ const Project = {
 
 Project.init = function init() {
 
+	Happens(this);
+
   console.log('init PROJECT');
+
+  this.emit('view:ready');
 
 };
 

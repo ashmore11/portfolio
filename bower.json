@@ -1,0 +1,26 @@
+{
+  "name": "Scott Ashmore - Portfolio",
+  "description": "",
+  "main": "keystone.js",
+  "authors": [
+    "Scott Ashmore <dev.scottashmore@gmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/ashmore11/portfolio",
+  "moduleType": [],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "gsap": "~1.18.2",
+    "happens": "~0.6.0",
+    "three.js": "~0.73.0",
+    "jquery": "~2.1.4",
+    "underscore": "~1.8.3"
+  }
+}

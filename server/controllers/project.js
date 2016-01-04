@@ -12,8 +12,6 @@ exports = module.exports = function(req, res) {
 
   view.query('page', page.model.findOne({ slug: 'project' }));
   view.query('post', post.model.findOne({ slug: req.params.id }));
-
-  console.log(post.model.findOne({ slug: req.params.id }));
   
   view.render('project');
   

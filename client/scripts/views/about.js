@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 const About = {
 
   $el: $('#about'),
@@ -8,7 +6,11 @@ const About = {
 
 About.init = function init() {
 
+	Happens(this);
+
   console.log('init ABOUT');
+
+  this.emit('view:ready');
 
 };
 

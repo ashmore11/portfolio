@@ -47,7 +47,12 @@ post.add({
   video: {
     type: types.Url,
     required: false
-  }
+  },
+  tags: { 
+		type: types.Relationship, 
+		ref: 'Tags',
+		many: true
+	}
 });
 
 post.defaultColumns = 'title, state, createdOn';
