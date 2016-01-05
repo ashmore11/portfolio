@@ -1,19 +1,20 @@
 import Win           from 'app/utils/window';
 import TextureLoader from 'app/utils/textureLoader';
 import Nav           from 'app/utils/navigation';
+import Request       from 'app/utils/request';
+import Scene         from 'app/components/scene';
+import Camera        from 'app/components/camera';
 
 const ProjectSphere = {
 
   $el: null,
   data: null,
-  scene: null,
-  camera: null,
   pos: {},
   projects: [],
-  faces: [],
   intersected: null,
   raycaster: new THREE.Raycaster,
   camera_pos: new THREE.Vector3,
+  projectMouseOver: false,
   cylinder: {
     radiusTop: 3000,
     radiusBottom: 3000,
@@ -22,22 +23,38 @@ const ProjectSphere = {
     heightSegments: 16,
     openEnded: true,
     thetaStart: 0,
-    thetaLength: (Math.PI * 2) / 6.25,
+    thetaLength: (Math.PI * 2) / 6.5,
   },
 
 };
 
-ProjectSphere.init = function init(data, scene, camera) {
+ProjectSphere.init = function init(data) {
 
   this.$el = $('#three-viewport');
 
-  this.data   = [0,1,2,3,4,5];
-  this.scene  = scene;
-  this.camera = camera;
+  const url = `${window.location.origin}/api/posts`;
+
+  this.getData(url);
 
   this.bind();
-  this.createProjects();
-  this.createFaceArray();
+
+};
+
+ProjectSphere.getData = function getData(url) {
+
+  Request.get(url).then(response => {
+
+    // this.data = JSON.parse(response).filter(item => {
+
+    //   return item.state === 'published';
+
+    // });
+
+    this.data = [0,1,2,3,4,5];
+
+    this.createProjects();
+  
+  });
 
 };
 
@@ -97,12 +114,15 @@ ProjectSphere.createProjects = function createProjects() {
     project.lookAt(target);
 
     this.projects.push(project);
-    this.scene.add(project);
+    Scene.obj.add(project);
 
   });
 
 };
 
+/**
+ * Mouse move over the scene
+ */
 ProjectSphere.mouseMove = function mouseMove(event) {
 
   const evt = {
@@ -115,6 +135,9 @@ ProjectSphere.mouseMove = function mouseMove(event) {
 
 };
 
+/**
+ * Mouse down on a project
+ */
 ProjectSphere.mouseDown = function mouseDown(event) {
 
   const evt = {
@@ -135,7 +158,12 @@ ProjectSphere.mouseDown = function mouseDown(event) {
 
 };
 
+/**
+ * Mouse over a project
+ */
 ProjectSphere.mouseOver = function mouseOver() {
+
+  this.projectMouseOver = true;
 
   const title    = $('#home h1');
   const material = this.intersected.material;
@@ -163,7 +191,12 @@ ProjectSphere.mouseOver = function mouseOver() {
 
 };
 
+/**
+ * Mouse out of a project
+ */
 ProjectSphere.mouseOut = function mouseOut() {
+
+  this.projectMouseOver = false;
 
   const title    = $('#home h1');
   const material = this.intersected.material;
@@ -189,42 +222,16 @@ ProjectSphere.mouseOut = function mouseOut() {
 
 };
 
-ProjectSphere.createFaceArray = function () {
-
-  let arr;
-
-  _.forEach(this.projects, project => {
-
-    _.forEach(project.geometry.vertices, (vertex, i) => {
-
-        if (i === project.geometry.vertices.length - 1) arr.push(vertex);
-
-        if (i % 3 === 0) {
-
-          if (i !== 0) this.faces.push(arr);
-
-          arr = [];
-
-        }
-
-        arr.push(vertex);
-
-    });
-  
-  });
-
-};
-
 ProjectSphere.update = function update() {
 
   // taking the camera's world position into consideration
-  this.camera_pos.setFromMatrixPosition(this.camera.matrixWorld);
+  this.camera_pos.setFromMatrixPosition(Camera.obj.matrixWorld);
 
   this.raycaster.ray.origin.copy(this.camera_pos);
 
   this.raycaster.ray.direction
     .set(this.pos.x, this.pos.y, 0)
-    .unproject(this.camera)
+    .unproject(Camera.obj)
     .sub(this.camera_pos)
     .normalize();
 
@@ -234,7 +241,7 @@ ProjectSphere.update = function update() {
 
     this.intersected = intersects[0].object;
 
-    if (!Win.width < 768) this.mouseOver();
+    if (!Win.width < 768 && !this.projectMouseOver) this.mouseOver();
 
   } else {
 
@@ -243,12 +250,6 @@ ProjectSphere.update = function update() {
     this.intersected = null;
 
   }
-
-  _.forEach(this.projects, project => {
-      
-    project.geometry.verticesNeedUpdate = true;
-
-  });
 
 };
 

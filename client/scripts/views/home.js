@@ -1,15 +1,15 @@
 import Win            from 'app/utils/window';
+import RAF            from 'app/utils/raf';
+import Renderer       from 'app/components/renderer';
+import Scene          from 'app/components/scene';
+import Camera         from 'app/components/camera';
 import ProjectSphere  from 'app/components/projectSphere';
 import ParticleSystem from 'app/components/particleSystem';
-import OrbitControls  from 'app/components/orbitControls';
-import Request        from 'app/utils/request';
+import PivotControls  from 'app/components/pivotControls';
 
 const Home = {
 
-  $el: null,
-  projectSphere: ProjectSphere,
-  controls: OrbitControls,
-  particles: ParticleSystem,
+  $el: null
 
 };
 
@@ -17,120 +17,76 @@ Home.init = function init() {
 
 	Happens(this);
 
-  this.$el = $('#three-viewport');
+	RAF.start();
 
-  const host = window.location.origin;
-  const url  = `${host}/api/posts`;
+	this.$el = $('#three-viewport');
+	this.$el.append(Renderer.obj.domElement);
 
-  Request.get(url).then(response => {
-
-    this.data = JSON.parse(response).filter(item => {
-
-      return item.state === 'published';
-
-    });
-
-    this.initScene();
-
-    this.emit('view:ready');
+	Scene.init();
+	Camera.init();
+	Renderer.init();
   
-  });
-
-};
-
-Home.initScene = function initScene() {
-
-  this.scene     = new THREE.Scene();
-  this.scene.fog = new THREE.Fog(0x000000, 10, 10000);
-
-  this.camera = new THREE.PerspectiveCamera(55, Win.width / Win.height, 0.1, 10000);
+  ProjectSphere.init();
+  PivotControls.init();
+  ParticleSystem.init();
   
-  this.projectSphere.init(this.data, this.scene, this.camera);
-  this.controls.init(this.scene, this.camera);
-  this.particles.init(this.scene);
-  
-  this.renderer = new THREE.WebGLRenderer({ antialias: true });
-  this.renderer.setSize(Win.width, Win.height);
-  this.renderer.setClearColor(0x000000);
+  Camera.obj.position.set(0, 25, 1000);
 
-  this.$el.append(this.renderer.domElement);
-
-  // this.animateCameraPos();
-  
-  this.camTweenComplete = true;
-  this.camera.position.set(0, 25, 1000);
-  this.controls.pos.x = -0.00025;
-
-  this.render();
   this.bind();
 
 };
 
 Home.bind = function bind() {
 
-  Win.on('resize', this.resize.bind(this));
+	Win.on('resize', this.resize.bind(this));
+  RAF.on('tick',   this.update.bind(this));
 
 };
 
-Home.animateCameraPos = function animateCameraPos() {
+Home.runIntroFlyover = function runIntroFlyover() {
 
-	let params;
+  let params;
 
-  this.camera.position.set(0, 2500, 5000);
-  this.controls.pos.x = -0.00025;
-
-  params = {
-  	y: 25,
-  	easing: Sine.easeInOut,
-  };
-
-  TweenMax.to(this.camera.position, 5, params);
+  Camera.obj.position.set(0, 2500, 5000);
 
   params = {
-  	z: 1000,
-  	easing: Sine.easeInOut,
+    y: 25,
+    easing: Sine.easeInOut,
   };
 
-  TweenMax.to(this.camera.position, 6.5, params);
+  TweenMax.to(Camera.obj.position, 5, params);
+
+  params = {
+    z: 1000,
+    easing: Sine.easeInOut,
+  };
+
+  TweenMax.to(Camera.obj.position, 6.5, params);
 
 };
 
 Home.resize = function resize() {
 
-  this.renderer.setSize(Win.width, Win.height);
-  this.camera.aspect = Win.width / Win.height;
-  
-  this.camera.updateProjectionMatrix();
-
-};
-
-Home.render = function render() {
-  
-  this.RAF = requestAnimationFrame(this.render.bind(this));
-
-  this.renderer.render(this.scene, this.camera);
-  
-  this.update();
+	Camera.resize();
+	Renderer.resize();
 
 };
 
 Home.update = function update() {
   
-  this.controls.update();
-  this.particles.update();
-  this.projectSphere.update();
+  Renderer.update();
+  PivotControls.update();
+  ParticleSystem.update();
+  ProjectSphere.update();
 
 };
 
 Home.destroy = function destroy() {
 
-  console.log('destroy HOME');
+  ProjectSphere.unbind();
+  PivotControls.unbind();
 
-  this.projectSphere.unbind();
-  this.controls.unbind();
-
-  cancelAnimationFrame(this.RAF);
-  this.RAF = null;
+  RAF.stop();
 
 };
 

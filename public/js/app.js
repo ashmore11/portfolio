@@ -91,11 +91,11 @@
 
 	var _home2 = _interopRequireDefault(_home);
 
-	var _project = __webpack_require__(11);
+	var _project = __webpack_require__(15);
 
 	var _project2 = _interopRequireDefault(_project);
 
-	var _about = __webpack_require__(12);
+	var _about = __webpack_require__(16);
 
 	var _about2 = _interopRequireDefault(_about);
 
@@ -337,143 +337,111 @@
 
 	var _window2 = _interopRequireDefault(_window);
 
-	var _projectSphere = __webpack_require__(7);
+	var _raf = __webpack_require__(7);
+
+	var _raf2 = _interopRequireDefault(_raf);
+
+	var _renderer = __webpack_require__(8);
+
+	var _renderer2 = _interopRequireDefault(_renderer);
+
+	var _scene = __webpack_require__(10);
+
+	var _scene2 = _interopRequireDefault(_scene);
+
+	var _camera = __webpack_require__(9);
+
+	var _camera2 = _interopRequireDefault(_camera);
+
+	var _projectSphere = __webpack_require__(11);
 
 	var _projectSphere2 = _interopRequireDefault(_projectSphere);
 
-	var _particleSystem = __webpack_require__(9);
+	var _particleSystem = __webpack_require__(13);
 
 	var _particleSystem2 = _interopRequireDefault(_particleSystem);
 
-	var _orbitControls = __webpack_require__(10);
+	var _pivotControls = __webpack_require__(14);
 
-	var _orbitControls2 = _interopRequireDefault(_orbitControls);
-
-	var _request = __webpack_require__(4);
-
-	var _request2 = _interopRequireDefault(_request);
+	var _pivotControls2 = _interopRequireDefault(_pivotControls);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Home = {
 
-	  $el: null,
-	  projectSphere: _projectSphere2.default,
-	  controls: _orbitControls2.default,
-	  particles: _particleSystem2.default
+	  $el: null
 
 	};
 
 	Home.init = function init() {
-	  var _this = this;
 
 	  Happens(this);
 
+	  _raf2.default.start();
+
 	  this.$el = $('#three-viewport');
+	  this.$el.append(_renderer2.default.obj.domElement);
 
-	  var host = window.location.origin;
-	  var url = host + '/api/posts';
+	  _scene2.default.init();
+	  _camera2.default.init();
+	  _renderer2.default.init();
 
-	  _request2.default.get(url).then(function (response) {
+	  _projectSphere2.default.init();
+	  _pivotControls2.default.init();
+	  _particleSystem2.default.init();
 
-	    _this.data = JSON.parse(response).filter(function (item) {
+	  _camera2.default.obj.position.set(0, 25, 1000);
 
-	      return item.state === 'published';
-	    });
-
-	    _this.initScene();
-
-	    _this.emit('view:ready');
-	  });
-	};
-
-	Home.initScene = function initScene() {
-
-	  this.scene = new THREE.Scene();
-	  this.scene.fog = new THREE.Fog(0x000000, 10, 10000);
-
-	  this.camera = new THREE.PerspectiveCamera(55, _window2.default.width / _window2.default.height, 0.1, 10000);
-
-	  this.projectSphere.init(this.data, this.scene, this.camera);
-	  this.controls.init(this.scene, this.camera);
-	  this.particles.init(this.scene);
-
-	  this.renderer = new THREE.WebGLRenderer({ antialias: true });
-	  this.renderer.setSize(_window2.default.width, _window2.default.height);
-	  this.renderer.setClearColor(0x000000);
-
-	  this.$el.append(this.renderer.domElement);
-
-	  // this.animateCameraPos();
-
-	  this.camTweenComplete = true;
-	  this.camera.position.set(0, 25, 1000);
-	  this.controls.pos.x = -0.00025;
-
-	  this.render();
 	  this.bind();
 	};
 
 	Home.bind = function bind() {
 
 	  _window2.default.on('resize', this.resize.bind(this));
+	  _raf2.default.on('tick', this.update.bind(this));
 	};
 
-	Home.animateCameraPos = function animateCameraPos() {
+	Home.runIntroFlyover = function runIntroFlyover() {
 
 	  var params = undefined;
 
-	  this.camera.position.set(0, 2500, 5000);
-	  this.controls.pos.x = -0.00025;
+	  _camera2.default.obj.position.set(0, 2500, 5000);
 
 	  params = {
 	    y: 25,
 	    easing: Sine.easeInOut
 	  };
 
-	  TweenMax.to(this.camera.position, 5, params);
+	  TweenMax.to(_camera2.default.obj.position, 5, params);
 
 	  params = {
 	    z: 1000,
 	    easing: Sine.easeInOut
 	  };
 
-	  TweenMax.to(this.camera.position, 6.5, params);
+	  TweenMax.to(_camera2.default.obj.position, 6.5, params);
 	};
 
 	Home.resize = function resize() {
 
-	  this.renderer.setSize(_window2.default.width, _window2.default.height);
-	  this.camera.aspect = _window2.default.width / _window2.default.height;
-
-	  this.camera.updateProjectionMatrix();
-	};
-
-	Home.render = function render() {
-
-	  this.RAF = requestAnimationFrame(this.render.bind(this));
-
-	  this.renderer.render(this.scene, this.camera);
-
-	  this.update();
+	  _camera2.default.resize();
+	  _renderer2.default.resize();
 	};
 
 	Home.update = function update() {
 
-	  this.controls.update();
-	  this.particles.update();
-	  this.projectSphere.update();
+	  _renderer2.default.update();
+	  _pivotControls2.default.update();
+	  _particleSystem2.default.update();
+	  _projectSphere2.default.update();
 	};
 
 	Home.destroy = function destroy() {
 
-	  console.log('destroy HOME');
+	  _projectSphere2.default.unbind();
+	  _pivotControls2.default.unbind();
 
-	  this.projectSphere.unbind();
-	  this.controls.unbind();
-
-	  cancelAnimationFrame(this.RAF);
-	  this.RAF = null;
+	  _raf2.default.stop();
 	};
 
 	exports.default = Home;
@@ -535,6 +503,49 @@
 
 /***/ },
 /* 7 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var RAF = {
+
+	  ticker: null
+
+	};
+
+	RAF.init = function init() {
+
+	  Happens(this);
+	};
+
+	RAF.start = function start() {
+
+	  this.ticker = window.requestAnimationFrame(this.tick.bind(this));
+	};
+
+	RAF.stop = function stop() {
+
+	  window.cancelAnimationFrame(this.ticker.bind(this));
+
+	  this.ticker = null;
+	};
+
+	RAF.tick = function tick(time) {
+
+	  this.ticker = window.requestAnimationFrame(this.tick.bind(this));
+
+	  this.emit('tick', time);
+	};
+
+	RAF.init();
+
+	exports.default = RAF;
+
+/***/ },
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -547,7 +558,126 @@
 
 	var _window2 = _interopRequireDefault(_window);
 
-	var _textureLoader = __webpack_require__(8);
+	var _camera = __webpack_require__(9);
+
+	var _camera2 = _interopRequireDefault(_camera);
+
+	var _scene = __webpack_require__(10);
+
+	var _scene2 = _interopRequireDefault(_scene);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Renderer = {
+
+	  obj: new THREE.WebGLRenderer({ antialias: true })
+
+	};
+
+	Renderer.init = function init() {
+
+	  this.obj.setSize(_window2.default.width, _window2.default.height);
+	  this.obj.setClearColor(0x000000);
+	};
+
+	Renderer.resize = function resize() {
+
+	  this.obj.setSize(_window2.default.width, _window2.default.height);
+	};
+
+	Renderer.update = function update() {
+
+	  this.obj.render(_scene2.default.obj, _camera2.default.obj);
+	};
+
+	exports.default = Renderer;
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _window = __webpack_require__(6);
+
+	var _window2 = _interopRequireDefault(_window);
+
+	var _scene = __webpack_require__(10);
+
+	var _scene2 = _interopRequireDefault(_scene);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Camera = {
+
+	  fov: 55,
+	  aspect: _window2.default.width / _window2.default.height,
+	  near: 0.1,
+	  far: 10000,
+	  obj: null
+
+	};
+
+	Camera.init = function init() {
+
+	  this.obj = new THREE.PerspectiveCamera(this.fov, this.aspect, this.near, this.far);
+
+	  _scene2.default.obj.add(this.obj);
+	};
+
+	Camera.resize = function resize() {
+
+	  this.obj.aspect = _window2.default.width / _window2.default.height;
+
+	  this.obj.updateProjectionMatrix();
+	};
+
+	exports.default = Camera;
+
+/***/ },
+/* 10 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var Scene = {
+
+	  obj: new THREE.Scene(),
+	  fog: new THREE.Fog(0x000000, 10, 10000)
+
+	};
+
+	Scene.init = function init() {
+
+	  this.obj.fog = this.fog;
+	};
+
+	Scene.init();
+
+	exports.default = Scene;
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _window = __webpack_require__(6);
+
+	var _window2 = _interopRequireDefault(_window);
+
+	var _textureLoader = __webpack_require__(12);
 
 	var _textureLoader2 = _interopRequireDefault(_textureLoader);
 
@@ -555,20 +685,30 @@
 
 	var _navigation2 = _interopRequireDefault(_navigation);
 
+	var _request = __webpack_require__(4);
+
+	var _request2 = _interopRequireDefault(_request);
+
+	var _scene = __webpack_require__(10);
+
+	var _scene2 = _interopRequireDefault(_scene);
+
+	var _camera = __webpack_require__(9);
+
+	var _camera2 = _interopRequireDefault(_camera);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var ProjectSphere = {
 
 	  $el: null,
 	  data: null,
-	  scene: null,
-	  camera: null,
 	  pos: {},
 	  projects: [],
-	  faces: [],
 	  intersected: null,
 	  raycaster: new THREE.Raycaster(),
 	  camera_pos: new THREE.Vector3(),
+	  projectMouseOver: false,
 	  cylinder: {
 	    radiusTop: 3000,
 	    radiusBottom: 3000,
@@ -577,22 +717,37 @@
 	    heightSegments: 16,
 	    openEnded: true,
 	    thetaStart: 0,
-	    thetaLength: Math.PI * 2 / 6.25
+	    thetaLength: Math.PI * 2 / 6.5
 	  }
 
 	};
 
-	ProjectSphere.init = function init(data, scene, camera) {
+	ProjectSphere.init = function init(data) {
 
 	  this.$el = $('#three-viewport');
 
-	  this.data = [0, 1, 2, 3, 4, 5];
-	  this.scene = scene;
-	  this.camera = camera;
+	  var url = window.location.origin + '/api/posts';
+
+	  this.getData(url);
 
 	  this.bind();
-	  this.createProjects();
-	  this.createFaceArray();
+	};
+
+	ProjectSphere.getData = function getData(url) {
+	  var _this = this;
+
+	  _request2.default.get(url).then(function (response) {
+
+	    // this.data = JSON.parse(response).filter(item => {
+
+	    //   return item.state === 'published';
+
+	    // });
+
+	    _this.data = [0, 1, 2, 3, 4, 5];
+
+	    _this.createProjects();
+	  });
 	};
 
 	ProjectSphere.bind = function bind() {
@@ -608,7 +763,7 @@
 	};
 
 	ProjectSphere.createProjects = function createProjects() {
-	  var _this = this;
+	  var _this2 = this;
 
 	  var target = new THREE.Vector3();
 	  var geometry = new THREE.CylinderGeometry(this.cylinder.radiusTop, this.cylinder.radiusBottom, this.cylinder.height, this.cylinder.radiusSegments, this.cylinder.heightSegments, this.cylinder.openEnded, this.cylinder.thetaStart, this.cylinder.thetaLength);
@@ -634,17 +789,20 @@
 	    // project.title         = item.title;
 	    // project.url           = `/project/${item.slug}`;
 
-	    var x = Math.cos(index * (Math.PI * 2) / _this.data.length);
-	    var z = Math.sin(index * (Math.PI * 2) / _this.data.length);
+	    var x = Math.cos(index * (Math.PI * 2) / _this2.data.length);
+	    var z = Math.sin(index * (Math.PI * 2) / _this2.data.length);
 
 	    project.position.set(x, 0, z);
 	    project.lookAt(target);
 
-	    _this.projects.push(project);
-	    _this.scene.add(project);
+	    _this2.projects.push(project);
+	    _scene2.default.obj.add(project);
 	  });
 	};
 
+	/**
+	 * Mouse move over the scene
+	 */
 	ProjectSphere.mouseMove = function mouseMove(event) {
 
 	  var evt = {
@@ -656,6 +814,9 @@
 	  this.pos.y = -(evt.y / _window2.default.height) * 2 + 1;
 	};
 
+	/**
+	 * Mouse down on a project
+	 */
 	ProjectSphere.mouseDown = function mouseDown(event) {
 
 	  var evt = {
@@ -674,7 +835,12 @@
 	  }
 	};
 
+	/**
+	 * Mouse over a project
+	 */
 	ProjectSphere.mouseOver = function mouseOver() {
+
+	  this.projectMouseOver = true;
 
 	  var title = $('#home h1');
 	  var material = this.intersected.material;
@@ -701,7 +867,12 @@
 	  TweenMax.to(material, 0.75, { opacity: 1 });
 	};
 
+	/**
+	 * Mouse out of a project
+	 */
 	ProjectSphere.mouseOut = function mouseOut() {
+
+	  this.projectMouseOver = false;
 
 	  var title = $('#home h1');
 	  var material = this.intersected.material;
@@ -726,37 +897,14 @@
 	  TweenMax.to(material, 0.75, params);
 	};
 
-	ProjectSphere.createFaceArray = function () {
-	  var _this2 = this;
-
-	  var arr = undefined;
-
-	  _.forEach(this.projects, function (project) {
-
-	    _.forEach(project.geometry.vertices, function (vertex, i) {
-
-	      if (i === project.geometry.vertices.length - 1) arr.push(vertex);
-
-	      if (i % 3 === 0) {
-
-	        if (i !== 0) _this2.faces.push(arr);
-
-	        arr = [];
-	      }
-
-	      arr.push(vertex);
-	    });
-	  });
-	};
-
 	ProjectSphere.update = function update() {
 
 	  // taking the camera's world position into consideration
-	  this.camera_pos.setFromMatrixPosition(this.camera.matrixWorld);
+	  this.camera_pos.setFromMatrixPosition(_camera2.default.obj.matrixWorld);
 
 	  this.raycaster.ray.origin.copy(this.camera_pos);
 
-	  this.raycaster.ray.direction.set(this.pos.x, this.pos.y, 0).unproject(this.camera).sub(this.camera_pos).normalize();
+	  this.raycaster.ray.direction.set(this.pos.x, this.pos.y, 0).unproject(_camera2.default.obj).sub(this.camera_pos).normalize();
 
 	  var intersects = this.raycaster.intersectObjects(this.projects);
 
@@ -764,24 +912,19 @@
 
 	    this.intersected = intersects[0].object;
 
-	    if (!_window2.default.width < 768) this.mouseOver();
+	    if (!_window2.default.width < 768 && !this.projectMouseOver) this.mouseOver();
 	  } else {
 
 	    if (!_window2.default.width < 768 && this.intersected) this.mouseOut();
 
 	    this.intersected = null;
 	  }
-
-	  _.forEach(this.projects, function (project) {
-
-	    project.geometry.verticesNeedUpdate = true;
-	  });
 	};
 
 	exports.default = ProjectSphere;
 
 /***/ },
-/* 8 */
+/* 12 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -804,7 +947,7 @@
 	exports.default = TextureLoader;
 
 /***/ },
-/* 9 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -813,15 +956,18 @@
 		value: true
 	});
 
-	var _textureLoader = __webpack_require__(8);
+	var _textureLoader = __webpack_require__(12);
 
 	var _textureLoader2 = _interopRequireDefault(_textureLoader);
+
+	var _scene = __webpack_require__(10);
+
+	var _scene2 = _interopRequireDefault(_scene);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var ParticleSystem = {
 
-		scene: null,
 		geometry: new THREE.Geometry(),
 		materials: [],
 		particles: [],
@@ -830,9 +976,7 @@
 
 	};
 
-	ParticleSystem.init = function init(scene) {
-
-		this.scene = scene;
+	ParticleSystem.init = function init() {
 
 		this.pushVertices();
 
@@ -876,7 +1020,7 @@
 
 			_this2.particles.push(particle);
 
-			_this2.scene.add(particle);
+			_scene2.default.obj.add(particle);
 		});
 	};
 
@@ -893,7 +1037,7 @@
 	exports.default = ParticleSystem;
 
 /***/ },
-/* 10 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -906,13 +1050,20 @@
 
 	var _window2 = _interopRequireDefault(_window);
 
+	var _camera = __webpack_require__(9);
+
+	var _camera2 = _interopRequireDefault(_camera);
+
+	var _scene = __webpack_require__(10);
+
+	var _scene2 = _interopRequireDefault(_scene);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var OrbitControls = {
+	var PivotControls = {
 
 		$el: null,
 		scene: null,
-		camera: null,
 		pivot: null,
 		tween: null,
 		pos: {
@@ -923,20 +1074,18 @@
 
 	};
 
-	OrbitControls.init = function init(scene, camera) {
+	PivotControls.init = function init() {
 
 		this.$el = $('#three-viewport');
 
-		this.scene = scene;
-		this.camera = camera;
+		_scene2.default.obj.add(this.pivot);
 
-		this.scene.add(this.pivot);
-		this.pivot.add(this.camera);
+		this.pivot.add(_camera2.default.obj);
 
 		this.bind();
 	};
 
-	OrbitControls.bind = function bind() {
+	PivotControls.bind = function bind() {
 
 		this.$el.on('mousemove', this.mouseMove.bind(this));
 		this.$el.on('touchstart', this.touchStart.bind(this));
@@ -944,7 +1093,7 @@
 		this.$el.on('touchend', this.touchEnd.bind(this));
 	};
 
-	OrbitControls.unbind = function unbind() {
+	PivotControls.unbind = function unbind() {
 
 		this.$el.off('mousemove');
 		this.$el.off('touchstart');
@@ -952,43 +1101,43 @@
 		this.$el.off('touchend');
 	};
 
-	OrbitControls.mouseMove = function mouseMove() {
+	PivotControls.mouseMove = function mouseMove() {
 
 		this.pos.x = event.pageX;
 		this.pos.x = this.pos.x - _window2.default.width / 2;
 		this.pos.x = this.pos.x * 0.000025;
 	};
 
-	OrbitControls.touchStart = function touchStart() {
+	PivotControls.touchStart = function touchStart() {
 
 		this.pos.a = event.originalEvent.touches[0].pageX;
 	};
 
-	OrbitControls.touchMove = function touchMove() {
+	PivotControls.touchMove = function touchMove() {
 
 		this.pos.x = event.originalEvent.touches[0].pageX;
 		this.pos.x = this.pos.x - this.pos.a;
 		this.pos.x = this.pos.x * -0.000025;
 	};
 
-	OrbitControls.touchEnd = function touchEnd() {
+	PivotControls.touchEnd = function touchEnd() {
 
 		var duration = Math.round(Math.abs(this.pos.x * 100000));
 
 		TweenMax.to(this.pos, duration, { x: 0, easing: Sine.easeOut });
 	};
 
-	OrbitControls.update = function update() {
+	PivotControls.update = function update() {
 
 		this.pivot.rotation.y = this.pivot.rotation.y - this.pos.x;
 
-		this.camera.lookAt(this.scene.position);
+		_camera2.default.obj.lookAt(_scene2.default.obj.position);
 	};
 
-	exports.default = OrbitControls;
+	exports.default = PivotControls;
 
 /***/ },
-/* 11 */
+/* 15 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1019,7 +1168,7 @@
 	exports.default = Project;
 
 /***/ },
-/* 12 */
+/* 16 */
 /***/ function(module, exports) {
 
 	'use strict';

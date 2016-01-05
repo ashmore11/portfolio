@@ -1,10 +1,11 @@
-import Win from 'app/utils/window';
+import Win    from 'app/utils/window';
+import Camera from 'app/components/camera';
+import Scene  from 'app/components/scene';
 
-const OrbitControls = {
+const PivotControls = {
 	
 	$el: null,
 	scene: null,
-	camera: null,
 	pivot: null,
 	tween: null,
 	pos: {
@@ -15,21 +16,19 @@ const OrbitControls = {
 
 };
 
-OrbitControls.init = function init(scene, camera) {
+PivotControls.init = function init() {
 
 	this.$el = $('#three-viewport');
 
-	this.scene = scene;
-	this.camera = camera;
+	Scene.obj.add(this.pivot);
 
-	this.scene.add(this.pivot);
-	this.pivot.add(this.camera);
+	this.pivot.add(Camera.obj);
 
 	this.bind();
 
 };
 
-OrbitControls.bind = function bind() {
+PivotControls.bind = function bind() {
 
 	this.$el.on('mousemove',  this.mouseMove.bind(this));
 	this.$el.on('touchstart', this.touchStart.bind(this));
@@ -38,7 +37,7 @@ OrbitControls.bind = function bind() {
 
 };
 
-OrbitControls.unbind = function unbind() {
+PivotControls.unbind = function unbind() {
 
 	this.$el.off('mousemove');
 	this.$el.off('touchstart');
@@ -47,7 +46,7 @@ OrbitControls.unbind = function unbind() {
 
 };
 
-OrbitControls.mouseMove = function mouseMove() {
+PivotControls.mouseMove = function mouseMove() {
 
 	this.pos.x = event.pageX;
 	this.pos.x = this.pos.x - Win.width / 2;
@@ -55,13 +54,13 @@ OrbitControls.mouseMove = function mouseMove() {
 
 };
 
-OrbitControls.touchStart = function touchStart() {
+PivotControls.touchStart = function touchStart() {
 
 	this.pos.a = event.originalEvent.touches[0].pageX;
 
 };
 
-OrbitControls.touchMove = function touchMove() {
+PivotControls.touchMove = function touchMove() {
 
 	this.pos.x = event.originalEvent.touches[0].pageX;
 	this.pos.x = this.pos.x - this.pos.a;
@@ -69,7 +68,7 @@ OrbitControls.touchMove = function touchMove() {
 
 };
 
-OrbitControls.touchEnd = function touchEnd() {
+PivotControls.touchEnd = function touchEnd() {
 
 	const duration = Math.round(Math.abs(this.pos.x * 100000));
 
@@ -77,12 +76,12 @@ OrbitControls.touchEnd = function touchEnd() {
 
 };
 
-OrbitControls.update = function update() {
+PivotControls.update = function update() {
 		
 	this.pivot.rotation.y = this.pivot.rotation.y - this.pos.x;
 
-	this.camera.lookAt(this.scene.position);
+	Camera.obj.lookAt(Scene.obj.position);
 
 };
 
-export default OrbitControls;
+export default PivotControls;

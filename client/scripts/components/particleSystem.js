@@ -1,8 +1,8 @@
 import TextureLoader from 'app/utils/textureLoader';
+import Scene         from 'app/components/scene';
 
 const ParticleSystem = {
 
-	scene      : null,
 	geometry   : new THREE.Geometry,
 	materials  : [],
 	particles  : [],
@@ -17,9 +17,7 @@ const ParticleSystem = {
 
 };
 
-ParticleSystem.init = function init(scene) {
-
-	this.scene = scene;
+ParticleSystem.init = function init() {
 
 	this.pushVertices();
 
@@ -64,7 +62,7 @@ ParticleSystem.createParticles = function createParticles() {
 
 		this.particles.push(particle);
 
-		this.scene.add(particle);
+		Scene.obj.add(particle);
 
 	});
 
