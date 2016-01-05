@@ -147,7 +147,7 @@
 	View.render = function render(html, id) {
 	  var _this2 = this;
 
-	  this.$el.html(html);
+	  this.$el.html($(html).html());
 
 	  if (this.view) this.view.destroy();
 

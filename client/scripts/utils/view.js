@@ -52,7 +52,7 @@ View.load = function load(url, id) {
 
 View.render = function render(html, id) {
 
-  this.$el.html(html);
+  this.$el.html($(html).html());
 
   if (this.view) this.view.destroy();
 
