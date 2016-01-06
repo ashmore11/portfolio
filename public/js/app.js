@@ -137,15 +137,20 @@
 	      return item.id === 'main';
 	    });
 
-	    _transitions2.default.fadeOut(_this.$el, 1, function () {
+	    if (_this.view === null) {
 
 	      _this.render(html, id);
-	    });
+	    } else {
+
+	      _transitions2.default.fadeOut(_this.$el, 1, function () {
+
+	        _this.render(html, id);
+	      });
+	    }
 	  });
 	};
 
 	View.render = function render(html, id) {
-	  var _this2 = this;
 
 	  this.$el.html($(html).html());
 
@@ -154,11 +159,13 @@
 	  this.view = void 0;
 	  this.view = this.views[id];
 
-	  this.view.init();
-	  this.view.on('view:ready', function () {
+	  // this.view.on('view:ready', () => {
 
-	    _transitions2.default.fadeIn(_this2.$el, 0.5);
-	  });
+	  _transitions2.default.fadeIn(this.$el, 2);
+
+	  // });
+
+	  this.view.init();
 	};
 
 	exports.default = View;
@@ -273,6 +280,27 @@
 	    };
 
 	    TweenMax.to(el, duration, params);
+	  },
+
+	  introFlyover: function introFlyover(camera) {
+
+	    var params = undefined;
+
+	    camera.position.set(0, 3000, 6500);
+
+	    params = {
+	      y: 25,
+	      easing: Expo.easeInOut
+	    };
+
+	    TweenMax.to(camera.position, 5, params);
+
+	    params = {
+	      z: 1000,
+	      easing: Expo.easeInOut
+	    };
+
+	    TweenMax.to(camera.position, 7, params);
 	  }
 
 	};
@@ -341,15 +369,19 @@
 
 	var _raf2 = _interopRequireDefault(_raf);
 
+	var _transitions = __webpack_require__(3);
+
+	var _transitions2 = _interopRequireDefault(_transitions);
+
 	var _renderer = __webpack_require__(8);
 
 	var _renderer2 = _interopRequireDefault(_renderer);
 
-	var _scene = __webpack_require__(10);
+	var _scene = __webpack_require__(9);
 
 	var _scene2 = _interopRequireDefault(_scene);
 
-	var _camera = __webpack_require__(9);
+	var _camera = __webpack_require__(10);
 
 	var _camera2 = _interopRequireDefault(_camera);
 
@@ -380,17 +412,13 @@
 	  _raf2.default.start();
 
 	  this.$el = $('#three-viewport');
-	  this.$el.append(_renderer2.default.obj.domElement);
-
-	  _scene2.default.init();
-	  _camera2.default.init();
-	  _renderer2.default.init();
+	  this.$el.append(_renderer2.default.domElement);
 
 	  _projectSphere2.default.init();
 	  _pivotControls2.default.init();
 	  _particleSystem2.default.init();
 
-	  _camera2.default.obj.position.set(0, 25, 1000);
+	  _transitions2.default.introFlyover(_camera2.default);
 
 	  this.bind();
 	};
@@ -401,36 +429,19 @@
 	  _raf2.default.on('tick', this.update.bind(this));
 	};
 
-	Home.runIntroFlyover = function runIntroFlyover() {
-
-	  var params = undefined;
-
-	  _camera2.default.obj.position.set(0, 2500, 5000);
-
-	  params = {
-	    y: 25,
-	    easing: Sine.easeInOut
-	  };
-
-	  TweenMax.to(_camera2.default.obj.position, 5, params);
-
-	  params = {
-	    z: 1000,
-	    easing: Sine.easeInOut
-	  };
-
-	  TweenMax.to(_camera2.default.obj.position, 6.5, params);
-	};
-
 	Home.resize = function resize() {
 
-	  _camera2.default.resize();
-	  _renderer2.default.resize();
+	  _renderer2.default.setSize(_window2.default.width, _window2.default.height);
+
+	  _camera2.default.aspect = _window2.default.width / _window2.default.height;
 	};
 
 	Home.update = function update() {
 
-	  _renderer2.default.update();
+	  _renderer2.default.render(_scene2.default, _camera2.default);
+
+	  _camera2.default.updateProjectionMatrix();
+
 	  _pivotControls2.default.update();
 	  _particleSystem2.default.update();
 	  _projectSphere2.default.update();
@@ -558,42 +569,34 @@
 
 	var _window2 = _interopRequireDefault(_window);
 
-	var _camera = __webpack_require__(9);
-
-	var _camera2 = _interopRequireDefault(_camera);
-
-	var _scene = __webpack_require__(10);
-
-	var _scene2 = _interopRequireDefault(_scene);
-
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var Renderer = {
+	var renderer = new THREE.WebGLRenderer({
+	  antialias: true
+	});
 
-	  obj: new THREE.WebGLRenderer({ antialias: true })
+	renderer.setClearColor(0x000000);
+	renderer.setSize(_window2.default.width, _window2.default.height);
 
-	};
-
-	Renderer.init = function init() {
-
-	  this.obj.setSize(_window2.default.width, _window2.default.height);
-	  this.obj.setClearColor(0x000000);
-	};
-
-	Renderer.resize = function resize() {
-
-	  this.obj.setSize(_window2.default.width, _window2.default.height);
-	};
-
-	Renderer.update = function update() {
-
-	  this.obj.render(_scene2.default.obj, _camera2.default.obj);
-	};
-
-	exports.default = Renderer;
+	exports.default = renderer;
 
 /***/ },
 /* 9 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var scene = new THREE.Scene();
+
+	scene.fog = new THREE.FogExp2(0x000000, 0.0001);
+
+	exports.default = scene;
+
+/***/ },
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -606,62 +609,18 @@
 
 	var _window2 = _interopRequireDefault(_window);
 
-	var _scene = __webpack_require__(10);
-
-	var _scene2 = _interopRequireDefault(_scene);
-
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var Camera = {
+	var fov = 55;
+	var aspect = _window2.default.width / _window2.default.height;
+	var near = 0.1;
+	var far = 10000;
 
-	  fov: 55,
-	  aspect: _window2.default.width / _window2.default.height,
-	  near: 0.1,
-	  far: 10000,
-	  obj: null
+	var camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 
-	};
+	camera.position.set(0, 25, 1000);
 
-	Camera.init = function init() {
-
-	  this.obj = new THREE.PerspectiveCamera(this.fov, this.aspect, this.near, this.far);
-
-	  _scene2.default.obj.add(this.obj);
-	};
-
-	Camera.resize = function resize() {
-
-	  this.obj.aspect = _window2.default.width / _window2.default.height;
-
-	  this.obj.updateProjectionMatrix();
-	};
-
-	exports.default = Camera;
-
-/***/ },
-/* 10 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var Scene = {
-
-	  obj: new THREE.Scene(),
-	  fog: new THREE.Fog(0x000000, 10, 10000)
-
-	};
-
-	Scene.init = function init() {
-
-	  this.obj.fog = this.fog;
-	};
-
-	Scene.init();
-
-	exports.default = Scene;
+	exports.default = camera;
 
 /***/ },
 /* 11 */
@@ -689,11 +648,11 @@
 
 	var _request2 = _interopRequireDefault(_request);
 
-	var _scene = __webpack_require__(10);
+	var _scene = __webpack_require__(9);
 
 	var _scene2 = _interopRequireDefault(_scene);
 
-	var _camera = __webpack_require__(9);
+	var _camera = __webpack_require__(10);
 
 	var _camera2 = _interopRequireDefault(_camera);
 
@@ -796,7 +755,7 @@
 	    project.lookAt(target);
 
 	    _this2.projects.push(project);
-	    _scene2.default.obj.add(project);
+	    _scene2.default.add(project);
 	  });
 	};
 
@@ -900,11 +859,11 @@
 	ProjectSphere.update = function update() {
 
 	  // taking the camera's world position into consideration
-	  this.camera_pos.setFromMatrixPosition(_camera2.default.obj.matrixWorld);
+	  this.camera_pos.setFromMatrixPosition(_camera2.default.matrixWorld);
 
 	  this.raycaster.ray.origin.copy(this.camera_pos);
 
-	  this.raycaster.ray.direction.set(this.pos.x, this.pos.y, 0).unproject(_camera2.default.obj).sub(this.camera_pos).normalize();
+	  this.raycaster.ray.direction.set(this.pos.x, this.pos.y, 0).unproject(_camera2.default).sub(this.camera_pos).normalize();
 
 	  var intersects = this.raycaster.intersectObjects(this.projects);
 
@@ -960,7 +919,7 @@
 
 	var _textureLoader2 = _interopRequireDefault(_textureLoader);
 
-	var _scene = __webpack_require__(10);
+	var _scene = __webpack_require__(9);
 
 	var _scene2 = _interopRequireDefault(_scene);
 
@@ -1020,7 +979,7 @@
 
 			_this2.particles.push(particle);
 
-			_scene2.default.obj.add(particle);
+			_scene2.default.add(particle);
 		});
 	};
 
@@ -1050,11 +1009,11 @@
 
 	var _window2 = _interopRequireDefault(_window);
 
-	var _camera = __webpack_require__(9);
+	var _camera = __webpack_require__(10);
 
 	var _camera2 = _interopRequireDefault(_camera);
 
-	var _scene = __webpack_require__(10);
+	var _scene = __webpack_require__(9);
 
 	var _scene2 = _interopRequireDefault(_scene);
 
@@ -1078,9 +1037,9 @@
 
 		this.$el = $('#three-viewport');
 
-		_scene2.default.obj.add(this.pivot);
+		_scene2.default.add(this.pivot);
 
-		this.pivot.add(_camera2.default.obj);
+		this.pivot.add(_camera2.default);
 
 		this.bind();
 	};
@@ -1131,7 +1090,7 @@
 
 		this.pivot.rotation.y = this.pivot.rotation.y - this.pos.x;
 
-		_camera2.default.obj.lookAt(_scene2.default.obj.position);
+		_camera2.default.lookAt(_scene2.default.position);
 	};
 
 	exports.default = PivotControls;

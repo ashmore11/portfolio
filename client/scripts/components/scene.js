@@ -1,16 +1,5 @@
-const Scene = {
+const scene = new THREE.Scene();
 
-  obj: new THREE.Scene(),
-  fog: new THREE.Fog(0x000000, 10, 10000),
+scene.fog = new THREE.FogExp2(0x000000, 0.0001);
 
-};
-
-Scene.init = function init() {
-
-  this.obj.fog = this.fog;
-
-};
-
-Scene.init();
-
-export default Scene;
+export default scene

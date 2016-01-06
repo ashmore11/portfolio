@@ -1,5 +1,6 @@
 import Win            from 'app/utils/window';
 import RAF            from 'app/utils/raf';
+import Transitions    from 'app/utils/transitions';
 import Renderer       from 'app/components/renderer';
 import Scene          from 'app/components/scene';
 import Camera         from 'app/components/camera';
@@ -15,22 +16,18 @@ const Home = {
 
 Home.init = function init() {
 
-	Happens(this);
+  Happens(this);
 
-	RAF.start();
+  RAF.start();
 
-	this.$el = $('#three-viewport');
-	this.$el.append(Renderer.obj.domElement);
-
-	Scene.init();
-	Camera.init();
-	Renderer.init();
+  this.$el = $('#three-viewport');
+  this.$el.append(Renderer.domElement);
   
   ProjectSphere.init();
   PivotControls.init();
   ParticleSystem.init();
-  
-  Camera.obj.position.set(0, 25, 1000);
+
+  Transitions.introFlyover(Camera);
 
   this.bind();
 
@@ -38,43 +35,25 @@ Home.init = function init() {
 
 Home.bind = function bind() {
 
-	Win.on('resize', this.resize.bind(this));
+  Win.on('resize', this.resize.bind(this));
   RAF.on('tick',   this.update.bind(this));
-
-};
-
-Home.runIntroFlyover = function runIntroFlyover() {
-
-  let params;
-
-  Camera.obj.position.set(0, 2500, 5000);
-
-  params = {
-    y: 25,
-    easing: Sine.easeInOut,
-  };
-
-  TweenMax.to(Camera.obj.position, 5, params);
-
-  params = {
-    z: 1000,
-    easing: Sine.easeInOut,
-  };
-
-  TweenMax.to(Camera.obj.position, 6.5, params);
 
 };
 
 Home.resize = function resize() {
 
-	Camera.resize();
-	Renderer.resize();
+  Renderer.setSize(Win.width, Win.height);
+
+  Camera.aspect = Win.width / Win.height;
 
 };
 
 Home.update = function update() {
+
+  Renderer.render(Scene, Camera);
+
+  Camera.updateProjectionMatrix();
   
-  Renderer.update();
   PivotControls.update();
   ParticleSystem.update();
   ProjectSphere.update();

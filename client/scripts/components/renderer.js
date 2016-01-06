@@ -1,30 +1,10 @@
-import Win    from 'app/utils/window';
-import Camera from 'app/components/camera';
-import Scene  from 'app/components/scene';
+import Win from 'app/utils/window';
 
-const Renderer = {
+const renderer = new THREE.WebGLRenderer({
+  antialias: true
+});
 
-  obj: new THREE.WebGLRenderer({ antialias: true }),
+renderer.setClearColor(0x000000);
+renderer.setSize(Win.width, Win.height);
 
-};
-
-Renderer.init = function init() {
-
-  this.obj.setSize(Win.width, Win.height);
-  this.obj.setClearColor(0x000000);
-
-};
-
-Renderer.resize = function resize() {
-
-  this.obj.setSize(Win.width, Win.height);
-
-};
-
-Renderer.update = function update() {
-
-  this.obj.render(Scene.obj, Camera.obj);
-
-};
-
-export default Renderer;
+export default renderer;

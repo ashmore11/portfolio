@@ -3,7 +3,7 @@ import Scene         from 'app/components/scene';
 
 const ParticleSystem = {
 
-	geometry   : new THREE.Geometry,
+	geometry   : new THREE.Geometry(),
 	materials  : [],
 	particles  : [],
 	count      : 5000,
@@ -62,7 +62,7 @@ ParticleSystem.createParticles = function createParticles() {
 
 		this.particles.push(particle);
 
-		Scene.obj.add(particle);
+		Scene.add(particle);
 
 	});
 

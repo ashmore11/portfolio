@@ -33,6 +33,28 @@ const Transitions = {
 
   },
 
+  introFlyover: function introFlyover(camera) {
+
+    let params;
+
+    camera.position.set(0, 3000, 6500);
+
+    params = {
+      y: 25,
+      easing: Expo.easeInOut,
+    };
+
+    TweenMax.to(camera.position, 5, params);
+
+    params = {
+      z: 1000,
+      easing: Expo.easeInOut,
+    };
+
+    TweenMax.to(camera.position, 7, params);
+
+  },
+
 };
 
 Transitions.init();

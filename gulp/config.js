@@ -38,12 +38,13 @@ export default {
 	nodemon: {
 		script: 'keystone.js',
 		ignore: [
-			'gulp', 
-			'client', 
-			'node_modules', 
-			'public', 
-			'package.json', 
-			'bower.json'
+			'gulp',
+			'client',
+			'public',
+			'node_modules',
+			'bower_components',
+			'package.json',
+			'bower.json',
 		],
 	},
 

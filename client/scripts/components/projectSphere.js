@@ -12,8 +12,8 @@ const ProjectSphere = {
   pos: {},
   projects: [],
   intersected: null,
-  raycaster: new THREE.Raycaster,
-  camera_pos: new THREE.Vector3,
+  raycaster: new THREE.Raycaster(),
+  camera_pos: new THREE.Vector3(),
   projectMouseOver: false,
   cylinder: {
     radiusTop: 3000,
@@ -114,7 +114,7 @@ ProjectSphere.createProjects = function createProjects() {
     project.lookAt(target);
 
     this.projects.push(project);
-    Scene.obj.add(project);
+    Scene.add(project);
 
   });
 
@@ -225,13 +225,13 @@ ProjectSphere.mouseOut = function mouseOut() {
 ProjectSphere.update = function update() {
 
   // taking the camera's world position into consideration
-  this.camera_pos.setFromMatrixPosition(Camera.obj.matrixWorld);
+  this.camera_pos.setFromMatrixPosition(Camera.matrixWorld);
 
   this.raycaster.ray.origin.copy(this.camera_pos);
 
   this.raycaster.ray.direction
     .set(this.pos.x, this.pos.y, 0)
-    .unproject(Camera.obj)
+    .unproject(Camera)
     .sub(this.camera_pos)
     .normalize();
 

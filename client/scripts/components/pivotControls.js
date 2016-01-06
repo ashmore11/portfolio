@@ -20,9 +20,9 @@ PivotControls.init = function init() {
 
 	this.$el = $('#three-viewport');
 
-	Scene.obj.add(this.pivot);
+	Scene.add(this.pivot);
 
-	this.pivot.add(Camera.obj);
+	this.pivot.add(Camera);
 
 	this.bind();
 
@@ -80,7 +80,7 @@ PivotControls.update = function update() {
 		
 	this.pivot.rotation.y = this.pivot.rotation.y - this.pos.x;
 
-	Camera.obj.lookAt(Scene.obj.position);
+	Camera.lookAt(Scene.position);
 
 };
 

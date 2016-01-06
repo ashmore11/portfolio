@@ -40,11 +40,19 @@ View.load = function load(url, id) {
     html = $.parseHTML(response);
     html = html.filter(item => { return item.id === 'main'; });
 
-    Transitions.fadeOut(this.$el, 1, () => {
+    if (this.view === null) {
 
       this.render(html, id);
 
-    });
+    } else {
+
+      Transitions.fadeOut(this.$el, 1, () => {
+
+        this.render(html, id);
+
+      });
+
+    }
   
   });
 
@@ -59,12 +67,13 @@ View.render = function render(html, id) {
   this.view = void 0;
   this.view = this.views[id];
   
+  // this.view.on('view:ready', () => {
+
+  Transitions.fadeIn(this.$el, 2);
+
+  // });
+
   this.view.init();
-  this.view.on('view:ready', () => {
-
-  	Transitions.fadeIn(this.$el, 0.5);
-
-  });
 
 };
 
