@@ -18,8 +18,6 @@ Home.init = function init() {
 
   Happens(this);
 
-  RAF.start();
-
   this.$el = $('#three-viewport');
   this.$el.append(Renderer.domElement);
   
@@ -28,6 +26,8 @@ Home.init = function init() {
   ParticleSystem.init();
 
   Transitions.introFlyover(Camera);
+
+  RAF.start();
 
   this.bind();
 

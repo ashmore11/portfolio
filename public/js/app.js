@@ -409,8 +409,6 @@
 
 	  Happens(this);
 
-	  _raf2.default.start();
-
 	  this.$el = $('#three-viewport');
 	  this.$el.append(_renderer2.default.domElement);
 
@@ -419,6 +417,8 @@
 	  _particleSystem2.default.init();
 
 	  _transitions2.default.introFlyover(_camera2.default);
+
+	  _raf2.default.start();
 
 	  this.bind();
 	};
