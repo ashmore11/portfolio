@@ -16,8 +16,6 @@ var keystone = require('keystone');
  */
 keystone.init({
 
-	'cookie secret': '.)1G(wwZgw"XLEx8(?/oP~4&k/u=}./~OeTmXnP40vSD|:~dmt7Fc#>k849QCk0[',
-
 	'name': 'Scott Ashmore - Portfolio',
 	'brand': 'Scott Ashmore - Portfolio CMS',
 	

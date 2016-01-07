@@ -44,13 +44,11 @@ ProjectSphere.getData = function getData(url) {
 
   Request.get(url).then(response => {
 
-    // this.data = JSON.parse(response).filter(item => {
+    this.data = JSON.parse(response).filter(item => {
 
-    //   return item.state === 'published';
+      return item.state === 'published';
 
-    // });
-
-    this.data = [0,1,2,3,4,5];
+    });
 
     this.createProjects();
   
@@ -88,15 +86,15 @@ ProjectSphere.createProjects = function createProjects() {
 
   this.data.forEach((item, index) => {
 
-    // const texture = TextureLoader(item.featuredImage.url);
+    const texture = TextureLoader(item.featuredImage.url);
     
-    // texture.minFilter = THREE.LinearFilter;
+    texture.minFilter = THREE.LinearFilter;
 
     const material = new THREE.MeshBasicMaterial({
-      // map         : texture,
+      map         : texture,
       transparent : true,
       opacity     : 0.5,
-      wireframe   : true
+      wireframe   : false
     });
 
     const project = new THREE.Mesh(geometry, material);
@@ -104,8 +102,8 @@ ProjectSphere.createProjects = function createProjects() {
     project.scale.x       = -1;
     project.material.side = THREE.DoubleSide;
     project.name          = 'project';
-    // project.title         = item.title;
-    // project.url           = `/project/${item.slug}`;
+    project.title         = item.title;
+    project.url           = `/project/${item.slug}`;
 
     const x = Math.cos(index * ( Math.PI * 2 ) / this.data.length);
     const z = Math.sin(index * ( Math.PI * 2 ) / this.data.length);

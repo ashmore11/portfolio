@@ -697,13 +697,10 @@
 
 	  _request2.default.get(url).then(function (response) {
 
-	    // this.data = JSON.parse(response).filter(item => {
+	    _this.data = JSON.parse(response).filter(function (item) {
 
-	    //   return item.state === 'published';
-
-	    // });
-
-	    _this.data = [0, 1, 2, 3, 4, 5];
+	      return item.state === 'published';
+	    });
 
 	    _this.createProjects();
 	  });
@@ -729,15 +726,15 @@
 
 	  this.data.forEach(function (item, index) {
 
-	    // const texture = TextureLoader(item.featuredImage.url);
+	    var texture = (0, _textureLoader2.default)(item.featuredImage.url);
 
-	    // texture.minFilter = THREE.LinearFilter;
+	    texture.minFilter = THREE.LinearFilter;
 
 	    var material = new THREE.MeshBasicMaterial({
-	      // map         : texture,
+	      map: texture,
 	      transparent: true,
 	      opacity: 0.5,
-	      wireframe: true
+	      wireframe: false
 	    });
 
 	    var project = new THREE.Mesh(geometry, material);
@@ -745,8 +742,8 @@
 	    project.scale.x = -1;
 	    project.material.side = THREE.DoubleSide;
 	    project.name = 'project';
-	    // project.title         = item.title;
-	    // project.url           = `/project/${item.slug}`;
+	    project.title = item.title;
+	    project.url = '/project/' + item.slug;
 
 	    var x = Math.cos(index * (Math.PI * 2) / _this2.data.length);
 	    var z = Math.sin(index * (Math.PI * 2) / _this2.data.length);
