@@ -611,7 +611,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var fov = 55;
+	var fov = 50;
 	var aspect = _window2.default.width / _window2.default.height;
 	var near = 0.1;
 	var far = 10000;
@@ -671,7 +671,7 @@
 	  cylinder: {
 	    radiusTop: 3000,
 	    radiusBottom: 3000,
-	    height: 1200,
+	    height: 1700,
 	    radiusSegments: 16,
 	    heightSegments: 16,
 	    openEnded: true,

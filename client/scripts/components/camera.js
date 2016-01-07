@@ -1,6 +1,6 @@
 import Win from 'app/utils/window';
 
-let fov    = 55;
+let fov    = 50;
 let aspect = Win.width / Win.height;
 let near   = 0.1;
 let far    = 10000;

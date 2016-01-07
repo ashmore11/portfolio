@@ -18,7 +18,7 @@ const ProjectSphere = {
   cylinder: {
     radiusTop: 3000,
     radiusBottom: 3000,
-    height: 1200,
+    height: 1700,
     radiusSegments: 16,
     heightSegments: 16,
     openEnded: true,
