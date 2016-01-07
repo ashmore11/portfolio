@@ -9,12 +9,20 @@ require('dotenv').load();
  */
 var keystone = require('keystone');
 
+keystone.set('cloudinary config', {
+	cloud_name: 'ht82bpqvb',
+	api_key: '714338449164971',
+	api_secret: 'pMKHku1J_ccJEl-oiDGZfr6WVXU'
+});
+
 /**
  * Initialise Keystone with your project's configuration.
  * See http://keystonejs.com/guide/config for available options
  * and documentation.
  */
 keystone.init({
+	'cookie secret' : '.)1G(wwZgw"XLEx8(?/oP~4&k/u=}./~OeTmXnP40vSD|:~dmt7Fc#>k849QCk0['
+	'mongo' : 'mongodb://dev.scottashmore@gmail.com:13-cheese-ass@ds039095.mongolab.com:39095/heroku_dgrvpr82'
 	'name': 'Scott Ashmore - Portfolio',
 	'brand': 'Scott Ashmore - Portfolio CMS',
 	
