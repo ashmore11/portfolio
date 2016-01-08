@@ -11,5 +11,3 @@ const App = {
 };
 
 App.init();
-
-window.APP = App;

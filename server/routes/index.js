@@ -7,6 +7,8 @@ var importRoutes = keystone.importer(__dirname);
  */
 keystone.pre('routes', middleware.initLocals);
 
+keystone.use(middleware.allowCrossDomain)
+
 /**
  * Import Route Controllers
  */

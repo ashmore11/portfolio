@@ -33,11 +33,11 @@ const Transitions = {
 
   },
 
-  introFlyover: function introFlyover(camera) {
+  introFlyover: function introFlyover(camera, controls) {
 
     let params;
 
-    camera.position.set(0, 3000, 6500);
+    camera.position.set(0, 3500, 7000);
 
     params = {
       y: 25,
@@ -52,6 +52,16 @@ const Transitions = {
     };
 
     TweenMax.to(camera.position, 7, params);
+
+    params = {
+      y: Math.PI * 1.055,
+      easing: Expo.easeInOut,
+      onComplete: () => {
+        this.emit('flyover:complete');
+      },
+    };
+
+    TweenMax.to(controls.pivot.rotation, 7, params);
 
   },
 

@@ -1,14 +1,4 @@
 /**
- * This file contains the common middleware used by your routes.
- * 
- * Extend or replace these functions as your application requires.
- * 
- * This structure is not enforced, and just a starting point. If
- * you have more middleware you may want to group it as separate
- * modules in your project's /lib directory.
- */
-
-/**
  * Initialises the standard view locals
  * 
  * The included layout depends on the navLinks array to generate
@@ -31,7 +21,7 @@ exports.initLocals = function(req, res, next) {
 };
 
 /**
- * Prevents people from accessing protected pages when they're not signed in
+ * Prevents people from accessing protected pages when they're not signed in.
  */
 exports.requireUser = function(req, res, next) {
 	
@@ -46,4 +36,16 @@ exports.requireUser = function(req, res, next) {
 		
 	}
 	
+};
+
+/**
+ * Enable CORS.
+ */
+exports.allowCrossDomain = function(req, res, next) {
+
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+
+  next();
+
 };

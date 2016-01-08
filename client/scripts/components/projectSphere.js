@@ -18,12 +18,12 @@ const ProjectSphere = {
   cylinder: {
     radiusTop: 3000,
     radiusBottom: 3000,
-    height: 1700,
+    height: 1200,
     radiusSegments: 16,
     heightSegments: 16,
     openEnded: true,
     thetaStart: 0,
-    thetaLength: (Math.PI * 2) / 6.5,
+    thetaLength: (Math.PI * 2) / 6,
   },
 
 };
@@ -32,17 +32,7 @@ ProjectSphere.init = function init(data) {
 
   this.$el = $('#three-viewport');
 
-  const url = `${window.location.origin}/api/posts`;
-
-  this.getData(url);
-
-  this.bind();
-
-};
-
-ProjectSphere.getData = function getData(url) {
-
-  Request.get(url).then(response => {
+  Request.get('api/posts').then(response => {
 
     this.data = JSON.parse(response).filter(item => {
 
@@ -53,6 +43,8 @@ ProjectSphere.getData = function getData(url) {
     this.createProjects();
   
   });
+
+  this.bind();
 
 };
 
@@ -81,7 +73,7 @@ ProjectSphere.createProjects = function createProjects() {
     this.cylinder.heightSegments,
     this.cylinder.openEnded,
     this.cylinder.thetaStart,
-    this.cylinder.thetaLength
+    (Math.PI * 2) / (this.data.length + 3)
   );
 
   this.data.forEach((item, index) => {

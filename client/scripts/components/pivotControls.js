@@ -80,8 +80,6 @@ PivotControls.update = function update() {
 		
 	this.pivot.rotation.y = this.pivot.rotation.y - this.pos.x;
 
-	Camera.lookAt(Scene.position);
-
 };
 
 export default PivotControls;

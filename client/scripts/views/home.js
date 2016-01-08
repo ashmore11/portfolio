@@ -6,11 +6,12 @@ import Scene          from 'app/components/scene';
 import Camera         from 'app/components/camera';
 import ProjectSphere  from 'app/components/projectSphere';
 import ParticleSystem from 'app/components/particleSystem';
-import PivotControls  from 'app/components/pivotControls';
+import Controls       from 'app/components/pivotControls';
 
 const Home = {
 
-  $el: null
+  $el: null,
+  introComplete: false,
 
 };
 
@@ -21,11 +22,14 @@ Home.init = function init() {
   this.$el = $('#three-viewport');
   this.$el.append(Renderer.domElement);
   
+  Controls.init();
   ProjectSphere.init();
-  PivotControls.init();
   ParticleSystem.init();
-
-  Transitions.introFlyover(Camera);
+  
+  Transitions.on('flyover:complete', () => {
+    this.introComplete = true;
+  });
+  Transitions.introFlyover(Camera, Controls);
 
   RAF.start();
 
@@ -53,8 +57,10 @@ Home.update = function update() {
   Renderer.render(Scene, Camera);
 
   Camera.updateProjectionMatrix();
+  Camera.lookAt(Scene.position);
   
-  PivotControls.update();
+  if (this.introComplete) Controls.update();
+  
   ParticleSystem.update();
   ProjectSphere.update();
 
@@ -62,8 +68,8 @@ Home.update = function update() {
 
 Home.destroy = function destroy() {
 
+  Controls.unbind();
   ProjectSphere.unbind();
-  PivotControls.unbind();
 
   RAF.stop();
 

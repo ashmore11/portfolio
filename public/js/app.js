@@ -91,11 +91,11 @@
 
 	var _home2 = _interopRequireDefault(_home);
 
-	var _project = __webpack_require__(15);
+	var _project = __webpack_require__(16);
 
 	var _project2 = _interopRequireDefault(_project);
 
-	var _about = __webpack_require__(16);
+	var _about = __webpack_require__(17);
 
 	var _about2 = _interopRequireDefault(_about);
 
@@ -245,7 +245,7 @@
 /* 3 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -282,11 +282,12 @@
 	    TweenMax.to(el, duration, params);
 	  },
 
-	  introFlyover: function introFlyover(camera) {
+	  introFlyover: function introFlyover(camera, controls) {
+	    var _this = this;
 
 	    var params = undefined;
 
-	    camera.position.set(0, 3000, 6500);
+	    camera.position.set(0, 3500, 7000);
 
 	    params = {
 	      y: 25,
@@ -301,6 +302,16 @@
 	    };
 
 	    TweenMax.to(camera.position, 7, params);
+
+	    params = {
+	      y: Math.PI * 1.055,
+	      easing: Expo.easeInOut,
+	      onComplete: function onComplete() {
+	        _this.emit('flyover:complete');
+	      }
+	    };
+
+	    TweenMax.to(controls.pivot.rotation, 7, params);
 	  }
 
 	};
@@ -389,11 +400,11 @@
 
 	var _projectSphere2 = _interopRequireDefault(_projectSphere);
 
-	var _particleSystem = __webpack_require__(13);
+	var _particleSystem = __webpack_require__(14);
 
 	var _particleSystem2 = _interopRequireDefault(_particleSystem);
 
-	var _pivotControls = __webpack_require__(14);
+	var _pivotControls = __webpack_require__(15);
 
 	var _pivotControls2 = _interopRequireDefault(_pivotControls);
 
@@ -401,22 +412,27 @@
 
 	var Home = {
 
-	  $el: null
+	  $el: null,
+	  introComplete: false
 
 	};
 
 	Home.init = function init() {
+	  var _this = this;
 
 	  Happens(this);
 
 	  this.$el = $('#three-viewport');
 	  this.$el.append(_renderer2.default.domElement);
 
-	  _projectSphere2.default.init();
 	  _pivotControls2.default.init();
+	  _projectSphere2.default.init();
 	  _particleSystem2.default.init();
 
-	  _transitions2.default.introFlyover(_camera2.default);
+	  _transitions2.default.on('flyover:complete', function () {
+	    _this.introComplete = true;
+	  });
+	  _transitions2.default.introFlyover(_camera2.default, _pivotControls2.default);
 
 	  _raf2.default.start();
 
@@ -441,16 +457,18 @@
 	  _renderer2.default.render(_scene2.default, _camera2.default);
 
 	  _camera2.default.updateProjectionMatrix();
+	  _camera2.default.lookAt(_scene2.default.position);
 
-	  _pivotControls2.default.update();
+	  if (this.introComplete) _pivotControls2.default.update();
+
 	  _particleSystem2.default.update();
 	  _projectSphere2.default.update();
 	};
 
 	Home.destroy = function destroy() {
 
-	  _projectSphere2.default.unbind();
 	  _pivotControls2.default.unbind();
+	  _projectSphere2.default.unbind();
 
 	  _raf2.default.stop();
 	};
@@ -656,6 +674,10 @@
 
 	var _camera2 = _interopRequireDefault(_camera);
 
+	var _appModel = __webpack_require__(13);
+
+	var _appModel2 = _interopRequireDefault(_appModel);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var ProjectSphere = {
@@ -671,39 +693,29 @@
 	  cylinder: {
 	    radiusTop: 3000,
 	    radiusBottom: 3000,
-	    height: 1700,
+	    height: 1200,
 	    radiusSegments: 16,
 	    heightSegments: 16,
 	    openEnded: true,
 	    thetaStart: 0,
-	    thetaLength: Math.PI * 2 / 6.5
+	    thetaLength: Math.PI * 2 / 6
 	  }
 
 	};
 
 	ProjectSphere.init = function init(data) {
+	  var _this = this;
 
 	  this.$el = $('#three-viewport');
 
-	  var url = window.location.origin + '/api/posts';
+	  _appModel2.default.getAllPosts(function (posts) {
 
-	  this.getData(url);
-
-	  this.bind();
-	};
-
-	ProjectSphere.getData = function getData(url) {
-	  var _this = this;
-
-	  _request2.default.get(url).then(function (response) {
-
-	    _this.data = JSON.parse(response).filter(function (item) {
-
-	      return item.state === 'published';
-	    });
+	    _this.data = posts;
 
 	    _this.createProjects();
 	  });
+
+	  this.bind();
 	};
 
 	ProjectSphere.bind = function bind() {
@@ -722,7 +734,7 @@
 	  var _this2 = this;
 
 	  var target = new THREE.Vector3();
-	  var geometry = new THREE.CylinderGeometry(this.cylinder.radiusTop, this.cylinder.radiusBottom, this.cylinder.height, this.cylinder.radiusSegments, this.cylinder.heightSegments, this.cylinder.openEnded, this.cylinder.thetaStart, this.cylinder.thetaLength);
+	  var geometry = new THREE.CylinderGeometry(this.cylinder.radiusTop, this.cylinder.radiusBottom, this.cylinder.height, this.cylinder.radiusSegments, this.cylinder.heightSegments, this.cylinder.openEnded, this.cylinder.thetaStart, Math.PI * 2 / (this.data.length + 3));
 
 	  this.data.forEach(function (item, index) {
 
@@ -909,6 +921,50 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _request = __webpack_require__(4);
+
+	var _request2 = _interopRequireDefault(_request);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var AppModel = {
+
+	  data: null
+
+	};
+
+	AppModel.init = function init() {
+
+	  Happens(this);
+	};
+
+	AppModel.getAllPosts = function getAllPosts(callback) {
+
+	  _request2.default.get('api/posts').then(function (response) {
+
+	    var posts = JSON.parse(response).filter(function (item) {
+
+	      return item.state === 'published';
+	    });
+
+	    callback(posts);
+	  });
+	};
+
+	AppModel.init();
+
+	exports.default = AppModel;
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
 
@@ -993,7 +1049,7 @@
 	exports.default = ParticleSystem;
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1086,14 +1142,12 @@
 	PivotControls.update = function update() {
 
 		this.pivot.rotation.y = this.pivot.rotation.y - this.pos.x;
-
-		_camera2.default.lookAt(_scene2.default.position);
 	};
 
 	exports.default = PivotControls;
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1124,7 +1178,7 @@
 	exports.default = Project;
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports) {
 
 	'use strict';
