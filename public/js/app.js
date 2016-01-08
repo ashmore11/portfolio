@@ -63,8 +63,6 @@
 
 	App.init();
 
-	window.APP = App;
-
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
@@ -91,11 +89,11 @@
 
 	var _home2 = _interopRequireDefault(_home);
 
-	var _project = __webpack_require__(16);
+	var _project = __webpack_require__(15);
 
 	var _project2 = _interopRequireDefault(_project);
 
-	var _about = __webpack_require__(17);
+	var _about = __webpack_require__(16);
 
 	var _about2 = _interopRequireDefault(_about);
 
@@ -400,11 +398,11 @@
 
 	var _projectSphere2 = _interopRequireDefault(_projectSphere);
 
-	var _particleSystem = __webpack_require__(14);
+	var _particleSystem = __webpack_require__(13);
 
 	var _particleSystem2 = _interopRequireDefault(_particleSystem);
 
-	var _pivotControls = __webpack_require__(15);
+	var _pivotControls = __webpack_require__(14);
 
 	var _pivotControls2 = _interopRequireDefault(_pivotControls);
 
@@ -674,10 +672,6 @@
 
 	var _camera2 = _interopRequireDefault(_camera);
 
-	var _appModel = __webpack_require__(13);
-
-	var _appModel2 = _interopRequireDefault(_appModel);
-
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var ProjectSphere = {
@@ -708,9 +702,12 @@
 
 	  this.$el = $('#three-viewport');
 
-	  _appModel2.default.getAllPosts(function (posts) {
+	  _request2.default.get('api/posts').then(function (response) {
 
-	    _this.data = posts;
+	    _this.data = JSON.parse(response).filter(function (item) {
+
+	      return item.state === 'published';
+	    });
 
 	    _this.createProjects();
 	  });
@@ -921,50 +918,6 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _request = __webpack_require__(4);
-
-	var _request2 = _interopRequireDefault(_request);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var AppModel = {
-
-	  data: null
-
-	};
-
-	AppModel.init = function init() {
-
-	  Happens(this);
-	};
-
-	AppModel.getAllPosts = function getAllPosts(callback) {
-
-	  _request2.default.get('api/posts').then(function (response) {
-
-	    var posts = JSON.parse(response).filter(function (item) {
-
-	      return item.state === 'published';
-	    });
-
-	    callback(posts);
-	  });
-	};
-
-	AppModel.init();
-
-	exports.default = AppModel;
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
 
@@ -1049,7 +1002,7 @@
 	exports.default = ParticleSystem;
 
 /***/ },
-/* 15 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1147,7 +1100,7 @@
 	exports.default = PivotControls;
 
 /***/ },
-/* 16 */
+/* 15 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1178,7 +1131,7 @@
 	exports.default = Project;
 
 /***/ },
-/* 17 */
+/* 16 */
 /***/ function(module, exports) {
 
 	'use strict';

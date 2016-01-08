@@ -7,8 +7,6 @@ var importRoutes = keystone.importer(__dirname);
  */
 keystone.pre('routes', middleware.initLocals);
 
-keystone.use(middleware.allowCrossDomain)
-
 /**
  * Import Route Controllers
  */
@@ -23,9 +21,9 @@ var routes = {
 exports = module.exports = function(app) {
 	
   // views
-	app.get('/', routes.controllers.home);
-  app.get('/project/:id', routes.controllers.project);
-	app.get('/about', routes.controllers.about);
+	app.get('/', keystone.middleware.cors, routes.controllers.home);
+  app.get('/project/:id', keystone.middleware.cors, routes.controllers.project);
+	app.get('/about', keystone.middleware.cors, routes.controllers.about);
 
   // api
   app.get('/api/posts', keystone.middleware.api, routes.api.posts.getPosts);
