@@ -2,7 +2,7 @@
  * Simulate config options from your production environment by
  * customising the .env file in your project's root folder.
  */
-//require('dotenv').load();
+// require('dotenv').load();
 
 /**
  * Require keystone
@@ -33,7 +33,7 @@ keystone.init({
 
 });
 
-keystone.set('cors allow origin', true);
+// keystone.set('cors allow origin', true);
 
 /**
  * Load your project's Models
