@@ -37,15 +37,3 @@ exports.requireUser = function(req, res, next) {
 	}
 	
 };
-
-/**
- * Enable CORS.
- */
-// exports.allowCrossDomain = function(req, res, next) {
-
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.header("Access-Control-Allow-Headers", "X-Requested-With");
-
-//   next();
-
-// };
