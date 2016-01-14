@@ -5,7 +5,7 @@
   "dependencies": {
     "async": "^1.4.2",
     "dotenv": "^1.1.0",
-    "keystone": "git://github.com/keystonejs/keystone.git#master"
+    "keystone": "^0.3.16"
   },
   "devDependencies": {
     "babel-core": "^6.0.0",
