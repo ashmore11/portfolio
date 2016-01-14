@@ -555,7 +555,7 @@
 
 	RAF.stop = function stop() {
 
-	  window.cancelAnimationFrame(this.ticker.bind(this));
+	  window.cancelAnimationFrame(this.ticker);
 
 	  this.ticker = null;
 	};
