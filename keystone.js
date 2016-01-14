@@ -19,9 +19,8 @@ keystone.init({
 	'name': 'Scott Ashmore - Portfolio',
 	'brand': 'Scott Ashmore - Portfolio CMS',
 	
-	'stylus': 'public',
 	'static': 'public',
-	'favicon': 'public/favicon.ico',
+	// 'favicon': 'public/favicon.ico',
 	'views': 'client/templates/views',
 	'view engine': 'jade',
 	
