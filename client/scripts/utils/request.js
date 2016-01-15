@@ -10,7 +10,7 @@ const Request = {
 
       req.onload = () => {
 
-        if (req.status == 200) {
+        if(req.status == 200) {
           
           resolve(req.response);
 
@@ -22,7 +22,11 @@ const Request = {
 
       };
 
-      req.onerror = () => { reject(Error("Network Error")); };
+      req.onerror = () => {
+
+        reject(Error("Network Error")); 
+
+      };
 
       req.send();
 

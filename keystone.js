@@ -33,7 +33,7 @@ keystone.init({
 
 });
 
-// keystone.set('cors allow origin', true);
+keystone.set('cors allow origin', true);
 
 /**
  * Load your project's Models

@@ -23,7 +23,7 @@ Navigation.bind = function bind() {
 
 Navigation.go = function go(url) {
 
-	if (this.url === url) return;
+	if(this.url === url) return;
 
 	this.pushState(url);
 
@@ -49,11 +49,11 @@ Navigation.popState = function popState(event) {
 
 Navigation.getID = function getID() {
 
-	if (this.url === '/') {
+	if(this.url === '/') {
 
 		return 'home';
 
-	} else if (this.url === '/about') {
+	} else if(this.url === '/about') {
 
 		return 'about';
 

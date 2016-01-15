@@ -349,6 +349,7 @@
 	      };
 
 	      req.onerror = function () {
+
 	        reject(Error("Network Error"));
 	      };
 
@@ -587,9 +588,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var renderer = new THREE.WebGLRenderer({
-	  antialias: true
-	});
+	var renderer = new THREE.WebGLRenderer({ antialias: true });
 
 	renderer.setClearColor(0x000000);
 	renderer.setSize(_window2.default.width, _window2.default.height);
@@ -794,10 +793,7 @@
 
 	  var intersects = this.raycaster.intersectObjects(this.projects);
 
-	  if (intersects.length > 0) {
-
-	    _navigation2.default.go(intersects[0].object.url);
-	  }
+	  if (intersects.length > 0) _navigation2.default.go(intersects[0].object.url);
 	};
 
 	/**

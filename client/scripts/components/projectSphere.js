@@ -140,11 +140,7 @@ ProjectSphere.mouseDown = function mouseDown(event) {
 
   const intersects = this.raycaster.intersectObjects(this.projects);
 
-  if(intersects.length > 0) {
-
-    Nav.go(intersects[0].object.url);
-
-  }
+  if(intersects.length > 0) Nav.go(intersects[0].object.url);
 
 };
 
@@ -231,11 +227,11 @@ ProjectSphere.update = function update() {
 
     this.intersected = intersects[0].object;
 
-    if (!Win.width < 768 && !this.projectMouseOver) this.mouseOver();
+    if(!Win.width < 768 && !this.projectMouseOver) this.mouseOver();
 
   } else {
 
-    if (!Win.width < 768 && this.intersected) this.mouseOut();
+    if(!Win.width < 768 && this.intersected) this.mouseOut();
 
     this.intersected = null;
 
