@@ -2,7 +2,7 @@
  * Simulate config options from your production environment by
  * customising the .env file in your project's root folder.
  */
-require('dotenv').load();
+require('dotenv').config({ silent: true });
 
 /**
  * Require keystone
@@ -19,9 +19,8 @@ keystone.init({
 	'name': 'Scott Ashmore - Portfolio',
 	'brand': 'Scott Ashmore - Portfolio CMS',
 	
-	'stylus': 'public',
 	'static': 'public',
-	'favicon': 'public/favicon.ico',
+	// 'favicon': 'public/favicon.ico',
 	'views': 'client/templates/views',
 	'view engine': 'jade',
 	
