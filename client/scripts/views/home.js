@@ -1,6 +1,7 @@
 import Win            from 'app/utils/window';
 import RAF            from 'app/utils/raf';
 import Transitions    from 'app/utils/transitions';
+import Request        from 'app/utils/request';
 import Renderer       from 'app/components/renderer';
 import Scene          from 'app/components/scene';
 import Camera         from 'app/components/camera';
@@ -23,13 +24,12 @@ Home.init = function init() {
   this.$el.append(Renderer.domElement);
   
   Controls.init();
-  ProjectSphere.init();
-  ParticleSystem.init();
   
-  Transitions.on('flyover:complete', () => {
-    this.introComplete = true;
-  });
-  Transitions.introFlyover(Camera, Controls);
+  ParticleSystem.init();
+
+  this.renderProjects();
+  
+  this.runIntro();
 
   RAF.start();
 
@@ -41,6 +41,34 @@ Home.bind = function bind() {
 
   Win.on('resize', this.resize.bind(this));
   RAF.on('tick',   this.update.bind(this));
+
+};
+
+Home.renderProjects = function renderProjects() {
+
+  Request.get('api/posts').then(response => {
+
+    const data = JSON.parse(response).filter(item => {
+
+      return item.state === 'published';
+
+    });
+
+    ProjectSphere.init(this.$el, data);
+  
+  });
+
+};
+
+Home.runIntro = function runIntro() {
+
+  Transitions.on('flyover:complete', () => {
+
+    this.introComplete = true;
+
+  });
+
+  Transitions.introFlyover(Camera, Controls);
 
 };
 

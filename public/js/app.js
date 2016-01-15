@@ -383,6 +383,10 @@
 
 	var _transitions2 = _interopRequireDefault(_transitions);
 
+	var _request = __webpack_require__(4);
+
+	var _request2 = _interopRequireDefault(_request);
+
 	var _renderer = __webpack_require__(8);
 
 	var _renderer2 = _interopRequireDefault(_renderer);
@@ -417,7 +421,6 @@
 	};
 
 	Home.init = function init() {
-	  var _this = this;
 
 	  Happens(this);
 
@@ -425,13 +428,12 @@
 	  this.$el.append(_renderer2.default.domElement);
 
 	  _pivotControls2.default.init();
-	  _projectSphere2.default.init();
+
 	  _particleSystem2.default.init();
 
-	  _transitions2.default.on('flyover:complete', function () {
-	    _this.introComplete = true;
-	  });
-	  _transitions2.default.introFlyover(_camera2.default, _pivotControls2.default);
+	  this.renderProjects();
+
+	  this.runIntro();
 
 	  _raf2.default.start();
 
@@ -442,6 +444,31 @@
 
 	  _window2.default.on('resize', this.resize.bind(this));
 	  _raf2.default.on('tick', this.update.bind(this));
+	};
+
+	Home.renderProjects = function renderProjects() {
+	  var _this = this;
+
+	  _request2.default.get('api/posts').then(function (response) {
+
+	    var data = JSON.parse(response).filter(function (item) {
+
+	      return item.state === 'published';
+	    });
+
+	    _projectSphere2.default.init(_this.$el, data);
+	  });
+	};
+
+	Home.runIntro = function runIntro() {
+	  var _this2 = this;
+
+	  _transitions2.default.on('flyover:complete', function () {
+
+	    _this2.introComplete = true;
+	  });
+
+	  _transitions2.default.introFlyover(_camera2.default, _pivotControls2.default);
 	};
 
 	Home.resize = function resize() {
@@ -659,10 +686,6 @@
 
 	var _navigation2 = _interopRequireDefault(_navigation);
 
-	var _request = __webpack_require__(4);
-
-	var _request2 = _interopRequireDefault(_request);
-
 	var _scene = __webpack_require__(9);
 
 	var _scene2 = _interopRequireDefault(_scene);
@@ -681,7 +704,7 @@
 	  projects: [],
 	  intersected: null,
 	  raycaster: new THREE.Raycaster(),
-	  camera_pos: new THREE.Vector3(),
+	  cameraPos: new THREE.Vector3(),
 	  projectMouseOver: false,
 	  cylinder: {
 	    radiusTop: 3000,
@@ -696,22 +719,13 @@
 
 	};
 
-	ProjectSphere.init = function init(data) {
-	  var _this = this;
+	ProjectSphere.init = function init(el, data) {
 
-	  this.$el = $('#three-viewport');
-
-	  _request2.default.get('api/posts').then(function (response) {
-
-	    _this.data = JSON.parse(response).filter(function (item) {
-
-	      return item.state === 'published';
-	    });
-
-	    _this.createProjects();
-	  });
+	  this.$el = el;
+	  this.data = data;
 
 	  this.bind();
+	  this.createProjects();
 	};
 
 	ProjectSphere.bind = function bind() {
@@ -727,7 +741,7 @@
 	};
 
 	ProjectSphere.createProjects = function createProjects() {
-	  var _this2 = this;
+	  var _this = this;
 
 	  var target = new THREE.Vector3();
 	  var geometry = new THREE.CylinderGeometry(this.cylinder.radiusTop, this.cylinder.radiusBottom, this.cylinder.height, this.cylinder.radiusSegments, this.cylinder.heightSegments, this.cylinder.openEnded, this.cylinder.thetaStart, Math.PI * 2 / (this.data.length + 3));
@@ -753,13 +767,13 @@
 	    project.title = item.title;
 	    project.url = '/project/' + item.slug;
 
-	    var x = Math.cos(index * (Math.PI * 2) / _this2.data.length);
-	    var z = Math.sin(index * (Math.PI * 2) / _this2.data.length);
+	    var x = Math.cos(index * (Math.PI * 2) / _this.data.length);
+	    var z = Math.sin(index * (Math.PI * 2) / _this.data.length);
 
 	    project.position.set(x, 0, z);
 	    project.lookAt(target);
 
-	    _this2.projects.push(project);
+	    _this.projects.push(project);
 	    _scene2.default.add(project);
 	  });
 	};
@@ -861,11 +875,11 @@
 	ProjectSphere.update = function update() {
 
 	  // taking the camera's world position into consideration
-	  this.camera_pos.setFromMatrixPosition(_camera2.default.matrixWorld);
+	  this.cameraPos.setFromMatrixPosition(_camera2.default.matrixWorld);
 
-	  this.raycaster.ray.origin.copy(this.camera_pos);
+	  this.raycaster.ray.origin.copy(this.cameraPos);
 
-	  this.raycaster.ray.direction.set(this.pos.x, this.pos.y, 0).unproject(_camera2.default).sub(this.camera_pos).normalize();
+	  this.raycaster.ray.direction.set(this.pos.x, this.pos.y, 0).unproject(_camera2.default).sub(this.cameraPos).normalize();
 
 	  var intersects = this.raycaster.intersectObjects(this.projects);
 

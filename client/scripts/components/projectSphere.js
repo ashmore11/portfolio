@@ -1,7 +1,6 @@
 import Win           from 'app/utils/window';
 import TextureLoader from 'app/utils/textureLoader';
 import Nav           from 'app/utils/navigation';
-import Request       from 'app/utils/request';
 import Scene         from 'app/components/scene';
 import Camera        from 'app/components/camera';
 
@@ -13,7 +12,7 @@ const ProjectSphere = {
   projects: [],
   intersected: null,
   raycaster: new THREE.Raycaster(),
-  camera_pos: new THREE.Vector3(),
+  cameraPos: new THREE.Vector3(),
   projectMouseOver: false,
   cylinder: {
     radiusTop: 3000,
@@ -28,23 +27,13 @@ const ProjectSphere = {
 
 };
 
-ProjectSphere.init = function init(data) {
+ProjectSphere.init = function init(el, data) {
 
-  this.$el = $('#three-viewport');
-
-  Request.get('api/posts').then(response => {
-
-    this.data = JSON.parse(response).filter(item => {
-
-      return item.state === 'published';
-
-    });
-
-    this.createProjects();
-  
-  });
+  this.$el  = el;
+  this.data = data;
 
   this.bind();
+  this.createProjects();
 
 };
 
@@ -211,14 +200,14 @@ ProjectSphere.mouseOut = function mouseOut() {
 ProjectSphere.update = function update() {
 
   // taking the camera's world position into consideration
-  this.camera_pos.setFromMatrixPosition(Camera.matrixWorld);
+  this.cameraPos.setFromMatrixPosition(Camera.matrixWorld);
 
-  this.raycaster.ray.origin.copy(this.camera_pos);
+  this.raycaster.ray.origin.copy(this.cameraPos);
 
   this.raycaster.ray.direction
     .set(this.pos.x, this.pos.y, 0)
     .unproject(Camera)
-    .sub(this.camera_pos)
+    .sub(this.cameraPos)
     .normalize();
 
   const intersects = this.raycaster.intersectObjects(this.projects);
