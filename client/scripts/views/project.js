@@ -2,21 +2,21 @@ const Project = {
 
   $el: $('#project'),
 
-};
+  init: function init() {
 
-Project.init = function init() {
+    Happens(this);
 
-	Happens(this);
+    console.log('init PROJECT');
 
-  console.log('init PROJECT');
+    this.emit('view:ready');
 
-  this.emit('view:ready');
+  },
 
-};
+  destroy: function destroy() {
 
-Project.destroy = function destroy() {
+    console.log('destroy PROJECT');
 
-  console.log('destroy PROJECT');
+  },
 
 };
 

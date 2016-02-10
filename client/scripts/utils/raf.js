@@ -2,33 +2,33 @@ const RAF = {
 
   ticker: null,
 
-};
+  init: function init() {
 
-RAF.init = function init() {
-  
-  Happens(this);
+    Happens(this);
 
-};
+  },
 
-RAF.start = function start() {
+  start: function start() {
 
-  this.ticker = window.requestAnimationFrame(this.tick.bind(this));
+    this.ticker = window.requestAnimationFrame(this.tick.bind(this));
 
-};
+  },
 
-RAF.stop = function stop() {
+  stop: function stop() {
 
-  window.cancelAnimationFrame(this.ticker);
-  
-  this.ticker = null;
+    window.cancelAnimationFrame(this.ticker);
 
-};
+    this.ticker = null;
 
-RAF.tick = function tick(time) {
+  },
 
-  this.ticker = window.requestAnimationFrame(this.tick.bind(this));
+  tick: function tick(time) {
 
-  this.emit('tick', time);
+    this.ticker = window.requestAnimationFrame(this.tick.bind(this));
+
+    this.emit('tick', time);
+
+  },
 
 };
 

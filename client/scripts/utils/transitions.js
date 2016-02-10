@@ -25,7 +25,9 @@ const Transitions = {
       autoAlpha: 0,
       ease: Power2.easeOut,
       onComplete: () => {
+
         callback();
+
       },
     };
 
@@ -57,7 +59,9 @@ const Transitions = {
       y: Math.PI * 1.055,
       easing: Expo.easeInOut,
       onComplete: () => {
+
         this.emit('flyover:complete');
+
       },
     };
 

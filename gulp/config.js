@@ -9,7 +9,7 @@ export default {
 	},
 
 	/**
-	 * Paths for all the source files
+	 * Paths
 	 */
 	paths: {
 		vendor: {
@@ -33,14 +33,14 @@ export default {
 	},
 
 	/**
-	 * Config for nodemon
+	 * Nodemon
 	 */
 	nodemon: {
 		script: 'keystone.js',
 		ignore: [
 			'gulp',
-			'client',
 			'public',
+			'client',
 			'node_modules',
 			'bower_components',
 			'package.json',
@@ -49,7 +49,31 @@ export default {
 	},
 
 	/**
-	 * Config for the webpack module bundler
+	 * Eslint
+	 */
+	eslint: {
+    extends: 'airbnb/base',
+    rules: {
+      'padded-blocks': [2, 'always'],
+      'no-param-reassign': [2, { 'props': false }],
+      'new-cap': [2, {'capIsNewExceptions': ['Happens', 'TextureLoader'] }],
+      'no-console': 0,
+      'no-alert': 0,
+    },
+    globals: {
+      'TweenMax': true,
+      '$': true,
+      '_': true,
+      'Happens': true,
+      'THREE': true,
+      'Sine': true,
+      'Power2': true,
+      'Expo': true,
+    },
+  },
+
+	/**
+	 * Webpack
 	 */
 	webpack: {
 		output: {
@@ -57,13 +81,13 @@ export default {
 			filename: 'app.js',
 		},
 		module: {
-			loaders: [{ 
-				test: /\.js$/, 
-				exclude: /node_modules/, 
-				loader: 'babel', 
+			loaders: [{
+				test: /\.js$/,
+				exclude: /node_modules/,
+				loader: 'babel',
 				query: {
 					presets: ['es2015']
-				} 
+				}
 			}]
 		},
 		resolve: {

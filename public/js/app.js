@@ -52,16 +52,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var App = {
-
-	  init: function init() {
-
-	    _view2.default.init();
-	  }
-
-	};
-
-	App.init();
+	_view2.default.init();
 
 /***/ },
 /* 1 */
@@ -107,63 +98,61 @@
 	    home: _home2.default,
 	    project: _project2.default,
 	    about: _about2.default
-	  }
+	  },
 
-	};
+	  init: function init() {
 
-	View.init = function init() {
+	    this.load(_navigation2.default.originalState, _navigation2.default.getID());
 
-	  this.load(_navigation2.default.originalState, _navigation2.default.getID());
+	    this.bind();
+	  },
 
-	  this.bind();
-	};
+	  bind: function bind() {
 
-	View.bind = function bind() {
+	    _navigation2.default.on('url:changed', this.load.bind(this));
+	  },
 
-	  _navigation2.default.on('url:changed', this.load.bind(this));
-	};
+	  load: function load(url, id) {
+	    var _this = this;
 
-	View.load = function load(url, id) {
-	  var _this = this;
+	    _request2.default.get(url).then(function (response) {
 
-	  _request2.default.get(url).then(function (response) {
+	      var html = $.parseHTML(response).filter(function (item) {
 
-	    var html = undefined;
+	        return item.id === 'main';
+	      });
 
-	    html = $.parseHTML(response);
-	    html = html.filter(function (item) {
-	      return item.id === 'main';
-	    });
-
-	    if (_this.view === null) {
-
-	      _this.render(html, id);
-	    } else {
-
-	      _transitions2.default.fadeOut(_this.$el, 1, function () {
+	      if (_this.view === null) {
 
 	        _this.render(html, id);
-	      });
-	    }
-	  });
-	};
+	      } else {
 
-	View.render = function render(html, id) {
+	        _transitions2.default.fadeOut(_this.$el, 1, function () {
 
-	  this.$el.html($(html).html());
+	          _this.render(html, id);
+	        });
+	      }
+	    });
+	  },
 
-	  if (this.view) this.view.destroy();
+	  render: function render(html, id) {
 
-	  this.view = void 0;
-	  this.view = this.views[id];
+	    this.$el.html($(html).html());
 
-	  // this.view.on('view:ready', () => {
+	    if (this.view) this.view.destroy();
 
-	  _transitions2.default.fadeIn(this.$el, 2);
+	    this.view = void 0;
+	    this.view = this.views[id];
 
-	  // });
+	    // this.view.on('view:ready', () => {
 
-	  this.view.init();
+	    _transitions2.default.fadeIn(this.$el, 2);
+
+	    // });
+
+	    this.view.init();
+	  }
+
 	};
 
 	exports.default = View;
@@ -175,64 +164,63 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 	var Navigation = {
 
-		originalState: window.location.pathname,
-		url: null
+	  originalState: window.location.pathname,
+	  url: null,
 
-	};
+	  init: function init() {
 
-	Navigation.init = function init() {
+	    Happens(this);
 
-		Happens(this);
+	    this.url = this.originalState;
 
-		this.url = this.originalState;
+	    this.bind();
+	  },
 
-		this.bind();
-	};
+	  bind: function bind() {
 
-	Navigation.bind = function bind() {
+	    $(window).bind('popstate', this.popState.bind(this));
+	  },
 
-		$(window).bind('popstate', this.popState.bind(this));
-	};
+	  go: function go(url) {
 
-	Navigation.go = function go(url) {
+	    if (this.url === url) return;
 
-		if (this.url === url) return;
+	    this.pushState(url);
+	  },
 
-		this.pushState(url);
-	};
+	  pushState: function pushState(url) {
 
-	Navigation.pushState = function pushState(url) {
+	    this.url = url;
 
-		this.url = url;
+	    history.pushState(this.url, null, this.url);
 
-		history.pushState(this.url, null, this.url);
+	    this.emit('url:changed', this.url, this.getID());
+	  },
 
-		this.emit('url:changed', this.url, this.getID());
-	};
+	  popState: function popState(event) {
 
-	Navigation.popState = function popState(event) {
+	    this.url = event.originalEvent.state || this.originalState;
 
-		this.url = event.originalEvent.state || this.originalState;
+	    this.emit('url:changed', this.url, this.getID());
+	  },
 
-		this.emit('url:changed', this.url, this.getID());
-	};
+	  getID: function getID() {
 
-	Navigation.getID = function getID() {
+	    if (this.url === '/') {
 
-		if (this.url === '/') {
+	      return 'home';
+	    } else if (this.url === '/about') {
 
-			return 'home';
-		} else if (this.url === '/about') {
+	      return 'about';
+	    }
 
-			return 'about';
-		} else {
+	    return 'project';
+	  }
 
-			return 'project';
-		}
 	};
 
 	Navigation.init();
@@ -273,6 +261,7 @@
 	      autoAlpha: 0,
 	      ease: Power2.easeOut,
 	      onComplete: function onComplete() {
+
 	        callback();
 	      }
 	    };
@@ -305,6 +294,7 @@
 	      y: Math.PI * 1.055,
 	      easing: Expo.easeInOut,
 	      onComplete: function onComplete() {
+
 	        _this.emit('flyover:complete');
 	      }
 	    };
@@ -322,7 +312,7 @@
 /* 4 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -339,7 +329,7 @@
 
 	      req.onload = function () {
 
-	        if (req.status == 200) {
+	        if (req.status === 200) {
 
 	          resolve(req.response);
 	        } else {
@@ -350,7 +340,7 @@
 
 	      req.onerror = function () {
 
-	        reject(Error("Network Error"));
+	        reject(Error('Network Error'));
 	      };
 
 	      req.send();
@@ -416,87 +406,85 @@
 	var Home = {
 
 	  $el: null,
-	  introComplete: false
+	  introComplete: false,
 
-	};
+	  init: function init() {
 
-	Home.init = function init() {
+	    Happens(this);
 
-	  Happens(this);
+	    this.$el = $('#three-viewport');
+	    this.$el.append(_renderer2.default.domElement);
 
-	  this.$el = $('#three-viewport');
-	  this.$el.append(_renderer2.default.domElement);
+	    _particleSystem2.default.init();
+	    _pivotControls2.default.init();
 
-	  _pivotControls2.default.init();
+	    this.renderProjects();
+	    this.runIntro();
 
-	  _particleSystem2.default.init();
+	    _raf2.default.start();
 
-	  this.renderProjects();
+	    this.bind();
+	  },
 
-	  this.runIntro();
+	  bind: function bind() {
 
-	  _raf2.default.start();
+	    _window2.default.on('resize', this.resize.bind(this));
+	    _raf2.default.on('tick', this.update.bind(this));
+	  },
 
-	  this.bind();
-	};
+	  renderProjects: function renderProjects() {
+	    var _this = this;
 
-	Home.bind = function bind() {
+	    _request2.default.get('api/posts').then(function (response) {
 
-	  _window2.default.on('resize', this.resize.bind(this));
-	  _raf2.default.on('tick', this.update.bind(this));
-	};
+	      var data = JSON.parse(response).filter(function (item) {
 
-	Home.renderProjects = function renderProjects() {
-	  var _this = this;
+	        return item.state === 'published';
+	      });
 
-	  _request2.default.get('api/posts').then(function (response) {
+	      _projectSphere2.default.init(_this.$el, data);
+	    });
+	  },
 
-	    var data = JSON.parse(response).filter(function (item) {
+	  runIntro: function runIntro() {
+	    var _this2 = this;
 
-	      return item.state === 'published';
+	    _transitions2.default.on('flyover:complete', function () {
+
+	      _this2.introComplete = true;
 	    });
 
-	    _projectSphere2.default.init(_this.$el, data);
-	  });
-	};
+	    _transitions2.default.introFlyover(_camera2.default, _pivotControls2.default);
+	  },
 
-	Home.runIntro = function runIntro() {
-	  var _this2 = this;
+	  resize: function resize() {
 
-	  _transitions2.default.on('flyover:complete', function () {
+	    _renderer2.default.setSize(_window2.default.width, _window2.default.height);
 
-	    _this2.introComplete = true;
-	  });
+	    _camera2.default.aspect = _window2.default.width / _window2.default.height;
+	  },
 
-	  _transitions2.default.introFlyover(_camera2.default, _pivotControls2.default);
-	};
+	  update: function update() {
 
-	Home.resize = function resize() {
+	    _renderer2.default.render(_scene2.default, _camera2.default);
 
-	  _renderer2.default.setSize(_window2.default.width, _window2.default.height);
+	    _camera2.default.updateProjectionMatrix();
+	    _camera2.default.lookAt(_scene2.default.position);
 
-	  _camera2.default.aspect = _window2.default.width / _window2.default.height;
-	};
+	    if (this.introComplete) _pivotControls2.default.update();
 
-	Home.update = function update() {
+	    _particleSystem2.default.update();
+	    _projectSphere2.default.update();
+	  },
 
-	  _renderer2.default.render(_scene2.default, _camera2.default);
+	  destroy: function destroy() {
 
-	  _camera2.default.updateProjectionMatrix();
-	  _camera2.default.lookAt(_scene2.default.position);
+	    _pivotControls2.default.unbind();
+	    _projectSphere2.default.unbind();
 
-	  if (this.introComplete) _pivotControls2.default.update();
+	    _raf2.default.stop();
+	  }
 
-	  _particleSystem2.default.update();
-	  _projectSphere2.default.update();
-	};
-
-	Home.destroy = function destroy() {
-
-	  _pivotControls2.default.unbind();
-	  _projectSphere2.default.unbind();
-
-	  _raf2.default.stop();
 	};
 
 	exports.default = Home;
@@ -508,48 +496,48 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 	var Window = {
 
-		$el: $(window),
-		width: 0,
-		height: 0
+	  $el: $(window),
+	  width: 0,
+	  height: 0,
 
-	};
+	  init: function init() {
 
-	Window.init = function init() {
+	    Happens(this);
 
-		Happens(this);
+	    this.resize();
+	    this.bind();
+	  },
 
-		this.resize();
-		this.bind();
-	};
+	  bind: function bind() {
 
-	Window.bind = function bind() {
+	    this.$el.on('resize', this.resize.bind(this));
+	    this.$el.on('keydown', this.keydown.bind(this));
+	  },
 
-		this.$el.on('resize', this.resize.bind(this));
-		this.$el.on('keydown', this.keydown.bind(this));
-	};
+	  resize: function resize() {
 
-	Window.resize = function resize() {
+	    this.width = this.$el.width();
+	    this.height = this.$el.height();
 
-		this.width = this.$el.width();
-		this.height = this.$el.height();
+	    this.emit('resize');
+	  },
 
-		this.emit('resize');
-	};
+	  keydown: function keydown(event) {
 
-	Window.keydown = function keydown(event) {
+	    var key = undefined;
 
-		var key = undefined;
+	    if (event.keyCode === 38) key = 'up';
+	    if (event.keyCode === 40) key = 'down';
+	    if (event.keyCode === 37) key = 'left';
+	    if (event.keyCode === 39) key = 'right';
 
-		if (event.keyCode === 38) key = 'up';
-		if (event.keyCode === 40) key = 'down';
-		if (event.keyCode === 37) key = 'left';
-		if (event.keyCode === 39) key = 'right';
+	    this.emit('keydown', key);
+	  }
 
-		this.emit('keydown', key);
 	};
 
 	Window.init();
@@ -567,32 +555,32 @@
 	});
 	var RAF = {
 
-	  ticker: null
+	  ticker: null,
 
-	};
+	  init: function init() {
 
-	RAF.init = function init() {
+	    Happens(this);
+	  },
 
-	  Happens(this);
-	};
+	  start: function start() {
 
-	RAF.start = function start() {
+	    this.ticker = window.requestAnimationFrame(this.tick.bind(this));
+	  },
 
-	  this.ticker = window.requestAnimationFrame(this.tick.bind(this));
-	};
+	  stop: function stop() {
 
-	RAF.stop = function stop() {
+	    window.cancelAnimationFrame(this.ticker);
 
-	  window.cancelAnimationFrame(this.ticker);
+	    this.ticker = null;
+	  },
 
-	  this.ticker = null;
-	};
+	  tick: function tick(time) {
 
-	RAF.tick = function tick(time) {
+	    this.ticker = window.requestAnimationFrame(this.tick.bind(this));
 
-	  this.ticker = window.requestAnimationFrame(this.tick.bind(this));
+	    this.emit('tick', time);
+	  }
 
-	  this.emit('tick', time);
 	};
 
 	RAF.init();
@@ -715,185 +703,185 @@
 	    openEnded: true,
 	    thetaStart: 0,
 	    thetaLength: Math.PI * 2 / 6
-	  }
+	  },
 
-	};
+	  init: function init(el, data) {
 
-	ProjectSphere.init = function init(el, data) {
+	    this.$el = el;
+	    this.data = data;
 
-	  this.$el = el;
-	  this.data = data;
+	    this.bind();
+	    this.createProjects();
+	  },
 
-	  this.bind();
-	  this.createProjects();
-	};
+	  bind: function bind() {
 
-	ProjectSphere.bind = function bind() {
+	    this.$el.on('mousemove touchmove', this.mouseMove.bind(this));
+	    this.$el.on('mousedown touchstart', this.mouseDown.bind(this));
+	  },
 
-	  this.$el.on('mousemove touchmove', this.mouseMove.bind(this));
-	  this.$el.on('mousedown touchstart', this.mouseDown.bind(this));
-	};
+	  unbind: function unbind() {
 
-	ProjectSphere.unbind = function unbind() {
+	    this.$el.off('mousemove touchmove');
+	    this.$el.off('mousedown touchstart');
+	  },
 
-	  this.$el.off('mousemove touchmove');
-	  this.$el.off('mousedown touchstart');
-	};
+	  createProjects: function createProjects() {
+	    var _this = this;
 
-	ProjectSphere.createProjects = function createProjects() {
-	  var _this = this;
+	    var target = new THREE.Vector3();
+	    var geometry = new THREE.CylinderGeometry(this.cylinder.radiusTop, this.cylinder.radiusBottom, this.cylinder.height, this.cylinder.radiusSegments, this.cylinder.heightSegments, this.cylinder.openEnded, this.cylinder.thetaStart, Math.PI * 2 / (this.data.length + 3));
 
-	  var target = new THREE.Vector3();
-	  var geometry = new THREE.CylinderGeometry(this.cylinder.radiusTop, this.cylinder.radiusBottom, this.cylinder.height, this.cylinder.radiusSegments, this.cylinder.heightSegments, this.cylinder.openEnded, this.cylinder.thetaStart, Math.PI * 2 / (this.data.length + 3));
+	    this.data.forEach(function (item, index) {
 
-	  this.data.forEach(function (item, index) {
+	      var texture = (0, _textureLoader2.default)(item.featuredImage.url);
 
-	    var texture = (0, _textureLoader2.default)(item.featuredImage.url);
+	      texture.minFilter = THREE.LinearFilter;
 
-	    texture.minFilter = THREE.LinearFilter;
+	      var material = new THREE.MeshBasicMaterial({
+	        map: texture,
+	        transparent: true,
+	        opacity: 0.5,
+	        wireframe: false
+	      });
 
-	    var material = new THREE.MeshBasicMaterial({
-	      map: texture,
-	      transparent: true,
-	      opacity: 0.5,
-	      wireframe: false
+	      var project = new THREE.Mesh(geometry, material);
+
+	      project.scale.x = -1;
+	      project.material.side = THREE.DoubleSide;
+	      project.name = 'project';
+	      project.title = item.title;
+	      project.url = '/project/' + item.slug;
+
+	      var x = Math.cos(index * (Math.PI * 2) / _this.data.length);
+	      var z = Math.sin(index * (Math.PI * 2) / _this.data.length);
+
+	      project.position.set(x, 0, z);
+	      project.lookAt(target);
+
+	      _this.projects.push(project);
+	      _scene2.default.add(project);
 	    });
+	  },
 
-	    var project = new THREE.Mesh(geometry, material);
+	  /**
+	   * Mouse move over the scene
+	   */
+	  mouseMove: function mouseMove(event) {
 
-	    project.scale.x = -1;
-	    project.material.side = THREE.DoubleSide;
-	    project.name = 'project';
-	    project.title = item.title;
-	    project.url = '/project/' + item.slug;
+	    var evt = {
+	      x: event.pageX || event.originalEvent.touches[0].pageX,
+	      y: event.pageY || event.originalEvent.touches[0].pageY
+	    };
 
-	    var x = Math.cos(index * (Math.PI * 2) / _this.data.length);
-	    var z = Math.sin(index * (Math.PI * 2) / _this.data.length);
+	    this.pos.x = evt.x / _window2.default.width * 2 - 1;
+	    this.pos.y = -(evt.y / _window2.default.height) * 2 + 1;
+	  },
 
-	    project.position.set(x, 0, z);
-	    project.lookAt(target);
+	  /**
+	   * Mouse down on a project
+	   */
+	  mouseDown: function mouseDown(event) {
 
-	    _this.projects.push(project);
-	    _scene2.default.add(project);
-	  });
-	};
+	    var evt = {
+	      x: event.pageX || event.originalEvent.touches[0].pageX,
+	      y: event.pageY || event.originalEvent.touches[0].pageY
+	    };
 
-	/**
-	 * Mouse move over the scene
-	 */
-	ProjectSphere.mouseMove = function mouseMove(event) {
+	    this.pos.x = evt.x / _window2.default.width * 2 - 1;
+	    this.pos.y = -(evt.y / _window2.default.height) * 2 + 1;
 
-	  var evt = {
-	    x: event.pageX || event.originalEvent.touches[0].pageX,
-	    y: event.pageY || event.originalEvent.touches[0].pageY
-	  };
+	    var intersects = this.raycaster.intersectObjects(this.projects);
 
-	  this.pos.x = evt.x / _window2.default.width * 2 - 1;
-	  this.pos.y = -(evt.y / _window2.default.height) * 2 + 1;
-	};
+	    if (intersects.length > 0) _navigation2.default.go(intersects[0].object.url);
+	  },
 
-	/**
-	 * Mouse down on a project
-	 */
-	ProjectSphere.mouseDown = function mouseDown(event) {
+	  /**
+	   * Mouse over a project
+	   */
+	  mouseOver: function mouseOver() {
 
-	  var evt = {
-	    x: event.pageX || event.originalEvent.touches[0].pageX,
-	    y: event.pageY || event.originalEvent.touches[0].pageY
-	  };
+	    this.projectMouseOver = true;
 
-	  this.pos.x = evt.x / _window2.default.width * 2 - 1;
-	  this.pos.y = -(evt.y / _window2.default.height) * 2 + 1;
+	    var title = $('#home h1');
+	    var material = this.intersected.material;
 
-	  var intersects = this.raycaster.intersectObjects(this.projects);
+	    var params = undefined;
 
-	  if (intersects.length > 0) _navigation2.default.go(intersects[0].object.url);
-	};
+	    this.$el.css({ cursor: 'pointer' });
 
-	/**
-	 * Mouse over a project
-	 */
-	ProjectSphere.mouseOver = function mouseOver() {
+	    title.html(this.intersected.title);
 
-	  this.projectMouseOver = true;
+	    params = {
+	      autoAlpha: 1,
+	      y: -10,
+	      scale: 1
+	    };
 
-	  var title = $('#home h1');
-	  var material = this.intersected.material;
+	    TweenMax.to(title, 0.5, params);
 
-	  var params = undefined;
+	    params = {
+	      opacity: 0.75,
+	      easing: Sine.easeOut
+	    };
 
-	  this.$el.css({ cursor: 'pointer' });
+	    TweenMax.to(material, 0.75, { opacity: 1 });
+	  },
 
-	  title.html(this.intersected.title);
+	  /**
+	   * Mouse out of a project
+	   */
+	  mouseOut: function mouseOut() {
 
-	  params = {
-	    autoAlpha: 1,
-	    y: -10,
-	    scale: 1
-	  };
+	    this.projectMouseOver = false;
 
-	  TweenMax.to(title, 0.5, params);
+	    var title = $('#home h1');
+	    var material = this.intersected.material;
 
-	  params = {
-	    opacity: 0.75,
-	    easing: Sine.easeOut
-	  };
+	    var params = undefined;
 
-	  TweenMax.to(material, 0.75, { opacity: 1 });
-	};
+	    this.$el.css({ cursor: 'ew-resize' });
 
-	/**
-	 * Mouse out of a project
-	 */
-	ProjectSphere.mouseOut = function mouseOut() {
+	    params = {
+	      autoAlpha: 0,
+	      y: 0,
+	      scale: 0.9
+	    };
 
-	  this.projectMouseOver = false;
+	    TweenMax.to(title, 0.5, params);
 
-	  var title = $('#home h1');
-	  var material = this.intersected.material;
+	    params = {
+	      opacity: 0.5,
+	      easing: Sine.easeOut
+	    };
 
-	  var params = undefined;
+	    TweenMax.to(material, 0.75, params);
+	  },
 
-	  this.$el.css({ cursor: 'ew-resize' });
+	  update: function update() {
 
-	  params = {
-	    autoAlpha: 0,
-	    y: 0,
-	    scale: 0.9
-	  };
+	    // taking the camera's world position into consideration
+	    this.cameraPos.setFromMatrixPosition(_camera2.default.matrixWorld);
 
-	  TweenMax.to(title, 0.5, params);
+	    this.raycaster.ray.origin.copy(this.cameraPos);
 
-	  params = {
-	    opacity: 0.5,
-	    easing: Sine.easeOut
-	  };
+	    this.raycaster.ray.direction.set(this.pos.x, this.pos.y, 0).unproject(_camera2.default).sub(this.cameraPos).normalize();
 
-	  TweenMax.to(material, 0.75, params);
-	};
+	    var intersects = this.raycaster.intersectObjects(this.projects);
 
-	ProjectSphere.update = function update() {
+	    if (intersects.length > 0) {
 
-	  // taking the camera's world position into consideration
-	  this.cameraPos.setFromMatrixPosition(_camera2.default.matrixWorld);
+	      this.intersected = intersects[0].object;
 
-	  this.raycaster.ray.origin.copy(this.cameraPos);
+	      if (!_window2.default.width < 768 && !this.projectMouseOver) this.mouseOver();
+	    } else {
 
-	  this.raycaster.ray.direction.set(this.pos.x, this.pos.y, 0).unproject(_camera2.default).sub(this.cameraPos).normalize();
+	      if (!_window2.default.width < 768 && this.intersected) this.mouseOut();
 
-	  var intersects = this.raycaster.intersectObjects(this.projects);
-
-	  if (intersects.length > 0) {
-
-	    this.intersected = intersects[0].object;
-
-	    if (!_window2.default.width < 768 && !this.projectMouseOver) this.mouseOver();
-	  } else {
-
-	    if (!_window2.default.width < 768 && this.intersected) this.mouseOut();
-
-	    this.intersected = null;
+	      this.intersected = null;
+	    }
 	  }
+
 	};
 
 	exports.default = ProjectSphere;
@@ -928,7 +916,7 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 
 	var _textureLoader = __webpack_require__(12);
@@ -943,70 +931,70 @@
 
 	var ParticleSystem = {
 
-		geometry: new THREE.Geometry(),
-		materials: [],
-		particles: [],
-		count: 5000,
-		parameters: [[[1, 1, 0.5], 5], [[0.95, 1, 0.5], 4], [[0.90, 1, 0.5], 3], [[0.85, 1, 0.5], 2], [[0.80, 1, 0.5], 1]]
+	  geometry: new THREE.Geometry(),
+	  materials: [],
+	  particles: [],
+	  count: 5000,
+	  parameters: [[[1, 1, 0.5], 5], [[0.95, 1, 0.5], 4], [[0.90, 1, 0.5], 3], [[0.85, 1, 0.5], 2], [[0.80, 1, 0.5], 1]],
 
-	};
+	  init: function init() {
 
-	ParticleSystem.init = function init() {
+	    this.pushVertices();
 
-		this.pushVertices();
+	    this.createParticles();
+	  },
 
-		this.createParticles();
-	};
+	  pushVertices: function pushVertices() {
+	    var _this = this;
 
-	ParticleSystem.pushVertices = function pushVertices() {
-		var _this = this;
+	    _.times(this.count, function () {
 
-		_.times(this.count, function () {
+	      var vertex = new THREE.Vector3();
 
-			var vertex = new THREE.Vector3();
+	      vertex.x = Math.random() * 8000 - 4000;
+	      vertex.y = Math.random() * 8000 - 4000;
+	      vertex.z = Math.random() * 8000 - 4000;
 
-			vertex.x = Math.random() * 8000 - 4000;
-			vertex.y = Math.random() * 8000 - 4000;
-			vertex.z = Math.random() * 8000 - 4000;
+	      _this.geometry.vertices.push(vertex);
+	    });
+	  },
 
-			_this.geometry.vertices.push(vertex);
-		});
-	};
+	  createParticles: function createParticles() {
+	    var _this2 = this;
 
-	ParticleSystem.createParticles = function createParticles() {
-		var _this2 = this;
+	    this.parameters.map(function (item, index) {
 
-		this.parameters.map(function (item, index) {
+	      var size = item[1];
 
-			var size = item[1];
+	      _this2.materials[index] = new THREE.PointsMaterial({
+	        size: size,
+	        map: (0, _textureLoader2.default)('images/_tmp/particle.jpg'),
+	        blending: THREE.NormalBlending,
+	        transparent: true
+	      });
 
-			_this2.materials[index] = new THREE.PointsMaterial({
-				size: size,
-				map: (0, _textureLoader2.default)('images/_tmp/particle.jpg'),
-				blending: THREE.NormalBlending,
-				transparent: true
-			});
+	      var particle = new THREE.Points(_this2.geometry, _this2.materials[index]);
 
-			var particle = new THREE.Points(_this2.geometry, _this2.materials[index]);
+	      particle.rotation.x = Math.random() * 6;
+	      particle.rotation.y = Math.random() * 6;
+	      particle.rotation.z = Math.random() * 6;
 
-			particle.rotation.x = Math.random() * 6;
-			particle.rotation.y = Math.random() * 6;
-			particle.rotation.z = Math.random() * 6;
+	      _this2.particles.push(particle);
 
-			_this2.particles.push(particle);
+	      _scene2.default.add(particle);
+	    });
+	  },
 
-			_scene2.default.add(particle);
-		});
-	};
+	  update: function update() {
 
-	ParticleSystem.update = function update() {
+	    var time = Date.now() * 0.00001;
 
-		var time = Date.now() * 0.00001;
+	    this.particles.map(function (item, index) {
 
-		this.particles.map(function (item, index) {
+	      item.rotation.y = time * (index < 4 ? index + 1 : -(index + 1));
+	    });
+	  }
 
-			item.rotation.y = time * (index < 4 ? index + 1 : -(index + 1));
-		});
 	};
 
 	exports.default = ParticleSystem;
@@ -1018,7 +1006,7 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 
 	var _window = __webpack_require__(6);
@@ -1037,74 +1025,73 @@
 
 	var PivotControls = {
 
-		$el: null,
-		scene: null,
-		pivot: null,
-		tween: null,
-		pos: {
-			a: 0,
-			x: 0
-		},
-		pivot: new THREE.Object3D()
+	  $el: null,
+	  scene: null,
+	  tween: null,
+	  pos: {
+	    a: 0,
+	    x: 0
+	  },
+	  pivot: new THREE.Object3D(),
 
-	};
+	  init: function init() {
 
-	PivotControls.init = function init() {
+	    this.$el = $('#three-viewport');
 
-		this.$el = $('#three-viewport');
+	    _scene2.default.add(this.pivot);
 
-		_scene2.default.add(this.pivot);
+	    this.pivot.add(_camera2.default);
 
-		this.pivot.add(_camera2.default);
+	    this.bind();
+	  },
 
-		this.bind();
-	};
+	  bind: function bind() {
 
-	PivotControls.bind = function bind() {
+	    this.$el.on('mousemove', this.mouseMove.bind(this));
+	    this.$el.on('touchstart', this.touchStart.bind(this));
+	    this.$el.on('touchmove', this.touchMove.bind(this));
+	    this.$el.on('touchend', this.touchEnd.bind(this));
+	  },
 
-		this.$el.on('mousemove', this.mouseMove.bind(this));
-		this.$el.on('touchstart', this.touchStart.bind(this));
-		this.$el.on('touchmove', this.touchMove.bind(this));
-		this.$el.on('touchend', this.touchEnd.bind(this));
-	};
+	  unbind: function unbind() {
 
-	PivotControls.unbind = function unbind() {
+	    this.$el.off('mousemove');
+	    this.$el.off('touchstart');
+	    this.$el.off('touchmove');
+	    this.$el.off('touchend');
+	  },
 
-		this.$el.off('mousemove');
-		this.$el.off('touchstart');
-		this.$el.off('touchmove');
-		this.$el.off('touchend');
-	};
+	  mouseMove: function mouseMove() {
 
-	PivotControls.mouseMove = function mouseMove() {
+	    this.pos.x = event.pageX;
+	    this.pos.x = this.pos.x - _window2.default.width / 2;
+	    this.pos.x = this.pos.x * 0.000025;
+	  },
 
-		this.pos.x = event.pageX;
-		this.pos.x = this.pos.x - _window2.default.width / 2;
-		this.pos.x = this.pos.x * 0.000025;
-	};
+	  touchStart: function touchStart() {
 
-	PivotControls.touchStart = function touchStart() {
+	    this.pos.a = event.originalEvent.touches[0].pageX;
+	  },
 
-		this.pos.a = event.originalEvent.touches[0].pageX;
-	};
+	  touchMove: function touchMove() {
 
-	PivotControls.touchMove = function touchMove() {
+	    this.pos.x = event.originalEvent.touches[0].pageX;
+	    this.pos.x = this.pos.x - this.pos.a;
+	    this.pos.x = this.pos.x * -0.000025;
+	  },
 
-		this.pos.x = event.originalEvent.touches[0].pageX;
-		this.pos.x = this.pos.x - this.pos.a;
-		this.pos.x = this.pos.x * -0.000025;
-	};
+	  touchEnd: function touchEnd() {
 
-	PivotControls.touchEnd = function touchEnd() {
+	    var duration = Math.round(Math.abs(this.pos.x * 100000));
 
-		var duration = Math.round(Math.abs(this.pos.x * 100000));
+	    TweenMax.to(this.pos, duration, { x: 0, easing: Sine.easeOut });
+	  },
 
-		TweenMax.to(this.pos, duration, { x: 0, easing: Sine.easeOut });
-	};
+	  update: function update() {
 
-	PivotControls.update = function update() {
+	    this.pivot.rotation.y = this.pivot.rotation.y - this.pos.x;
+	  }
 
-		this.pivot.rotation.y = this.pivot.rotation.y - this.pos.x;
 	};
 
 	exports.default = PivotControls;
@@ -1120,22 +1107,22 @@
 	});
 	var Project = {
 
-	  $el: $('#project')
+	  $el: $('#project'),
 
-	};
+	  init: function init() {
 
-	Project.init = function init() {
+	    Happens(this);
 
-	  Happens(this);
+	    console.log('init PROJECT');
 
-	  console.log('init PROJECT');
+	    this.emit('view:ready');
+	  },
 
-	  this.emit('view:ready');
-	};
+	  destroy: function destroy() {
 
-	Project.destroy = function destroy() {
+	    console.log('destroy PROJECT');
+	  }
 
-	  console.log('destroy PROJECT');
 	};
 
 	exports.default = Project;
@@ -1151,22 +1138,22 @@
 	});
 	var About = {
 
-	  $el: $('#about')
+	  $el: $('#about'),
 
-	};
+	  init: function init() {
 
-	About.init = function init() {
+	    Happens(this);
 
-	  Happens(this);
+	    console.log('init ABOUT');
 
-	  console.log('init ABOUT');
+	    this.emit('view:ready');
+	  },
 
-	  this.emit('view:ready');
-	};
+	  destroy: function destroy() {
 
-	About.destroy = function destroy() {
+	    console.log('destroy ABOUT');
+	  }
 
-	  console.log('destroy ABOUT');
 	};
 
 	exports.default = About;

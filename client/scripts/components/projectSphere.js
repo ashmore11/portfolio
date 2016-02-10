@@ -1,8 +1,8 @@
-import Win           from 'app/utils/window';
+import Win from 'app/utils/window';
 import TextureLoader from 'app/utils/textureLoader';
-import Nav           from 'app/utils/navigation';
-import Scene         from 'app/components/scene';
-import Camera        from 'app/components/camera';
+import Nav from 'app/utils/navigation';
+import Scene from 'app/components/scene';
+import Camera from 'app/components/camera';
 
 const ProjectSphere = {
 
@@ -25,206 +25,206 @@ const ProjectSphere = {
     thetaLength: (Math.PI * 2) / 6,
   },
 
-};
+  init: function init(el, data) {
 
-ProjectSphere.init = function init(el, data) {
+    this.$el = el;
+    this.data = data;
 
-  this.$el  = el;
-  this.data = data;
+    this.bind();
+    this.createProjects();
 
-  this.bind();
-  this.createProjects();
+  },
 
-};
+  bind: function bind() {
 
-ProjectSphere.bind = function bind() {
-  
-  this.$el.on('mousemove touchmove', this.mouseMove.bind(this));
-  this.$el.on('mousedown touchstart', this.mouseDown.bind(this));
+    this.$el.on('mousemove touchmove', this.mouseMove.bind(this));
+    this.$el.on('mousedown touchstart', this.mouseDown.bind(this));
 
-};
+  },
 
-ProjectSphere.unbind = function unbind() {
-  
-  this.$el.off('mousemove touchmove');
-  this.$el.off('mousedown touchstart');
+  unbind: function unbind() {
 
-};
+    this.$el.off('mousemove touchmove');
+    this.$el.off('mousedown touchstart');
 
-ProjectSphere.createProjects = function createProjects() {
+  },
 
-  const target   = new THREE.Vector3();
-  const geometry = new THREE.CylinderGeometry(
-    this.cylinder.radiusTop,
-    this.cylinder.radiusBottom,
-    this.cylinder.height,
-    this.cylinder.radiusSegments,
-    this.cylinder.heightSegments,
-    this.cylinder.openEnded,
-    this.cylinder.thetaStart,
-    (Math.PI * 2) / (this.data.length + 3)
-  );
+  createProjects: function createProjects() {
 
-  this.data.forEach((item, index) => {
+    const target = new THREE.Vector3();
+    const geometry = new THREE.CylinderGeometry(
+      this.cylinder.radiusTop,
+      this.cylinder.radiusBottom,
+      this.cylinder.height,
+      this.cylinder.radiusSegments,
+      this.cylinder.heightSegments,
+      this.cylinder.openEnded,
+      this.cylinder.thetaStart,
+      (Math.PI * 2) / (this.data.length + 3)
+    );
 
-    const texture = TextureLoader(item.featuredImage.url);
-    
-    texture.minFilter = THREE.LinearFilter;
+    this.data.forEach((item, index) => {
 
-    const material = new THREE.MeshBasicMaterial({
-      map         : texture,
-      transparent : true,
-      opacity     : 0.5,
-      wireframe   : false
+      const texture = TextureLoader(item.featuredImage.url);
+
+      texture.minFilter = THREE.LinearFilter;
+
+      const material = new THREE.MeshBasicMaterial({
+        map: texture,
+        transparent: true,
+        opacity: 0.5,
+        wireframe: false,
+      });
+
+      const project = new THREE.Mesh(geometry, material);
+
+      project.scale.x = -1;
+      project.material.side = THREE.DoubleSide;
+      project.name = 'project';
+      project.title = item.title;
+      project.url = `/project/${item.slug}`;
+
+      const x = Math.cos(index * (Math.PI * 2) / this.data.length);
+      const z = Math.sin(index * (Math.PI * 2) / this.data.length);
+
+      project.position.set(x, 0, z);
+      project.lookAt(target);
+
+      this.projects.push(project);
+      Scene.add(project);
+
     });
 
-    const project = new THREE.Mesh(geometry, material);
+  },
 
-    project.scale.x       = -1;
-    project.material.side = THREE.DoubleSide;
-    project.name          = 'project';
-    project.title         = item.title;
-    project.url           = `/project/${item.slug}`;
+  /**
+   * Mouse move over the scene
+   */
+  mouseMove: function mouseMove(event) {
 
-    const x = Math.cos(index * ( Math.PI * 2 ) / this.data.length);
-    const z = Math.sin(index * ( Math.PI * 2 ) / this.data.length);
+    const evt = {
+      x: event.pageX || event.originalEvent.touches[0].pageX,
+      y: event.pageY || event.originalEvent.touches[0].pageY,
+    };
 
-    project.position.set(x, 0, z)
-    project.lookAt(target);
+    this.pos.x = (evt.x / Win.width) * 2 - 1;
+    this.pos.y = - (evt.y / Win.height) * 2 + 1;
 
-    this.projects.push(project);
-    Scene.add(project);
+  },
 
-  });
+  /**
+   * Mouse down on a project
+   */
+  mouseDown: function mouseDown(event) {
 
-};
+    const evt = {
+      x: event.pageX || event.originalEvent.touches[0].pageX,
+      y: event.pageY || event.originalEvent.touches[0].pageY,
+    };
 
-/**
- * Mouse move over the scene
- */
-ProjectSphere.mouseMove = function mouseMove(event) {
+    this.pos.x = (evt.x / Win.width) * 2 - 1;
+    this.pos.y = - (evt.y / Win.height) * 2 + 1;
 
-  const evt = {
-    x: event.pageX || event.originalEvent.touches[0].pageX,
-    y: event.pageY || event.originalEvent.touches[0].pageY,
-  }
+    const intersects = this.raycaster.intersectObjects(this.projects);
 
-  this.pos.x = ( evt.x / Win.width  ) * 2 - 1;
-  this.pos.y = - ( evt.y / Win.height ) * 2 + 1;
+    if (intersects.length > 0) Nav.go(intersects[0].object.url);
 
-};
+  },
 
-/**
- * Mouse down on a project
- */
-ProjectSphere.mouseDown = function mouseDown(event) {
+  /**
+   * Mouse over a project
+   */
+  mouseOver: function mouseOver() {
 
-  const evt = {
-    x: event.pageX || event.originalEvent.touches[0].pageX,
-    y: event.pageY || event.originalEvent.touches[0].pageY
-  };
+    this.projectMouseOver = true;
 
-  this.pos.x = (evt.x / Win.width) * 2 - 1;
-  this.pos.y = - (evt.y / Win.height) * 2 + 1;
+    const title = $('#home h1');
+    const material = this.intersected.material;
 
-  const intersects = this.raycaster.intersectObjects(this.projects);
+    let params;
 
-  if(intersects.length > 0) Nav.go(intersects[0].object.url);
+    this.$el.css({ cursor: 'pointer' });
 
-};
+    title.html(this.intersected.title);
 
-/**
- * Mouse over a project
- */
-ProjectSphere.mouseOver = function mouseOver() {
+    params = {
+      autoAlpha: 1,
+      y: -10,
+      scale: 1,
+    };
 
-  this.projectMouseOver = true;
+    TweenMax.to(title, 0.5, params);
 
-  const title    = $('#home h1');
-  const material = this.intersected.material;
+    params = {
+      opacity: 0.75,
+      easing: Sine.easeOut,
+    };
 
-  let params;
+    TweenMax.to(material, 0.75, { opacity: 1 });
 
-  this.$el.css({ cursor: 'pointer' });
+  },
 
-  title.html(this.intersected.title);
+  /**
+   * Mouse out of a project
+   */
+  mouseOut: function mouseOut() {
 
-  params = {
-    autoAlpha: 1, 
-    y: -10, 
-    scale: 1,
-  };
+    this.projectMouseOver = false;
 
-  TweenMax.to(title, 0.5, params);
+    const title = $('#home h1');
+    const material = this.intersected.material;
 
-  params = {
-    opacity: 0.75, 
-    easing: Sine.easeOut,
-  };
-  
-  TweenMax.to(material, 0.75, { opacity: 1 });
+    let params;
 
-};
+    this.$el.css({ cursor: 'ew-resize' });
 
-/**
- * Mouse out of a project
- */
-ProjectSphere.mouseOut = function mouseOut() {
+    params = {
+      autoAlpha: 0,
+      y: 0,
+      scale: 0.9,
+    };
 
-  this.projectMouseOver = false;
+    TweenMax.to(title, 0.5, params);
 
-  const title    = $('#home h1');
-  const material = this.intersected.material;
+    params = {
+      opacity: 0.5,
+      easing: Sine.easeOut,
+    };
 
-  let params;
+    TweenMax.to(material, 0.75, params);
 
-  this.$el.css({ cursor: 'ew-resize' });
+  },
 
-  params = {
-    autoAlpha: 0,
-    y: 0,
-    scale: 0.9,
-  };
+  update: function update() {
 
-  TweenMax.to(title, 0.5, params);
+    // taking the camera's world position into consideration
+    this.cameraPos.setFromMatrixPosition(Camera.matrixWorld);
 
-  params = {
-    opacity: 0.5, 
-    easing: Sine.easeOut,
-  };
-    
-  TweenMax.to(material, 0.75, params);
+    this.raycaster.ray.origin.copy(this.cameraPos);
 
-};
+    this.raycaster.ray.direction
+      .set(this.pos.x, this.pos.y, 0)
+      .unproject(Camera)
+      .sub(this.cameraPos)
+      .normalize();
 
-ProjectSphere.update = function update() {
+    const intersects = this.raycaster.intersectObjects(this.projects);
 
-  // taking the camera's world position into consideration
-  this.cameraPos.setFromMatrixPosition(Camera.matrixWorld);
+    if (intersects.length > 0) {
 
-  this.raycaster.ray.origin.copy(this.cameraPos);
+      this.intersected = intersects[0].object;
 
-  this.raycaster.ray.direction
-    .set(this.pos.x, this.pos.y, 0)
-    .unproject(Camera)
-    .sub(this.cameraPos)
-    .normalize();
+      if (!Win.width < 768 && !this.projectMouseOver) this.mouseOver();
 
-  const intersects = this.raycaster.intersectObjects(this.projects);
+    } else {
 
-  if(intersects.length > 0) {
+      if (!Win.width < 768 && this.intersected) this.mouseOut();
 
-    this.intersected = intersects[0].object;
+      this.intersected = null;
 
-    if(!Win.width < 768 && !this.projectMouseOver) this.mouseOver();
+    }
 
-  } else {
-
-    if(!Win.width < 768 && this.intersected) this.mouseOut();
-
-    this.intersected = null;
-
-  }
+  },
 
 };
 

@@ -1,9 +1,9 @@
-import Nav         from 'app/utils/navigation';
+import Nav from 'app/utils/navigation';
 import Transitions from 'app/utils/transitions';
-import Request     from 'app/utils/request';
-import HomeView    from 'app/views/home';
+import Request from 'app/utils/request';
+import HomeView from 'app/views/home';
 import ProjectView from 'app/views/project';
-import AboutView   from 'app/views/about';
+import AboutView from 'app/views/about';
 
 const View = {
 
@@ -15,65 +15,66 @@ const View = {
     about: AboutView,
   },
 
-};
+  init: function init() {
 
-View.init = function init() {
+    this.load(Nav.originalState, Nav.getID());
 
-  this.load(Nav.originalState, Nav.getID());
+    this.bind();
 
-  this.bind();
+  },
 
-};
+  bind: function bind() {
 
-View.bind = function bind() {
+    Nav.on('url:changed', this.load.bind(this));
 
-	Nav.on('url:changed', this.load.bind(this));
+  },
 
-};
+  load: function load(url, id) {
 
-View.load = function load(url, id) {
+    Request.get(url).then(response => {
 
-  Request.get(url).then(response => {
+      const html = $.parseHTML(response).filter(item => {
 
-  	let html;
-
-    html = $.parseHTML(response);
-    html = html.filter(item => { return item.id === 'main'; });
-
-    if (this.view === null) {
-
-      this.render(html, id);
-
-    } else {
-
-      Transitions.fadeOut(this.$el, 1, () => {
-
-        this.render(html, id);
+        return item.id === 'main';
 
       });
 
-    }
-  
-  });
+      if (this.view === null) {
 
-};
+        this.render(html, id);
 
-View.render = function render(html, id) {
+      } else {
 
-  this.$el.html($(html).html());
+        Transitions.fadeOut(this.$el, 1, () => {
 
-  if (this.view) this.view.destroy();
+          this.render(html, id);
 
-  this.view = void 0;
-  this.view = this.views[id];
-  
-  // this.view.on('view:ready', () => {
+        });
 
-  Transitions.fadeIn(this.$el, 2);
+      }
 
-  // });
+    });
 
-  this.view.init();
+  },
+
+  render: function render(html, id) {
+
+    this.$el.html($(html).html());
+
+    if (this.view) this.view.destroy();
+
+    this.view = void 0;
+    this.view = this.views[id];
+
+    // this.view.on('view:ready', () => {
+
+    Transitions.fadeIn(this.$el, 2);
+
+    // });
+
+    this.view.init();
+
+  },
 
 };
 

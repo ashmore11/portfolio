@@ -4,10 +4,10 @@ var Types = keystone.Field.Types;
 
 var page = new keystone.List('Page', {
 	map: { name: 'title' },
-	autokey: { 
-		path: 'slug', 
-		from: 'title', 
-		unique: true 
+	autokey: {
+		path: 'slug',
+		from: 'title',
+		unique: true,
 	}
 });
 
@@ -24,7 +24,7 @@ page.add({
 			type: { type: Types.Text }
 		}
 	},
-	title: { 
+	title: {
 		type: Types.Text,
 		required: true
 	},

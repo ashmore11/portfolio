@@ -2,21 +2,21 @@ const About = {
 
   $el: $('#about'),
 
-};
+  init: function init() {
 
-About.init = function init() {
+    Happens(this);
 
-	Happens(this);
+    console.log('init ABOUT');
 
-  console.log('init ABOUT');
+    this.emit('view:ready');
 
-  this.emit('view:ready');
+  },
 
-};
+  destroy: function destroy() {
 
-About.destroy = function destroy() {
+    console.log('destroy ABOUT');
 
-  console.log('destroy ABOUT');
+  },
 
 };
 

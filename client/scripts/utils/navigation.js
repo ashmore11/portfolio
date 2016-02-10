@@ -1,67 +1,65 @@
 const Navigation = {
 
-	originalState: window.location.pathname,
-	url: null,
+  originalState: window.location.pathname,
+  url: null,
 
-};
+  init: function init() {
 
-Navigation.init = function init() {
+    Happens(this);
 
-	Happens(this);
+    this.url = this.originalState;
 
-	this.url = this.originalState;
+    this.bind();
 
-	this.bind();
+  },
 
-};
+  bind: function bind() {
 
-Navigation.bind = function bind() {
+    $(window).bind('popstate', this.popState.bind(this));
 
-	$(window).bind('popstate', this.popState.bind(this));
+  },
 
-};
+  go: function go(url) {
 
-Navigation.go = function go(url) {
+    if (this.url === url) return;
 
-	if(this.url === url) return;
+    this.pushState(url);
 
-	this.pushState(url);
+  },
 
-};
+  pushState: function pushState(url) {
 
-Navigation.pushState = function pushState(url) {
+    this.url = url;
 
-	this.url = url;
+    history.pushState(this.url, null, this.url);
 
-	history.pushState(this.url, null, this.url);
+    this.emit('url:changed', this.url, this.getID());
 
-	this.emit('url:changed', this.url, this.getID());
+  },
 
-};
+  popState: function popState(event) {
 
-Navigation.popState = function popState(event) {
+    this.url = event.originalEvent.state || this.originalState;
 
-	this.url = event.originalEvent.state || this.originalState;
+    this.emit('url:changed', this.url, this.getID());
 
-	this.emit('url:changed', this.url, this.getID());
+  },
 
-};
+  getID: function getID() {
 
-Navigation.getID = function getID() {
+    if (this.url === '/') {
 
-	if(this.url === '/') {
+      return 'home';
 
-		return 'home';
+    } else if (this.url === '/about') {
 
-	} else if(this.url === '/about') {
+      return 'about';
 
-		return 'about';
+    }
 
-	} else {
-		
-		return 'project';
+    return 'project';
 
-	}
+  },
 
 };
 
