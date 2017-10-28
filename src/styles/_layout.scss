@@ -1,0 +1,19 @@
+// Z-Index
+// Usage z-index: map-get($zindex, modules);
+$zindex: (
+  error     : 9000,
+  overlay   : 7000,
+  header    : 6000,
+  modal     : 5500,
+  dropdown  : 5000,
+  subnav    : 4000,
+  footer    : 3000,
+  main      : 2000,
+  modules   : 1000,
+  tooltip   : 500,
+  plus      : 1,
+  null      : 0,
+  minus     : -1
+);
+
+$grid-gap: 16px;

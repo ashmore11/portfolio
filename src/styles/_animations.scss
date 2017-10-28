@@ -1,0 +1,29 @@
+%animation-appear {
+  opacity: 0;
+  transform: translate3d(0, 25px, 0);
+  transition: opacity 0.2s $easeInQuart, transform 0.4s $easeInQuart;
+}
+
+%animation-appear-active {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition: opacity 0.8s $easeOutQuart, transform 0.8s $easeOutQuart;
+}
+
+$animationDelay: 0.5s;
+$animationDirection: forwards;
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes slideUp {
+  0% { transform: translateY(20px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes slideInDown {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(0); }
+}

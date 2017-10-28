@@ -1,0 +1,140 @@
+@import "./colors";
+
+$font-heading: "Oswald", sans-serif;
+$font-copy: "Raleway", sans-serif;
+
+$font-weight-thin: 100;
+$font-weight-extra-light: 200;
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semi-bold: 600;
+$font-weight-bold: 700;
+$font-weight-extra-bold: 800;
+$font-weight-black: 900;
+
+// Utils
+%font-smoothing {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Headings
+%logo {
+
+  @extend %font-smoothing;
+
+  font-family: $font-heading;
+  font-weight: $font-weight-regular;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+%main-nav-item {
+  font-family: $font-heading;
+  font-weight: $font-weight-regular;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+%placeholder {
+  font-family: $font-copy;
+  font-weight: $font-weight-extra-light;
+}
+
+%header {
+  font-family: $font-copy;
+  font-weight: $font-weight-regular;
+  font-size: 32px;
+  line-height: normal;
+}
+
+%heading-1 {
+  font-family: $font-heading;
+  font-weight: $font-weight-regular;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+// Other
+%card-title {
+  line-height: 1.4;
+  font-family: $font-copy;
+  font-weight: $font-weight-extra-light;
+  font-size: 20px;
+}
+
+%pagination {
+  line-height: 1.4;
+  font-family: $font-heading;
+  font-weight: $font-weight-regular;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+%cta {
+  font-family: $font-heading;
+  font-weight: $font-weight-regular;
+  font-size: 12px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+%label {
+  font-family: $font-copy;
+  font-weight: $font-weight-medium;
+  font-size: 14px;
+}
+
+%url {
+
+  @extend %label;
+  text-decoration: underline;
+}
+
+%paragraph {
+
+  @extend %label;
+  color: $color-grey;
+  font-weight: normal;
+  line-height: 24px;
+}
+
+%small-copy {
+
+  @extend %label;
+  font-size: 12px;
+}
+
+%no-result-title {
+  font-family: $font-copy;
+  font-weight: $font-weight-extra-light;
+  font-size: 36px;
+}
+
+%no-result-description {
+  font-family: $font-copy;
+  font-weight: $font-weight-regular;
+  font-size: 14px;
+}
+
+%status {
+  font-family: $font-heading;
+  font-weight: $font-weight-regular;
+  font-size: 9px;
+  text-transform: uppercase;
+  color: $color-white;
+  letter-spacing: 0.3em;
+}
+
+%definition-term {
+  font-family: $font-heading;
+  font-weight: $font-weight-regular;
+  font-size: 10px;
+  color: $color-light-grey;
+  text-transform: uppercase;
+}
