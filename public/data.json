@@ -1,0 +1,34 @@
+{
+  "projects": [
+    {
+      "id": "adidas_snapchat",
+      "title": "adidas: Snapchat Football Game",
+      "description": "Working with Snap UK, UNIT9 Digital designed and developed an addictive tap and play adidas Snapchat game. Part of the \"Here to Create\" campaign, we hacked Snapchat Story feeds with a keepie-uppie, football challenge game."
+    },
+    {
+      "id": "crown_royal",
+      "title": "Crown Royal: Crown Your Father",
+      "description": "This Father's Day 2017 we teamed up with Crown Royal and Anomaly to celebrate dads and father figures on their special day. A special Crown Royal Father's Day. UNIT9 Films and Digital produced two different activations sharing the same idea. Celebrating the nobility of all father figures who deserve kingly commemoration on Father's Day."
+    },
+    {
+      "id": "telekom_calendar",
+      "title": "Telekom: Der Magische Adventskalender",
+      "description": "An Audiobook Brought to Life Through an Interactive Advent Calendar Jonas is a young boy who discovers a magical advent calendar, which sends him on an unforgettable adventure. Each door is locked, but displays a symbol that gives him a clue to its contents. He must go on a journey to meet a series of unlikely characters to help him open one door each day. A series of audiobooks tells the story, created by Deutsche Telekom for their Christmas campaign."
+    },
+    {
+      "id": "spence_diamonds",
+      "title": "Spence Diamonds",
+      "description": "One of the most well-known diamond jewelers in Canada was ready to make its debut in the United States. But to break through the already saturated market of fine jewelry, Spence Diamonds knew it had to be bold in its positioning and attention grabbing in its approach."
+    },
+    {
+      "id": "kontra_k",
+      "title": "Kontra K: Next To You",
+      "description": "To launch German rapper Kontra K's latest album \"Labyrinth,\" we created an interactive film that allows fans to jump between the past and the present so that they can uncover clues to solve a murder mystery."
+    },
+    {
+      "id": "sainsburys_snapchat",
+      "title": "Sainsbury's Snapchat Easter Game",
+      "description": "We created a retro-styled SnapChat game for UK retailer Sainsbury's – where the gaming environment loads directly in the user feed. The gameplay is based on a traditional \"roller game\", with an easter twist. The user has to roll an easter egg as far as they can – avoiding obstacles by tilting and moving their phone screen. The further the user gets, the more points they win."
+    }
+  ]
+}
