@@ -2,6 +2,7 @@ import './style.scss';
 
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { WebMap, WebScene } from 'react-arcgis';
 
 import { fetchProjectsAsync, setCurrentProjectAsync } from 'actions';
 
@@ -25,23 +26,10 @@ class Home extends Component {
 
     return (
       <section className="Page Home">
-        <h1>HOME</h1>
-
-        <br />
-        <br />
-
-        <ul>
-          {projects.map((project, index) => (
-            <li key={project.id} id={project.id} onClick={this.projectClicked}>
-              {project.title}
-            </li>
-          ))}
-        </ul>
-
-        <br />
-        <br />
-
-        {currentProject && <div>Current Project: {currentProject.title}</div>}
+        <div style={{ width: '100vw', height: '100vh' }}>
+          <WebMap id="6627e1dd5f594160ac60f9dfc411673f" />
+          <WebScene id="f8aa0c25485a40a1ada1e4b600522681" />
+        </div>
       </section>
     );
   }
