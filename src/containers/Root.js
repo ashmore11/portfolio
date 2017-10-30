@@ -8,9 +8,9 @@ import Home from 'containers/Home';
 
 import { ROUTES } from 'helpers/config';
 
-const Root = ({ store, history }) => (
+const Root = ({ store }) => (
   <Provider store={store}>
-    <BrowserRouter history={history}>
+    <BrowserRouter>
       <App>
         <Switch>
           <Route path={ROUTES.get('home').path} exact component={Home} />
@@ -21,8 +21,7 @@ const Root = ({ store, history }) => (
 );
 
 Root.propTypes = {
-  store: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired
+  store: PropTypes.object.isRequired
 };
 
 export default Root;

@@ -2,47 +2,39 @@ import './style.scss';
 
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { WebMap, WebScene } from 'react-arcgis';
+import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
 
-import { fetchProjectsAsync, setCurrentProjectAsync } from 'actions';
-
+@firebaseConnect(['projects'])
+@connect(state => ({
+  projects: state.firebase.data.projects
+}))
 class Home extends Component {
-  componentDidMount() {
-    const { projects, fetchProjects } = this.props;
+  renderProjects() {
+    const { projects } = this.props;
 
-    if (!projects) fetchProjects();
+    return !isLoaded(projects)
+      ? 'Loading'
+      : isEmpty(projects)
+        ? 'Projects list is empty'
+        : projects.map(project => (
+            <li key={project.id} id={project.id}>
+              {project.title}
+            </li>
+          ));
   }
 
-  projectClicked = event => {
-    const { setCurrentProject } = this.props;
-
-    setCurrentProject(event.target.id);
-  };
-
   render() {
-    const { projects, currentProject } = this.props;
-
-    if (!projects) return null;
+    const { projects } = this.props;
 
     return (
       <section className="Page Home">
-        <div style={{ width: '100vw', height: '100vh' }}>
-          <WebMap id="6627e1dd5f594160ac60f9dfc411673f" />
-          <WebScene id="f8aa0c25485a40a1ada1e4b600522681" />
-        </div>
+        <h1>HOME</h1>
+        <br />
+        <ul>{this.renderProjects()}</ul>
+        <br />
       </section>
     );
   }
 }
 
-const mapStateToProps = state => ({
-  projects: state.project.projects,
-  currentProject: state.project.currentProject
-});
-
-const mapDispatchToProps = dispatch => ({
-  fetchProjects: () => dispatch(fetchProjectsAsync()),
-  setCurrentProject: id => dispatch(setCurrentProjectAsync(id))
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Home);
+export default Home;
