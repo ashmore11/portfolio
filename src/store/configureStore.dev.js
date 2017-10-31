@@ -1,43 +1,31 @@
-import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
-import { reactReduxFirebase, firebaseStateReducer } from 'react-redux-firebase';
+import { createStore, compose } from 'redux';
+import rootReducer from 'reducers';
+import { FIREBASE } from 'helpers/config';
+import { reactReduxFirebase } from 'react-redux-firebase';
 import firebase from 'firebase';
-import ReduxThunk from 'redux-thunk';
 
-const firebaseConfig = {
-  apiKey: 'AIzaSyDazvyybJmssoCAIQ5pzwQhSJd_LOkFDzQ',
-  authDomain: 'scorching-fire-8072.firebaseapp.com',
-  databaseURL: 'https://scorching-fire-8072.firebaseio.com',
-  projectId: 'scorching-fire-8072',
-  storageBucket: 'scorching-fire-8072.appspot.com',
-  messagingSenderId: '500917944104'
-};
+firebase.initializeApp(FIREBASE.get('config'));
 
-const rrfConfig = {
-  userProfile: 'users'
-};
+export default function configureStore(initialState, history) {
+  const extMiddleware =
+    typeof window === 'object' &&
+    typeof window.devToolsExtension !== 'undefined'
+      ? window.devToolsExtension()
+      : f => f;
 
-firebase.initializeApp(firebaseConfig);
+  const createStoreWithMiddleware = compose(
+    reactReduxFirebase(firebase, FIREBASE.get('rrfConfig')),
+    extMiddleware
+  )(createStore);
 
-const rootReducer = combineReducers({
-  firebase: firebaseStateReducer
-});
+  const store = createStoreWithMiddleware(rootReducer);
 
-const configureStore = (preloadedState = {}) => {
-  const extMiddleware = window.__REDUX_DEVTOOLS_EXTENSION__
-    ? [window.__REDUX_DEVTOOLS_EXTENSION__()]
-    : [];
-
-  const store = createStore(
-    rootReducer,
-    preloadedState,
-    compose(
-      ...extMiddleware,
-      applyMiddleware(ReduxThunk),
-      reactReduxFirebase(firebase, rrfConfig) // firebase instance as first argument
-    )
-  );
+  if (module.hot) {
+    module.hot.accept('../reducers', () => {
+      const nextRootReducer = require('../reducers');
+      store.replaceReducer(nextRootReducer);
+    });
+  }
 
   return store;
-};
-
-export default configureStore;
+}

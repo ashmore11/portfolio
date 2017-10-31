@@ -1,13 +1,10 @@
 import './style.scss';
 
 import React, { Component } from 'react';
+import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
 
-@firebaseConnect(['projects'])
-@connect(state => ({
-  projects: state.firebase.data.projects
-}))
 class Home extends Component {
   renderProjects() {
     const { projects } = this.props;
@@ -37,4 +34,10 @@ class Home extends Component {
   }
 }
 
-export default Home;
+const mapStateToProps = state => ({
+  projects: state.firebase.data.projects
+});
+
+export default compose(firebaseConnect(['projects']), connect(mapStateToProps))(
+  Home
+);

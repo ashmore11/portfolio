@@ -17,4 +17,18 @@ const API_KEYS = new Map()
   .set('google-api', process.env.REACT_APP_GOOGLE_API_KEY)
   .set('google-sign-in', '988394247599-reaj9p23813vln1hfthc26kencsjerii');
 
-export { PATHS, ROUTES, COLORS, API_KEYS };
+const FIREBASE = new Map()
+  .set('config', {
+    apiKey: 'AIzaSyDazvyybJmssoCAIQ5pzwQhSJd_LOkFDzQ',
+    authDomain: 'scorching-fire-8072.firebaseapp.com',
+    databaseURL: 'https://scorching-fire-8072.firebaseio.com',
+    projectId: 'scorching-fire-8072',
+    storageBucket: 'scorching-fire-8072.appspot.com',
+    messagingSenderId: '500917944104'
+  })
+  .set('rrfConfig', {
+    userProfile: 'users',
+    enableLogging: false
+  });
+
+export { PATHS, ROUTES, COLORS, API_KEYS, FIREBASE };
